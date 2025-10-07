@@ -1,0 +1,1 @@
+[25-Jun-2025 19:16:53 Asia/Kolkata] PHP Fatal error:  Cannot use Illuminate\Http\Request as Request because the name is already in use in /home1/getdemo/dental_clinic/app/Http/Controllers/ReportController.php on line 14

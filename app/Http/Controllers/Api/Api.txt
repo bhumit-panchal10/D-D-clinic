@@ -1,0 +1,422 @@
+(1) Url : http://127.0.0.1:8000/api/LevelList
+
+Action : LevelList
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "data": [
+        {
+            "lid": 0,
+            "level": "Select Level"
+        },
+        {
+            "lid": 1,
+            "level": "English"
+        },
+        {
+            "lid": 2,
+            "level": "Gujarati"
+        }
+    ]
+}
+
+(2) Url : http://127.0.0.1:8000/api/StandardList
+
+Action : StandardList
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "data": [
+        {
+            "standardId": 0,
+            "standard": "Select Standard"
+        },
+        {
+            "standardId": 1,
+            "standard": "10"
+        },
+        {
+            "standardId": 2,
+            "standard": "12"
+        }
+    ]
+}
+
+(3) Url : http://127.0.0.1:8000/api/AppBanner
+
+Action : AppBanner
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "banner_id": 1,
+            "title": "Test1",
+            "photo": "BannerImage/1665991867.jpg"
+        },
+        {
+            "banner_id": 2,
+            "title": "Test2",
+            "photo": "BannerImage/1665995538.jpg"
+        }
+    ]
+}
+
+(4) Url : http://127.0.0.1:8000/api/SubjectList
+
+Action : SubjectList
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "subid": 0,
+            "streamId": 0,
+            "standardId": 0,
+            "subject": "Select Subject"
+        },
+        {
+            "subid": 3,
+            "streamId": 2,
+            "standardId": 2,
+            "subject": "C Programming"
+        },
+        {
+            "subid": 1,
+            "streamId": 1,
+            "standardId": 1,
+            "subject": "Maths"
+        },
+        {
+            "subid": 5,
+            "streamId": 1,
+            "standardId": 1,
+            "subject": "p.t"
+        },
+        {
+            "subid": 2,
+            "streamId": 1,
+            "standardId": 1,
+            "subject": "Science"
+        },
+        {
+            "subid": 4,
+            "streamId": 1,
+            "standardId": 1,
+            "subject": "ss"
+        }
+    ]
+}
+
+(5) Url : http://127.0.0.1:8000/api/Notice
+
+Action : Notice
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "notice_id": 3,
+            "title": "test1",
+            "description": "test1..."
+        },
+        {
+            "notice_id": 2,
+            "title": "test",
+            "description": "&nbsp;\r\n\r\ngetdemo\r\n\r..."
+        },
+        {
+            "notice_id": 1,
+            "title": "Test Apollo Notice",
+            "description": "Test Apollo Notice..."
+        }
+    ]
+}
+
+(6) Url : http://127.0.0.1:8000/api/ChapterList
+
+Action : ChapterList
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "chapter_id": 0,
+            "chapter_name": "Select Chapter",
+            "subid": 0
+        },
+        {
+            "chapter_id": 2,
+            "chapter_name": "basic test",
+            "subid": 2
+        },
+        {
+            "chapter_id": 1,
+            "chapter_name": "Test1",
+            "subid": 2
+        }
+    ]
+}
+
+(7) Url : http://127.0.0.1:8000/api/SubjectVideo
+
+Action : SubjectVideo
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "subid": 2,
+            "title": "test123",
+            "video_url": "https://www.youtube.com/embed/IM1bvPzJtTE",
+            "description": "test123",
+            "chapter_id": 1,
+            "subject": "Science"
+        },
+        {
+            "subid": 2,
+            "title": "apollo",
+            "video_url": "https://www.youtube.com/embed/g6fnFALEseI",
+            "description": "Apollo Test",
+            "chapter_id": 2,
+            "subject": "Science"
+        }
+    ]
+}
+
+(8) Url : http://127.0.0.1:8000/api/ManagePdf
+
+Action : ManagePdf
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "pdf_id": 3,
+            "chapterId": 1,
+            "title": "TEST2",
+            "subid": 2,
+            "pdf_file": "ManagePDF/1666099938.pdf",
+            "subject": "Science"
+        },
+        {
+            "pdf_id": 4,
+            "chapterId": 2,
+            "title": "apollo",
+            "subid": 2,
+            "pdf_file": "ManagePDF/1666933515.pdf",
+            "subject": "Science"
+        }
+    ]
+}
+
+(9) Url : http://127.0.0.1:8000/api/ManageAudio
+
+Action : ManageAudio
+
+Method : post
+
+Resposne : 
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "audio_id": 3,
+            "chapterId": 1,
+            "subid": 2,
+            "title": "Test Apollo",
+            "url": "https://www.youtube.com/embed/G5yYl7gFDx0",
+            "audioImage": "AudioImage/",
+            "subject": "Science"
+        },
+        {
+            "audio_id": 5,
+            "chapterId": 2,
+            "subid": 2,
+            "title": "Getdemo TEt",
+            "url": "https://www.youtube.com/embed/G5yYl7gFDx0",
+            "audioImage": "AudioImage/1666259657.jpg",
+            "subject": "Science"
+        },
+        {
+            "audio_id": 6,
+            "chapterId": 1,
+            "subid": 2,
+            "title": "hello",
+            "url": "https://www.gtu.ac.in/",
+            "audioImage": "AudioImage/1666261422.png",
+            "subject": "Science"
+        }
+    ]
+}
+
+(10) Url : http://127.0.0.1:8000/api/MySubscription
+
+Action : MySubscription
+
+Method : post
+
+{
+    "status": 1,
+    "message": "Success.",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "stu_sub_id": 4,
+            "stu_id": 1,
+            "streamId": 1,
+            "standardId": 1,
+            "courseId": 1,
+            "videoId": 1,
+            "pdfId": 1,
+            "audioId": 1,
+            "startDate": "2022-11-12 00:00:00.000000",
+            "endDate": "2022-11-05 00:00:00.000000",
+            "isAllowOutsideAccess": 0
+        },
+        {
+            "stu_sub_id": 5,
+            "stu_id": 1,
+            "streamId": 1,
+            "standardId": 1,
+            "courseId": 1,
+            "videoId": 0,
+            "pdfId": 1,
+            "audioId": 1,
+            "startDate": "2022-11-12 00:00:00.000000",
+            "endDate": "2022-11-19 00:00:00.000000",
+            "isAllowOutsideAccess": 0
+        }
+    ]
+}
+
+(11) Url : http://127.0.0.1:8000/api/Course
+
+Action : Course
+
+Method : post
+
+{
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "data": [
+        {
+            "course_id ": 1,
+            "streamId": 1,
+            "standardId": 1,
+            "course_name": "Apollo"
+        },
+        {
+            "course_id ": 2,
+            "streamId": 1,
+            "standardId": 1,
+            "course_name": "mihir"
+        },
+        {
+            "course_id ": 3,
+            "streamId": 1,
+            "standardId": 1,
+            "course_name": "Test1"
+        },
+        {
+            "course_id ": 5,
+            "streamId": 2,
+            "standardId": 2,
+            "course_name": "morning"
+        },
+        {
+            "course_id ": 6,
+            "streamId": 1,
+            "standardId": 1,
+            "course_name": "evening batch"
+        }
+    ]
+}
+
+(12)Url:http://getdemo.in/Ahuja_Classes/api/StudentRegister
+
+    Action : StudentRegister
+
+    Method : post
+
+    Resposne :
+    
+    {
+    "status": 1,
+    "message": "success",
+    "data": {
+        "name": "mihir",
+        "password": "$2y$10$IA8cBqfIyXN3s5HmxOIzg.PT.dfPKhNhdkmjHRZ7RGX4ye/AkpwwK",
+        "mobile": 9725123569,
+        "address": "isanpur",
+        "updated_at": "2022-11-05T05:09:05.000000Z",
+        "created_at": "2022-11-05T05:09:05.000000Z",
+        "id": 5
+    },
+    "token_type": "Bearer"
+}
+
+(13)http://getdemo.in/Ahuja_Classes/api/UpdateProfileImage
+    
+    Action : UpdateProfileImage
+
+    Method : post
+
+    Resposne :
+    
+   {
+    "status": 1,
+    "message": "success",
+    "token_type": "Bearer",
+    "photo": "http://getdemo.in/Ahuja_Classes/StudentRegister/1667625745.jpg"
+}
