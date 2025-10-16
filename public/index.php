@@ -20,6 +20,7 @@ if (file_exists($maintenance = __DIR__ . '/../dental_clinic/storage/framework/ma
     require $maintenance;
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader

@@ -752,6 +752,13 @@
                                                 <input type="text" name="comment" id="comment"
                                                     class="form-control">
                                             </div>
+                                            <div class="col-md-6 mt-3">
+                                                <label for="date" class="form-label">Date</label>
+                                                <input type="date" name="date" id="date"
+                                                    value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                                                    class="form-control">
+                                            </div>
+
                                         </div>
 
                                         <div class="mt-4">
@@ -905,9 +912,9 @@
                                                         <td>{{ $diag->Diagnosis->tooth_selection ?? '' }}</td>
                                                         <td>{{ $diag->notes }}</td>
                                                         <td>{{ $diag->treatment_amount ?? '' }}</td>
-                                                      
+
                                                         <td>
-                                                             @if ($diag->treatment_start)
+                                                            @if ($diag->treatment_start)
                                                                 <span class="badge bg-success">Treatment Start</span>
                                                             @else
                                                                 <button type="button" class="btn btn-sm btn-primary"
@@ -1114,6 +1121,11 @@
                                 <input type="number" name="treatment_amount" id="treatment_amount" class="form-control"
                                     readonly>
                             </div>
+                            <div class="col-6">
+                                <label for="qty" class="form-label">Date</label>
+                                <input type="date" name="treatment_date" id="treatment_date"
+                                    value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="form-control">
+                            </div>
                             <div class="col-12">
                                 <label class="form-label">Notes </label>
                                 <textarea type="text" name="notes" class="form-control" id="notes"></textarea>
@@ -1147,6 +1159,9 @@
 
     {{-- Subtreatment fetch depend on Treatment --}}
     <script>
+        const routeUrl =
+            "{{ route('subtreatment.getByTreatment', ['treatment_id' => 'TREATMENT_ID']) }}"; // Note the placeholder for the treatment_id
+
         $('#treatmentDropdown').on('change', function() {
             const treatmentId = $(this).val();
             const subTreatmentDropdown = $('#subTreatmentDropdown');
@@ -1154,7 +1169,7 @@
             subTreatmentDropdown.empty().append('<option value="">Loading...</option>');
 
             if (treatmentId) {
-                const url = `/dental_clinic/admin/subtreatment/sub-treatments/${treatmentId}`;
+                const url = routeUrl.replace('TREATMENT_ID', treatmentId);
 
                 $.ajax({
                     url: url,
@@ -1492,6 +1507,7 @@
             if (!fd.get('treatment_qty')) fd.delete('treatment_qty');
             if (!fd.get('treatment_rate')) fd.delete('treatment_rate');
             if (!fd.get('treatment_amount')) fd.delete('treatment_amount');
+            if (!fd.get('treatment_date')) fd.delete('treatment_date');
             if (!fd.get('sub_treatment_id')) fd.delete('sub_treatment_id');
 
             fetch(`{{ route('patient.treatment-items.store') }}`, {

@@ -106,7 +106,7 @@ class PatientTreatmentController extends Controller
             ->where('treatment_flag', 0)
             ->orderBy('created_at', 'desc') // Order by latest entry
             ->paginate(config('app.per_page'));
-      
+
         $labs = Lab::all();
         $treatments = Treatment::all();
         $Diagnosis = Diagnosis::all();
@@ -223,6 +223,7 @@ class PatientTreatmentController extends Controller
             'comment'              => 'nullable|string',
         ]);
 
+
         if ((int)$request->diagnosis_type === 2) {
             $request->validate([
                 'tooth_selection' => 'required|string'
@@ -248,6 +249,7 @@ class PatientTreatmentController extends Controller
                     'tooth_selection' => implode(', ', $teeth),
                     'rate'            => $rate,
                     'comment'         => $request->comment,
+                    'date'         => $request->date,
                     'qty'             => $qty,
                     'amount'          => $amount,
                     'created_at'      => now(),
@@ -264,6 +266,7 @@ class PatientTreatmentController extends Controller
                         'tooth_selection' => $tooth,   // single tooth per row
                         'rate'            => $rate,
                         'comment'         => $request->comment,
+                        'date'         => $request->date,
                         'qty'             => 1,
                         'amount'          => $rate,    // rate * 1
                         'created_at'      => now(),
@@ -272,6 +275,7 @@ class PatientTreatmentController extends Controller
                 }
             }
         }
+        //dd($rows);
 
         // Insert all rows
         \App\Models\PatientTreatment::insert($rows);
