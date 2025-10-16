@@ -20,7 +20,8 @@ class PatientTreatment extends Model
         'comment',
         'amount',
         'treatment_flag',
-        'patient_treatment_id'
+        'patient_treatment_id',
+        'date'
     ];
 
     public function patient()

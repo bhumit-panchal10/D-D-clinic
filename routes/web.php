@@ -193,7 +193,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('payments/update', [PaymentsController::class, 'update'])->name('payments.update');
     Route::delete('payments/{id}', [PaymentsController::class, 'destroy'])->name('payments.destroy');
     Route::get('/payments/pdf/{id}/', [PaymentsController::class, 'generateInvoice'])->name('payments.invoice');
-
 });
 
 // Reports Routes
@@ -400,7 +399,7 @@ Route::prefix('admin/subtreatment')->name('subtreatment.')->middleware(['auth', 
     Route::post('/store', [SubTreatmentController::class, 'store'])->name('store'); // Store new treatment
     Route::put('/update/{id}', [SubTreatmentController::class, 'update'])->name('update'); // Update treatment
     Route::delete('/delete/{id}', [SubTreatmentController::class, 'destroy'])->name('destroy'); // Delete treatment
-    Route::get('/sub-treatments/{treatment_id}', [SubTreatmentController::class, 'getByTreatment']);
+    Route::get('/sub-treatments/{treatment_id}', [SubTreatmentController::class, 'getByTreatment'])->name('getByTreatment');
 });
 
 // Diagnosis Master Routes

@@ -21,9 +21,9 @@ class PatientTreatmentItemController extends Controller
         ]);
     }
 
-     public function markStart($id)
+    public function markStart($id)
     {
-        
+
         $item = PatientTreatmentItem::findOrFail($id);
         $item->update(['treatment_start' => 1]);
         return response()->json([
@@ -44,6 +44,7 @@ class PatientTreatmentItemController extends Controller
             'notes'        => 'nullable|string',
             'treatment_rate'        => 'nullable',
             'treatment_qty'        => 'nullable',
+            'treatment_date'        => 'nullable',
             'treatment_amount'        => 'nullable',
             'patient_treatment_id' => 'nullable',
         ]);
@@ -51,8 +52,11 @@ class PatientTreatmentItemController extends Controller
         $data['treatment_rate']   = (int) ($data['treatment_rate'] ?? 0);
         $data['treatment_qty']    = (int) ($data['treatment_qty'] ?? 0);
         $data['treatment_amount'] = (float) ($data['treatment_amount'] ?? 0);
+        $data['treatment_date'] = ($data['treatment_date'] ?? 0);
+
         // prevent duplicates for the same patient + diagnosis row (optional)
         $exists = PatientTreatmentItem::where($data)->exists();
+
         if (!$exists) {
             PatientTreatmentItem::create($data);
 

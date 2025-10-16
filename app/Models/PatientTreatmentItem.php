@@ -23,6 +23,7 @@ class PatientTreatmentItem extends Model
         'patient_treatment_id',
         'treatment_done',
         'is_billed',
+        'treatment_date',
         'treatment_start',
         'created_at',
         'updated_at'
