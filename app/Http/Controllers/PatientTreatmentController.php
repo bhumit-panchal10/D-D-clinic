@@ -103,7 +103,7 @@ class PatientTreatmentController extends Controller
         $patient = Patient::findOrFail($id); // Fetch patient details
         $patientTreatments = PatientTreatment::with(['Diagnosis', 'patientdocument'])
             ->where('patient_id', $id)
-            ->where('treatment_flag', 0)
+            //->where('treatment_flag', 0)
             ->orderBy('created_at', 'desc') // Order by latest entry
             ->paginate(config('app.per_page'));
 
