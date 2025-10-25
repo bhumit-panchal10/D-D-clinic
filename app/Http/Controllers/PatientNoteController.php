@@ -11,33 +11,55 @@ use Illuminate\Http\Request;
 
 class PatientNoteController extends Controller
 {
-    public function index(Request $request, $id)
+   public function index(Request $request, $id)
     {
         $patient = Patient::findOrFail($id);
+
         $treatments = \App\Models\PatientTreatmentItem::query()
-            ->select('treatments.id', 'treatments.treatment_name','patient_treatments.id as patient_treatment_id')
-            ->join('patient_treatments', 'PatientTreatmentItem.patient_treatment_id', '=', 'patient_treatments.id')
-            ->join('treatments', 'PatientTreatmentItem.treatment_id', '=', 'treatments.id')
+            ->select('treatments.id','treatments.treatment_name','patient_treatments.id as patient_treatment_id')
+            ->join('patient_treatments','PatientTreatmentItem.patient_treatment_id','=','patient_treatments.id')
+            ->join('treatments','PatientTreatmentItem.treatment_id','=','treatments.id')
             ->where('PatientTreatmentItem.treatment_start', 1)
             ->distinct()
             ->get();
        
-        $notes = PatientNote::where('patient_id', $id)->orderBy('created_at', 'desc')->paginate(config('app.per_page'));
-       // Edit Mode - Fetch the note if 'edit' parameter is present
-        $editNote = null;
-        if ($request->has('edit')) {
-            $editNote = PatientNote::find($request->edit);
-        }
 
-        return view('patient_notes.index', compact('patient', 'notes', 'editNote', 'treatments'));
+        $editNote = $request->has('edit') ? PatientNote::find($request->edit) : null;
+
+        // ✅ read and normalize the searched teeth (supports "13" or "13, 14,28")
+        $toothSelection = trim((string) $request->query('tooth_selection',''));
+        $teethFilter = collect(explode(',', $toothSelection))
+            ->map(fn($t) => trim($t))
+            ->filter(fn($t) => $t !== '')
+            ->unique()
+            ->values()
+            ->all(); // e.g. ['13','28']
+
+        // ✅ filter notes by selected teeth (if any)
+        $notesQuery = PatientNote::where('patient_id', $id)
+            ->when(!empty($teethFilter), function ($q) use ($teethFilter) {
+                $q->whereIn('tooth_number', $teethFilter);
+            })
+            ->orderBy('created_at','desc');
+
+        $notes = $notesQuery
+            ->paginate(config('app.per_page'))
+            ->appends(['tooth_selection' => $toothSelection]); // keep filter on pagination
+
+        return view('patient_notes.index', compact(
+            'patient','notes','editNote','treatments','toothSelection'
+        ));
     }
+
+
 
     public function viewDocument($id, $patient_id)
     {
         
         $note = PatientNote::where('treatment_id', $id)->first();
+       
         $note_id = $note->id;
-        $documents = PatientNoteDocument::with('patientTreatment')->where('patient_note_id', $note_id)->get();
+        $documents = PatientNoteDocument::with('patientTreatment','patientNote')->where('patient_note_id', $note_id)->get();
         
         //$patienttreatmentdoc = PatientNoteDocument::with('patientTreatment')->where('patient_note_id', $note_id)->get();
 
@@ -46,18 +68,31 @@ class PatientNoteController extends Controller
 
     public function getToothNumbers($treatmentId)
     {
-        // Get the treatment by ID
-        $patientTreatmentitem = PatientTreatmentItem::where('treatment_id', $treatmentId)->first();
-        $patientTreatment = PatientTreatment::where('id', $patientTreatmentitem->patient_treatment_id)->first();
-        if ($patientTreatment) {
-            // Assuming `tooth_selection` contains the comma-separated tooth numbers
-            $toothNumbers = explode(',', $patientTreatment->tooth_selection);
-            
-            return response()->json(['tooth_numbers' => $toothNumbers]);
+        // All PTI rows for this treatment
+        $ptiIds = PatientTreatmentItem::where('treatment_id', $treatmentId)
+            ->pluck('patient_treatment_id')
+            ->unique()
+            ->values();
+
+        if ($ptiIds->isEmpty()) {
+            return response()->json(['tooth_numbers' => []]);
         }
 
-        return response()->json(['tooth_numbers' => []]);
+        // Collect all tooth_selection strings, explode and de-duplicate
+        $toothNumbers = PatientTreatment::whereIn('id', $ptiIds)
+            ->pluck('tooth_selection')
+            ->flatMap(function ($s) {
+                return collect(explode(',', (string) $s))
+                    ->map(fn ($v) => trim($v))
+                    ->filter();
+            })
+            ->unique()
+            ->values()
+            ->all();
+
+        return response()->json(['tooth_numbers' => $toothNumbers]);
     }
+
 
     public function store(Request $request, $id)
     {
@@ -69,7 +104,7 @@ class PatientNoteController extends Controller
             'date' => 'required|date',
             'document.*' => 'nullable|file|mimes:jpeg,png,pdf,jpg' // each file up to 5MB
         ]);
-             
+                  
         // 1️⃣ Create the Patient Note record
         $note = PatientNote::create([
             'patient_id' => $id,
@@ -81,7 +116,7 @@ class PatientNoteController extends Controller
         $patientTreatmentitem = PatientTreatmentItem::where('treatment_id', $request->treatment_id)->first();
         $patientTreatment = PatientTreatment::where('id', $patientTreatmentitem->patient_treatment_id)->first();
         $date = $patientTreatment->created_at->format('Y/m/d'); // e.g. 2025/06/27
-
+     
 
         // 2️⃣ Handle Multiple Document Uploads
         if ($request->hasFile('document')) {

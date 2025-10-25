@@ -375,7 +375,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/patient_notes/{id}', [PatientNoteController::class, 'store'])->name('patient_notes.store');
     Route::patch('/patient_notes/{patient_id}/{id}', [PatientNoteController::class, 'update'])->name('patient_notes.update');
     Route::delete('/patient_notes/{patient_id}/{id}', [PatientNoteController::class, 'destroy'])->name('patient_notes.destroy');
-    Route::get('/patient_notes/{patient_id}/{id}/viewdocument', [PatientNoteController::class, 'viewDocument'])->name('patient_notes.viewdocument');
+    Route::get('/patient_notes/{patient_id?}/{id?}/viewdocument', [PatientNoteController::class, 'viewDocument'])->name('patient_notes.viewdocument');
 });
 
 Route::get('/get-tooth-numbers/{treatmentId}', [PatientNoteController::class, 'getToothNumbers'])->name('getToothNumbers');
