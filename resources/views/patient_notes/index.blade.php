@@ -699,18 +699,15 @@
                                 <span id ="icon-adult" class="ms-3 fs-3"><i class="fa fa-user"></i></span>
 
                                 <span id ="icon-children" class="ms-3 fs-3"><i class="fa fa-child"></i></span>
+                                 <input type="hidden" id="tooth_selection" value="{{ $toothSelection ?? '' }}">
 
-                                <form action="{{ route('patient_treatments.search', $patient->id) }}" method="GET"
-                                    id="toothSearchForm" class="mb-3 justify-content-end d-flex">
-                                    <input type="hidden" name="tooth_selection" maxlength="50"
-                                        id="tooth_selection_search"
-                                        value="{{ old('tooth_selection', $toothSelection ?? '') }}" class="form-control"
-                                        placeholder="E.g., 12, 14">
-
-                                    <button type="submit" class="btn btn-primary">Search</button>&nbsp;&nbsp;
-                                    <a href="{{ route('patient_treatments.index', $patient->id) }}"
-                                        class="btn btn-primary">Reset</a>
+                                <form action="{{ route('patient_notes.index', $patient->id) }}" method="GET" id="toothSearchForm" class="d-flex gap-2">
+                                <input type="hidden" name="tooth_selection" id="tooth_selection_search" value="{{ $toothSelection ?? '' }}">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <a href="{{ route('patient_notes.index', $patient->id) }}" class="btn btn-primary">Reset</a>
                                 </form>
+
+
                             </section>
                         </div>
 
@@ -724,14 +721,13 @@
                             <div class="card-body">
                                 <form action="{{ route('patient_notes.store', $patient->id) }}" method="POST" enctype="multipart/form-data">
                                     @csrf
-                                     @foreach ($treatments as $t)
-                                    <input type="hidden" name="patient_treatment_id" value="{{ $t->patient_treatment_id }}">
-                                    @endforeach
+                                    <input type="hidden" id="patient_treatment_id" name="patient_treatment_id" value="">
                                     <div class="mb-3">
                                         <label class="form-label">Treatment <span class="text-danger">*</span></label>
                                         <select name="treatment_id" id="treatment_id" class="form-control" required>
+                                            <option value="">Select Treatment</option>
                                             @foreach ($treatments as $t)
-                                                <option value="{{ $t->id }}">{{ $t->treatment_name }}</option>
+                                                <option value="{{ $t->id }}" data-patient_treatment_id="{{ $t->patient_treatment_id }}">{{ $t->treatment_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -743,7 +739,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label>Date <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" name="date" rows="3" required>
+                                        <input type="date" class="form-control" name="date" rows="3" value="{{ date('Y-m-d') }}" required>
                                     </div>
                                     <div class="mb-3">
                                         <label>Note <span class="text-danger">*</span></label>
@@ -764,15 +760,11 @@
                     </div>
                       
                     </div>
-
-                  
-
-                   
-
                 </div>
                    
 
                     <!-- Notes List Section -->
+                     @if($notes->count() > 0)
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
@@ -784,6 +776,7 @@
                                         <tr>
                                             <th>Sr. No</th>
                                             <th>Treatment</th>
+                                            <th>Tooth</th>
                                             <th>Note</th>
                                             <th>Date</th>
                                             <th>Actions</th>
@@ -794,10 +787,11 @@
                                             <tr>
                                                 <td>{{ $notes->firstItem() + $key }}</td>
                                                 <td>{{ $note->treatment->treatment_name ?? '' }}</td>
+                                                <td>{{ $note->tooth_number }}</td>
                                                 <td>{{ $note->notes }}</td>
                                                 <td>{{ $note->date ? date('d-m-Y', strtotime($note->date)) : '-' }}</td>
                                                 <td>
-                                                    <a href="{{ route('patient_notes.viewdocument', [$note->treatment->id,$patient->id]) }}"
+                                                    <a href="{{ route('patient_notes.viewdocument', [$note->treatment_id,$patient->id]) }}"
                                                         class="btn btn-sm btn-primary" title="View Document">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
@@ -826,6 +820,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                 </div>
 
@@ -848,6 +843,7 @@
                         <div class="mb-3">
                             <label class="form-label">Treatment <span class="text-danger">*</span></label>
                             <select name="treatment_id" class="form-control" required>
+                                <option value="">Select Treatment</option>
                                 @foreach ($treatments as $t)
                                     <option value="{{ $t->id }}">{{ $t->treatment_name }}</option>
                                 @endforeach
@@ -914,6 +910,9 @@
     $(document).ready(function() {
         $('#treatment_id').change(function() {
             var treatmentId = $(this).val();
+            var patientTreatmentId = $('#treatment_id option:selected').data('patient_treatment_id'); // Get the data-patient_treatment_id of the selected option
+            $('#patient_treatment_id').val(patientTreatmentId);
+           
             
             if(treatmentId) {
                 // Send AJAX request to fetch tooth numbers
@@ -992,6 +991,170 @@
             $("#confirmDelete").on("click", function() {
                 $("#deleteForm").submit();
             });
+        });
+    </script>
+
+  <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const adultBtn = document.getElementById("icon-adult");
+            const childBtn = document.getElementById("icon-children");
+            const toothSelectionInput = document.getElementById("tooth_selection");
+            const toothSearchInput = document.getElementById("tooth_selection_search");
+
+        
+            // === DATA FROM SERVER ===
+            const YELLOW_TEETH = @json($yellowTeeth ?? []); // diagnosis (flag=0)
+            const GREEN_TEETH = @json($greenTeeth ?? []); // done (flag=1)
+
+            // --- Toggle Adult/Child Teeth ---
+            adultBtn?.addEventListener("click", function() {
+                document.querySelectorAll(".adult-teeth-group > .row").forEach(row => row.style.display =
+                    "flex");
+                document.querySelectorAll(".children-teeth-group").forEach(group => group.style.display =
+                    "none");
+            });
+            childBtn?.addEventListener("click", function() {
+                document.querySelectorAll(".adult-teeth-group > .row").forEach(row => row.style.display =
+                    "none");
+                document.querySelectorAll(".children-teeth-group").forEach(group => group.style.display =
+                    "flex");
+            });
+
+            // === Helpers for visual state ===
+            function baselineState(tooth) {
+                if (GREEN_TEETH.includes(tooth)) return 'green';
+                if (YELLOW_TEETH.includes(tooth)) return 'yellow';
+                return 'white';
+            }
+
+            function setToothState(img, state, lock = false) {
+                img.dataset.state = state;
+                img.classList.remove('tooth-green', 'tooth-yellow', 'tooth-neutral');
+
+                if (state === 'green') {
+                    img.src = img.dataset.color; // your green PNG
+                    img.classList.add('tooth-green');
+                } else if (state === 'yellow') {
+                    img.src = img.dataset.bw; // your yellow PNG
+                    img.classList.add('tooth-yellow');
+                } else {
+                    img.src = img.dataset.bw; // use yellow PNG base, but filter → gray
+                    img.classList.add('tooth-neutral');
+                }
+
+                img.dataset.lock = lock ? '1' : '';
+                img.style.pointerEvents = lock ? 'none' : '';
+            }
+
+
+            function paintAllFromDB() {
+                document.querySelectorAll(".teeth_wrapper img").forEach(img => {
+                    const tooth = img.alt;
+
+                    if (GREEN_TEETH.includes(tooth)) {
+                        // Done overrides everything
+                        setToothState(img, 'green', true);
+                    } else if (YELLOW_TEETH.includes(tooth)) {
+                        setToothState(img, 'yellow', false);
+                    } else {
+                        setToothState(img, 'white', false);
+                    }
+                });
+            }
+
+             // ✅ NEW: Green overlay based on a CSV list (search or selection)
+            function applySelectionFromString(str) {
+                const teeth = String(str || "")
+                .split(",")
+                .map(t => t.trim())
+                .filter(Boolean);
+
+                // Repaint baseline first (yellow/white/locked green)
+                paintAllFromDB();
+
+                // Then overlay the searched/selected teeth in green (unless locked)
+                teeth.forEach(tooth => {
+                const img = document.querySelector('.teeth_wrapper img[alt="' + tooth + '"]');
+                if (img && img.dataset.lock !== '1') {
+                    setToothState(img, 'green', false);
+                }
+                });
+            }
+
+            // Initial paint
+            paintAllFromDB();
+            applySelectionFromString(toothSearchInput?.value);
+
+            // --- Tooth Selection Click ---
+            document.querySelectorAll(".teeth_wrapper img").forEach(img => {
+                img.addEventListener("click", function() {
+                    if (this.dataset.lock === '1') return; // can't change done teeth
+
+                    const toothNumber = this.alt;
+                    // current form selection
+                    let currentTeeth = (toothSelectionInput?.value || '')
+                        .split(",").map(t => t.trim()).filter(t => t !== "");
+
+                    const currentState = this.dataset.state; // our own state tracker
+
+                    if (currentState !== 'green') {
+                        // select → make it green
+                        setToothState(this, 'green', false);
+                        if (!currentTeeth.includes(toothNumber)) currentTeeth.push(toothNumber);
+                    } else {
+                        // unselect → return to baseline from DB (yellow or white)
+                        const base = baselineState(toothNumber);
+                        setToothState(this, base, false);
+                        currentTeeth = currentTeeth.filter(t => t !== toothNumber);
+                    }
+
+                    // sync inputs
+                    const joined = currentTeeth.join(", ");
+                    if (toothSelectionInput) toothSelectionInput.value = joined;
+                    if (toothSearchInput) toothSearchInput.value = joined;
+
+                    updateAmount();
+                });
+            });
+
+            // --- Sync from Search Box to Main Input (merge values) ---
+            if (toothSearchInput) {
+                toothSearchInput.addEventListener("input", function() {
+                    let searchTeeth = this.value.split(",").map(t => t.trim()).filter(t => t !== "");
+                    let currentTeeth = (toothSelectionInput?.value || '')
+                        .split(",").map(t => t.trim()).filter(t => t !== "");
+
+                    // Merge and dedupe
+                    const merged = [...new Set([...currentTeeth, ...searchTeeth])];
+
+                    // Update both fields
+                    if (toothSelectionInput) toothSelectionInput.value = merged.join(", ");
+                    toothSearchInput.value = merged.join(", ");
+
+                    // Repaint baseline from DB first…
+                    paintAllFromDB();
+
+                    // …then overlay merged selection as green (unless locked)
+                    merged.forEach(tooth => {
+                        const img = document.querySelector('.teeth_wrapper img[alt="' + tooth +
+                            '"]');
+                        if (img && img.dataset.lock !== '1') setToothState(img, 'green', false);
+                    });
+
+                    updateAmount();
+                });
+            }
+
+            // --- Rate Change Update ---
+            document.getElementById("rate")?.addEventListener("input", updateAmount);
+
+            function updateAmount() {
+                let rate = parseFloat(document.getElementById("rate")?.value) || 0;
+                let qty = (document.getElementById("tooth_selection")?.value || '')
+                    .split(",").filter(t => t.trim() !== "").length;
+                document.getElementById("qty").value = qty;
+                document.getElementById("amount").value = (rate * qty).toFixed(2);
+            }
         });
     </script>
 

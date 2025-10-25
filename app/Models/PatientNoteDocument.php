@@ -22,6 +22,11 @@ class PatientNoteDocument extends Model
 
     public function patientTreatment()
     {
-        return $this->belongsTo(PatientTreatment::class);
+        return $this->belongsTo(PatientTreatment::class, 'patient_treatment_id', 'id');
     }
+    public function patientNote()
+    {
+        return $this->belongsTo(PatientNote::class, 'patient_note_id', 'id');
+    }
+
 }
