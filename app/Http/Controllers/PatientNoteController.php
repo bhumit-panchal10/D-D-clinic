@@ -11,56 +11,84 @@ use Illuminate\Http\Request;
 
 class PatientNoteController extends Controller
 {
-   public function index(Request $request, $id)
+    public function index(Request $request, $id)
     {
         $patient = Patient::findOrFail($id);
 
+        // ✅ Fetch all available treatments for this patient
         $treatments = \App\Models\PatientTreatmentItem::query()
-            ->select('treatments.id','treatments.treatment_name','patient_treatments.id as patient_treatment_id')
-            ->join('patient_treatments','PatientTreatmentItem.patient_treatment_id','=','patient_treatments.id')
-            ->join('treatments','PatientTreatmentItem.treatment_id','=','treatments.id')
+            ->select('treatments.id', 'treatments.treatment_name', 'patient_treatments.id as patient_treatment_id')
+            ->join('patient_treatments', 'PatientTreatmentItem.patient_treatment_id', '=', 'patient_treatments.id')
+            ->join('treatments', 'PatientTreatmentItem.treatment_id', '=', 'treatments.id')
             ->where('PatientTreatmentItem.treatment_start', 1)
             ->distinct()
             ->get();
-       
 
+        // ✅ For edit mode (optional)
         $editNote = $request->has('edit') ? PatientNote::find($request->edit) : null;
 
-        // ✅ read and normalize the searched teeth (supports "13" or "13, 14,28")
-        $toothSelection = trim((string) $request->query('tooth_selection',''));
-        $teethFilter = collect(explode(',', $toothSelection))
-            ->map(fn($t) => trim($t))
-            ->filter(fn($t) => $t !== '')
+        // ✅ Yellow teeth → Diagnosis (flag = 0)
+        $yellowTeeth = \App\Models\PatientTreatment::where('patient_id', $id)
+            ->where('treatment_flag', 0)
+            ->pluck('tooth_selection')
+            ->filter()
+            ->map(fn($t) => array_map('strval', explode(',', $t)))
+            ->collapse()
             ->unique()
             ->values()
-            ->all(); // e.g. ['13','28']
+            ->toArray();
 
-        // ✅ filter notes by selected teeth (if any)
+        // ✅ Green teeth → Done (flag = 1)
+        $greenTeeth = \App\Models\PatientTreatment::where('patient_id', $id)
+            ->where('treatment_flag', 1)
+            ->pluck('tooth_selection')
+            ->filter()
+            ->map(fn($t) => array_map('strval', explode(',', $t)))
+            ->collapse()
+            ->unique()
+            ->values()
+            ->toArray();
+
+        // ✅ Read selected/search teeth (like “13,14,15”)
+        $toothSelection = trim((string) $request->query('tooth_selection', ''));
+        $teethFilter = collect(explode(',', $toothSelection))
+            ->map(fn($t) => trim($t))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        // ✅ Filter patient notes by selected teeth (if any)
         $notesQuery = PatientNote::where('patient_id', $id)
-            ->when(!empty($teethFilter), function ($q) use ($teethFilter) {
-                $q->whereIn('tooth_number', $teethFilter);
-            })
-            ->orderBy('created_at','desc');
+            ->when(!empty($teethFilter), fn($q) => $q->whereIn('tooth_number', $teethFilter))
+            ->orderByDesc('created_at');
 
         $notes = $notesQuery
-            ->paginate(config('app.per_page'))
-            ->appends(['tooth_selection' => $toothSelection]); // keep filter on pagination
+            ->paginate(config('app.per_page', 10))
+            ->appends(['tooth_selection' => $toothSelection]);
 
         return view('patient_notes.index', compact(
-            'patient','notes','editNote','treatments','toothSelection'
+            'patient',
+            'notes',
+            'editNote',
+            'treatments',
+            'toothSelection',
+            'greenTeeth',
+            'yellowTeeth'
         ));
     }
 
 
 
+
     public function viewDocument($id, $patient_id)
     {
-        
+
         $note = PatientNote::where('treatment_id', $id)->first();
-       
+
         $note_id = $note->id;
-        $documents = PatientNoteDocument::with('patientTreatment','patientNote')->where('patient_note_id', $note_id)->get();
-        
+        $documents = PatientNoteDocument::with('patientTreatment', 'patientNote')->where('patient_note_id', $note_id)->get();
+
         //$patienttreatmentdoc = PatientNoteDocument::with('patientTreatment')->where('patient_note_id', $note_id)->get();
 
         return view('patient_notes.document', compact('note', 'documents'));
@@ -83,7 +111,7 @@ class PatientNoteController extends Controller
             ->pluck('tooth_selection')
             ->flatMap(function ($s) {
                 return collect(explode(',', (string) $s))
-                    ->map(fn ($v) => trim($v))
+                    ->map(fn($v) => trim($v))
                     ->filter();
             })
             ->unique()
@@ -97,14 +125,14 @@ class PatientNoteController extends Controller
     public function store(Request $request, $id)
     {
 
-      
+
         $request->validate([
             'notes' => 'required|string|min:1',
             'treatment_id' => 'nullable|exists:treatments,id',
             'date' => 'required|date',
             'document.*' => 'nullable|file|mimes:jpeg,png,pdf,jpg' // each file up to 5MB
         ]);
-                  
+
         // 1️⃣ Create the Patient Note record
         $note = PatientNote::create([
             'patient_id' => $id,
@@ -116,7 +144,7 @@ class PatientNoteController extends Controller
         $patientTreatmentitem = PatientTreatmentItem::where('treatment_id', $request->treatment_id)->first();
         $patientTreatment = PatientTreatment::where('id', $patientTreatmentitem->patient_treatment_id)->first();
         $date = $patientTreatment->created_at->format('Y/m/d'); // e.g. 2025/06/27
-     
+
 
         // 2️⃣ Handle Multiple Document Uploads
         if ($request->hasFile('document')) {
@@ -208,5 +236,4 @@ class PatientNoteController extends Controller
             ->route('patient_notes.index', $patient_id)
             ->with('success', 'Note and related documents deleted successfully.');
     }
-
 }
