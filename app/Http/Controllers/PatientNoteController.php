@@ -21,6 +21,7 @@ class PatientNoteController extends Controller
             ->join('patient_treatments', 'PatientTreatmentItem.patient_treatment_id', '=', 'patient_treatments.id')
             ->join('treatments', 'PatientTreatmentItem.treatment_id', '=', 'treatments.id')
             ->where('PatientTreatmentItem.treatment_start', 1)
+            ->where('PatientTreatmentItem.patient_id', $id)
             ->distinct()
             ->get();
 
