@@ -104,6 +104,7 @@
 
                 @include('common.alert')
                 @include('patient.show', ['id' => $patient->id])
+                @include('patient_treatments.Submenu', ['id' => $patient->id])
 
                 <div class="card">
                     <div class="row">
