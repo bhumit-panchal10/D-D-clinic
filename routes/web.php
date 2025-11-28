@@ -48,8 +48,7 @@ use App\Models\PayToDr;
 use App\Http\Controllers\QuatationController;
 use App\Http\Controllers\ConcernFormMasterController;
 use App\Http\Controllers\PatientConcernFormController;
-
-
+use App\Http\Controllers\ReasonForVisitTodayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -466,6 +465,14 @@ Route::prefix('admin/concern/form/master')->name('concern_form_master.')->middle
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/patientconcernform/{patient_id}', [PatientConcernFormController::class, 'index'])->name('patientconcernform.index');
     Route::post('/patientconcernform/store', [PatientConcernFormController::class, 'store'])->name('patientconcernform.store');
+});
+
+// Labwork Routes
+Route::prefix('admin/ReasonForVisitToday')->name('ReasonForVisitToday.')->group(function () {
+    Route::get('/index/{patient_id}', [ReasonForVisitTodayController::class, 'index'])->name('index');
+    Route::post('/store', [ReasonForVisitTodayController::class, 'store'])->name('store');
+    Route::delete('/delete/{id}', [ReasonForVisitTodayController::class, 'destroy'])->name('destroy');
+    Route::get('/full-list', [ReasonForVisitTodayController::class, 'fullList'])->name('full_list'); // ✅ Added Route
 });
 
 Route::get('/concentform/{patient_id?}/{iConcernFormId?}/{PatientsConcernFormId?}', [PatientConcernFormController::class, 'concentform'])->name('concentform');
