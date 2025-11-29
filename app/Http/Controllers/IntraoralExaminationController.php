@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ReasonForVisitToday;
+use App\Models\IntraoralExamination;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 
-class ReasonForVisitTodayController extends Controller
+class IntraoralExaminationController extends Controller
 {
     public function index(Request $request, $patient_id)
     {
-        //dd($patient_id);
+
+
         $patient = Patient::findOrFail($patient_id); // Fetch patient details
 
-        $ReasonForVisitToday = ReasonForVisitToday::where('patient_id', $patient_id)->paginate(config('app.per_page'));
-        return view('ReasonForVisitToday.index', compact('ReasonForVisitToday', 'patient'));
+        $IntraoralExamination = IntraoralExamination::where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        return view('IntraoralExamination.index', compact('IntraoralExamination', 'patient'));
     }
 
     public function store(Request $request)

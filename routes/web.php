@@ -49,6 +49,7 @@ use App\Http\Controllers\QuatationController;
 use App\Http\Controllers\ConcernFormMasterController;
 use App\Http\Controllers\PatientConcernFormController;
 use App\Http\Controllers\ReasonForVisitTodayController;
+use App\Http\Controllers\IntraoralExaminationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -467,13 +468,25 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/patientconcernform/store', [PatientConcernFormController::class, 'store'])->name('patientconcernform.store');
 });
 
-// Labwork Routes
+// ReasonForVisitToday Routes
 Route::prefix('admin/ReasonForVisitToday')->name('ReasonForVisitToday.')->group(function () {
     Route::get('/index/{patient_id}', [ReasonForVisitTodayController::class, 'index'])->name('index');
     Route::post('/store', [ReasonForVisitTodayController::class, 'store'])->name('store');
+
+    Route::get('/edit/{id}', [ReasonForVisitTodayController::class, 'edit'])->name('edit');
+    Route::post('/update', [ReasonForVisitTodayController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [ReasonForVisitTodayController::class, 'destroy'])->name('destroy');
-    Route::get('/full-list', [ReasonForVisitTodayController::class, 'fullList'])->name('full_list'); // ✅ Added Route
 });
+
+Route::prefix('admin/IntraoralExamination')->name('IntraoralExamination.')->group(function () {
+    Route::get('/index/{patient_id}', [IntraoralExaminationController::class, 'index'])->name('index');
+    Route::post('/store', [IntraoralExaminationController::class, 'store'])->name('store');
+
+    Route::get('/edit/{id}', [IntraoralExaminationController::class, 'edit'])->name('edit');
+    Route::post('/update', [IntraoralExaminationController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [IntraoralExaminationController::class, 'destroy'])->name('destroy');
+});
+
 
 Route::get('/concentform/{patient_id?}/{iConcernFormId?}/{PatientsConcernFormId?}', [PatientConcernFormController::class, 'concentform'])->name('concentform');
 Route::post('/signature/upload', [PatientConcernFormController::class, 'upload'])->name('patient.upload');
