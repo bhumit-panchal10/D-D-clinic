@@ -6,16 +6,16 @@
         </a>
     </li>
 
-    <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('quotation.index', 'quotation.create')) active @endif" href="{{ route('quotation.index', $id) }}"
-            role="tab">
+    {{-- <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('ExtraoralExamination.index', 'quotation.create')) active @endif"
+            href="{{ route('ExtraoralExamination.index', $id) }}" role="tab">
             Extraoral Examination
         </a>
-    </li>
+    </li> --}}
 
     <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('patient_notes.index')) active @endif"
-            href="{{ route('patient_notes.index', $id) }}" role="tab">
+        <a class="nav-link @if (request()->routeIs('IntraoralExamination.index')) active @endif"
+            href="{{ route('IntraoralExamination.index', $id) }}" role="tab">
             Intraoral Examination
         </a>
     </li>
