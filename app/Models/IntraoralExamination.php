@@ -25,6 +25,9 @@ class IntraoralExamination extends Model
         'calculus',
         'stains',
         'BOP',
-        'created_at'
+        'patient_id',
+        'exam_date',
+        'created_at',
+        'updated_at'
     ];
 }
