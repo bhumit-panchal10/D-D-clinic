@@ -36,7 +36,7 @@ class ReasonForVisitTodayController extends Controller
             'TMJ' => $request->TMJ,
             'Lymphadenopathy' => $request->Lymphadenopathy,
             'date' => $request->date,
-            'comment' => $request->comment,  // Save the comment
+            'comment' => $request->comments,  // Save the comment
         ]);
 
         // Redirect back to the labwork index with success message

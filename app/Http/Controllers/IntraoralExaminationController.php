@@ -5,86 +5,111 @@ namespace App\Http\Controllers;
 use App\Models\IntraoralExamination;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IntraoralExaminationController extends Controller
 {
-    public function index(Request $request, $patient_id)
+    public function index($patientId)
     {
+        $patient = Patient::findOrFail($patientId);
+        $examination = IntraoralExamination::where('patient_id', $patientId)->first();
 
-
-        $patient = Patient::findOrFail($patient_id); // Fetch patient details
-
-        $IntraoralExamination = IntraoralExamination::where('patient_id', $patient_id)->paginate(config('app.per_page'));
-        return view('IntraoralExamination.index', compact('IntraoralExamination', 'patient'));
+        return view('IntraoralExamination.index', compact('patient', 'examination'));
     }
 
-    public function store(Request $request)
-    {
-
-        $request->validate([
-            'patient_id' => 'required|exists:patients,id',
-            'facial_asymmetry' => 'required',
-            'TMJ' => 'nullable',
-            'Lymphadenopathy' => 'nullable',
-            'date' => 'required|date',
-            'comment' => 'nullable|string', // Now it's optional
-        ]);
-
-        // Create Labwork record
-        ReasonForVisitToday::create([
-            'patient_id' => $request->patient_id,
-            'facial_asymmetry' => $request->facial_asymmetry,
-            'TMJ' => $request->TMJ,
-            'Lymphadenopathy' => $request->Lymphadenopathy,
-            'date' => $request->date,
-            'comment' => $request->comment,  // Save the comment
-        ]);
-
-        // Redirect back to the labwork index with success message
-        return redirect()->route('ReasonForVisitToday.index', ['patient_id' => $request->patient_id])
-            ->with('success', 'ReasonForVisitToday added successfully.');
-    }
-
-    public function edit($id)
-    {
-        $ReasonForVisit = ReasonForVisitToday::findOrFail($id);
-
-        return response()->json($ReasonForVisit);
-    }
-
-    public function update(Request $request)
+    public function store(Request $request, $patientId)
     {
         $request->validate([
-            'edit_date' => 'required|date',
-            'edit_facial_asymmetry' => 'required',
-            'edit_TMJ' => 'required',
-            'edit_Lymphadenopathy' => 'required',
-            'comments' => 'nullable|string'
+            // 'exam_date' => 'required|date',
+            'plaque' => 'nullable|string|in:+,++,+++',
+            'calculus' => 'nullable|string|in:+,++,+++',
+            'stains' => 'nullable|string|in:+,++,+++',
+            'bop' => 'nullable|string|in:Present,Absent,Localized,Generalized',
+            'impacted' => 'nullable|string|max:500',
+            'pocket' => 'nullable|string|max:500',
+            'vitality' => 'nullable|string|max:500',
+            'sensitivity' => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
-        $data = [
-            'date' => $request->edit_date,
-            'facial_asymmetry' => $request->edit_facial_asymmetry,
-            'TMJ' => $request->edit_TMJ,
-            'Lymphadenopathy' => $request->edit_Lymphadenopathy,
-            'comment' => $request->comments,
-            'updated_at' => now(),
-
+        // Map form field names to your database column names
+        $formToDbMapping = [
+            'caries_teeth' => 'caries',           // form => db
+            'pain_op_teeth' => 'pain_op',         // form => db
+            'missing_teeth' => 'missing',         // form => db
+            'mobility_teeth' => 'mobility',       // form => db
+            'prosthesis_teeth' => 'prosthesis',   // form => db
+            'bop' => 'BOP',                       // form => db
+            'pocket' => 'Pocket',                 // form => db
+            'sensitivity' => 'Sensitivity',       // form => db
         ];
 
-        ReasonForVisitToday::where("id", $request->id)->update($data);
+        // Start with basic data
+        $data = [
+            'patient_id' => $patientId,
+            'doctor_id' => Auth::id(),
+            'exam_date' => $request->exam_date,
+            'plaque' => $request->plaque,
+            'calculus' => $request->calculus,
+            'stains' => $request->stains,
+            'impacted' => $request->impacted,
+            'vitality' => $request->vitality,
+            'notes' => $request->notes,
+        ];
 
-        return redirect()->route('ReasonForVisitToday.index', $request->patient_id)->with('success', 'Reason For Visit Today updated successfully.');
+        // Add mapped fields
+        foreach ($formToDbMapping as $formField => $dbField) {
+            if ($request->has($formField)) {
+                if (str_contains($formField, '_teeth')) {
+                    // Process teeth fields (caries, pain_op, etc.)
+                    if (!empty($request->$formField)) {
+                        $teeth = array_filter(
+                            array_map('trim', explode(',', $request->$formField)),
+                            function ($tooth) {
+                                return !empty($tooth) && is_numeric($tooth);
+                            }
+                        );
+
+                        // Sort teeth numerically for consistency
+                        sort($teeth, SORT_NUMERIC);
+
+                        // Store as JSON string (since your columns are likely VARCHAR/TEXT)
+                        $data[$dbField] = implode(',', $teeth);
+                    } else {
+                        $data[$dbField] = null;
+                    }
+                } else {
+                    // Process regular fields (BOP, Pocket, Sensitivity)
+                    $data[$dbField] = $request->$formField;
+                }
+            }
+        }
+
+        // Check if examination already exists for this patient and date
+        $existingExam = IntraoralExamination::where('patient_id', $patientId)
+            ->whereDate('exam_date', $request->exam_date)
+            ->first();
+
+        if ($existingExam) {
+            // Update existing record
+            $existingExam->update($data);
+            $examination = $existingExam;
+        } else {
+            // Create new record
+            $examination = IntraoralExamination::create($data);
+        }
+
+        return redirect()->route('IntraoralExamination.index', ['patient' => $patientId, 'date' => $request->exam_date])
+            ->with('success', 'Intraoral examination ' . ($existingExam ? 'updated' : 'saved') . ' successfully!');
     }
 
     public function destroy($id)
     {
+        $examination = IntraoralExamination::findOrFail($id);
+        $patientId = $examination->patient_id;
+        $examination->delete();
 
-        $ReasonForVisit = ReasonForVisitToday::findOrFail($id);
-        $patient_id = $ReasonForVisit->patient_id;
-        $ReasonForVisit->delete();
-
-        return redirect()->route('ReasonForVisitToday.index', ['patient_id' => $patient_id])
-            ->with('success', 'Reason For Visit Today deleted successfully.');
+        return redirect()->route('intraoral.index', $patientId)
+            ->with('success', 'Examination deleted successfully!');
     }
 }

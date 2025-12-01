@@ -478,13 +478,18 @@ Route::prefix('admin/ReasonForVisitToday')->name('ReasonForVisitToday.')->group(
     Route::delete('/delete/{id}', [ReasonForVisitTodayController::class, 'destroy'])->name('destroy');
 });
 
-Route::prefix('admin/IntraoralExamination')->name('IntraoralExamination.')->group(function () {
-    Route::get('/index/{patient_id}', [IntraoralExaminationController::class, 'index'])->name('index');
-    Route::post('/store', [IntraoralExaminationController::class, 'store'])->name('store');
+Route::middleware(['auth'])->group(function () {
+    // Intraoral Examination Routes
+    Route::prefix('intraoral')->group(function () {
+        Route::get('/{patient}', [IntraoralExaminationController::class, 'index'])
+            ->name('IntraoralExamination.index');  // Changed name here
 
-    Route::get('/edit/{id}', [IntraoralExaminationController::class, 'edit'])->name('edit');
-    Route::post('/update', [IntraoralExaminationController::class, 'update'])->name('update');
-    Route::delete('/delete/{id}', [IntraoralExaminationController::class, 'destroy'])->name('destroy');
+        Route::post('/{patient}', [IntraoralExaminationController::class, 'store'])
+            ->name('IntraoralExamination.store');
+
+        Route::delete('/{examination}', [IntraoralExaminationController::class, 'destroy'])
+            ->name('IntraoralExamination.destroy');
+    });
 });
 
 
