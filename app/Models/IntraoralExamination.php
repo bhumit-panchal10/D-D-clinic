@@ -27,7 +27,15 @@ class IntraoralExamination extends Model
         'BOP',
         'patient_id',
         'exam_date',
+        'notes',
         'created_at',
         'updated_at'
+    ];
+    protected $casts = [
+        'caries'     => 'array',
+        'pain_op'    => 'array',
+        'missing'    => 'array',
+        'mobility'   => 'array',
+        'prosthesis' => 'array',
     ];
 }

@@ -4,138 +4,162 @@
 
 @section('content')
     <style>
-        .selected-teeth-summary .teeth-list-container {
+        /* Previous styles remain the same... */
+
+        /* New styles for list display */
+        .list-display-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .selected-teeth-summary .teeth-list {
-            min-height: 24px;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            color: #495057;
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .selected-teeth-summary .count-badge {
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .selected-teeth-summary .condition-summary {
-            border-left: 3px solid #dee2e6;
-            padding-left: 10px;
-            transition: all 0.2s ease;
-        }
-
-        .selected-teeth-summary .condition-summary:hover {
-            background-color: #f8f9fa;
-            border-left-color: #adb5bd;
-        }
-
-        /* Color coding for condition borders */
-        .condition-summary:nth-child(1) {
-            border-left-color: #dc3545;
-        }
-
-        .condition-summary:nth-child(2) {
-            border-left-color: #ffc107;
-        }
-
-        .condition-summary:nth-child(3) {
-            border-left-color: #6c757d;
-        }
-
-        .condition-summary:nth-child(4) {
-            border-left-color: #0d6efd;
-        }
-
-        .condition-summary:nth-child(5) {
-            border-left-color: #800080;
-        }
-
-        .teeth_wrapper {
-            width: 45px;
-            cursor: pointer;
-            text-align: center;
-            margin: 2px;
-        }
-
-        .teeth_wrapper img {
-            width: 35px;
-            height: 35px;
-            transition: all 0.3s ease;
-        }
-
-        /* Selected tooth styles */
-        .tooth-selected-caries {
-            filter: drop-shadow(0 0 3px #ff0000) brightness(0.8);
-            transform: scale(1.15);
-        }
-
-        .tooth-selected-pain {
-            filter: drop-shadow(0 0 3px #ff9900) brightness(0.8);
-            transform: scale(1.15);
-        }
-
-        .tooth-selected-missing {
-            filter: drop-shadow(0 0 3px #000000) brightness(0.5);
-            transform: scale(1.15);
-        }
-
-        .tooth-selected-mobility {
-            filter: drop-shadow(0 0 3px #0000ff) brightness(0.8);
-            transform: scale(1.15);
-        }
-
-        .tooth-selected-prosthesis {
-            filter: drop-shadow(0 0 3px #800080) brightness(0.8);
-            transform: scale(1.15);
-        }
-
-        .tooth-text {
-            font-size: 10px;
-            font-weight: bold;
-            margin-top: 3px;
-        }
-
-        .teeth-toggle-btn {
-            padding: 5px 10px;
-            margin: 0 5px;
-            border: 1px solid #ddd;
-            background: #f8f9fa;
-            cursor: pointer;
-        }
-
-        .teeth-toggle-btn.active {
-            background: #007bff;
-            color: white;
-        }
-
-        .teeth-section {
+            align-items: center;
             margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
         }
 
-        .chart-title {
-            background-color: #f8f9fa;
+        .field-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f1f1;
+            transition: background 0.2s ease;
+        }
+
+        .field-item:hover {
+            background: #f8f9fa;
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .field-label i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .field-value {
+            flex: 1;
+            color: #212529;
+            padding-left: 20px;
+            word-break: break-word;
+        }
+
+        .field-value-empty {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .teeth-list-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tooth-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-left: 3px solid;
+        }
+
+        .tooth-badge.caries {
+            border-left-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .tooth-badge.pain {
+            border-left-color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .tooth-badge.missing {
+            border-left-color: #6c757d;
+            background: rgba(108, 117, 125, 0.1);
+        }
+
+        .tooth-badge.mobility {
+            border-left-color: #0d6efd;
+            background: rgba(13, 110, 253, 0.1);
+        }
+
+        .tooth-badge.prosthesis {
+            border-left-color: #800080;
+            background: rgba(128, 0, 128, 0.1);
+        }
+
+        .no-data {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .exam-date-badge {
+            background: #0d6efd;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .list-toggle-btn {
+            background: #28a745;
+            color: white;
+            border: none;
             padding: 8px 15px;
-            border-bottom: 2px solid #dee2e6;
-            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .text-parameters {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
+        .list-toggle-btn:hover {
+            background: #218838;
         }
 
-        .child-teeth {
-            display: none;
+        /* Print specific styles */
+        @media print {
+
+            .list-toggle-btn,
+            .btn {
+                display: none !important;
+            }
+
+            .list-display-container {
+                box-shadow: none;
+                border: 1px solid #dee2e6;
+                page-break-inside: avoid;
+            }
+
+            .field-item {
+                page-break-inside: avoid;
+            }
         }
     </style>
 
@@ -178,7 +202,7 @@
                                     <label for="exam_date" class="form-label">Examination Date</label>
                                     <div class="input-group">
                                         <input type="date" name="date" id="exam_date" class="form-control"
-                                            value="" max="{{ date('Y-m-d') }}">
+                                            value="{{ $selectedDate ?? '' }}" max="{{ date('Y-m-d') }}">
                                         <button type="button" class="btn btn-outline-secondary" onclick="setToday()">
                                             Today
                                         </button>
@@ -192,27 +216,281 @@
                                 </div>
                             </div>
                         </form>
-
-                        <!-- Previous Exams -->
-                        {{-- @if ($allExamDates->count() > 0)
-                            <div class="mt-3">
-                                <small class="text-muted">Previous exams:</small>
-                                @foreach ($allExamDates as $examDate)
-                                    <a href="{{ route('intraoral.index', ['patient' => $patient->id, 'date' => $examDate['date']]) }}"
-                                        class="badge {{ $selectedDate == $examDate['date'] ? 'bg-primary' : 'bg-secondary' }} text-decoration-none ms-1">
-                                        {{ $examDate['formatted'] }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        @endif --}}
                     </div>
                 </div>
 
-                <!-- Main Form -->
-                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
-                    @csrf
-                    <input type="hidden" name="exam_date" value="">
+                <!-- LIST DISPLAY SECTION - Only show if examination exists -->
+                @if ($examination)
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Examination Details
+                                <span class="exam-date-badge ms-3">
+                                    {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
+                                </span>
+                            </h5>
+                            {{-- <button class="list-toggle-btn" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print
+                            </button> --}}
+                        </div>
+                        <div class="card-body">
+                            <div class="list-display-container">
+                                <div class="list-header">
+                                    <h6 class="mb-0">All Examination Parameters</h6>
+                                    {{-- <small class="text-muted">Doctor: {{ $examination->doctor->name ?? 'N/A' }}</small> --}}
+                                </div>
 
+                                <ul class="field-list">
+                                    <!-- Caries -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-tooth text-danger"></i>
+                                            Caries
+                                        </div>
+                                        <div class="field-value">
+                                            @if (!empty($examination->caries))
+
+                                                <div class="teeth-list-display">
+                                                    @foreach ($examination->caries as $tooth)
+                                                        <span class="tooth-badge caries">{{ $tooth }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="no-data">No teeth selected</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Pain O.P. -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-head-side-virus text-warning"></i>
+                                            Pain O.P.
+                                        </div>
+                                        <div class="field-value">
+                                            @if (!empty($examination->pain_op))
+                                                <div class="teeth-list-display">
+                                                    @foreach ($examination->pain_op as $tooth)
+                                                        <span class="tooth-badge pain">{{ $tooth }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="no-data">No teeth selected</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Missing -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-times-circle text-dark"></i>
+                                            Missing
+                                        </div>
+                                        <div class="field-value">
+                                            @if (!empty($examination->missing))
+                                                <div class="teeth-list-display">
+                                                    @foreach ($examination->missing as $tooth)
+                                                        <span class="tooth-badge missing">{{ $tooth }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="no-data">No teeth selected</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Mobility -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-arrows-alt text-primary"></i>
+                                            Mobility
+                                        </div>
+                                        <div class="field-value">
+                                            @if (!empty($examination->mobility))
+                                                <div class="teeth-list-display">
+                                                    @foreach ($examination->mobility as $tooth)
+                                                        <span class="tooth-badge mobility">{{ $tooth }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="no-data">No teeth selected</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Prosthesis -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-teeth" style="color: #800080;"></i>
+                                            Prosthesis
+                                        </div>
+                                        <div class="field-value">
+                                            @if (!empty($examination->prosthesis))
+                                                <div class="teeth-list-display">
+                                                    @foreach ($examination->prosthesis as $tooth)
+                                                        <span class="tooth-badge prosthesis">{{ $tooth }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="no-data">No teeth selected</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Text Parameters -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-file-alt text-secondary"></i>
+                                            Impacted
+                                        </div>
+                                        <div class="field-value">
+                                            {{ $examination->impacted ?: '<span class="field-value-empty">Not specified</span>' }}
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-ruler text-secondary"></i>
+                                            Pocket
+                                        </div>
+                                        <div class="field-value">
+                                            {{ $examination->Pocket ?: '<span class="field-value-empty">Not specified</span>' }}
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-heartbeat text-secondary"></i>
+                                            Vitality
+                                        </div>
+                                        <div class="field-value">
+                                            {{ $examination->vitality ?: '<span class="field-value-empty">Not specified</span>' }}
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-exclamation-circle text-secondary"></i>
+                                            Sensitivity
+                                        </div>
+                                        <div class="field-value">
+                                            {{ $examination->Sensitivity ?: '<span class="field-value-empty">Not specified</span>' }}
+                                        </div>
+                                    </li>
+
+                                    <!-- Scale Parameters -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-layer-group text-info"></i>
+                                            Plaque
+                                        </div>
+                                        <div class="field-value">
+                                            @if ($examination->plaque)
+                                                <span class="badge bg-info">{{ $examination->plaque }}</span>
+                                            @else
+                                                <span class="field-value-empty">Not specified</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-mountain text-info"></i>
+                                            Calculus
+                                        </div>
+                                        <div class="field-value">
+                                            @if ($examination->calculus)
+                                                <span class="badge bg-info">{{ $examination->calculus }}</span>
+                                            @else
+                                                <span class="field-value-empty">Not specified</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-tint text-info"></i>
+                                            Stains
+                                        </div>
+                                        <div class="field-value">
+                                            @if ($examination->stains)
+                                                <span class="badge bg-info">{{ $examination->stains }}</span>
+                                            @else
+                                                <span class="field-value-empty">Not specified</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-droplet text-info"></i>
+                                            B.O.P.
+                                        </div>
+                                        <div class="field-value">
+                                            @if ($examination->BOP)
+                                                <span class="badge bg-info">{{ $examination->BOP }}</span>
+                                            @else
+                                                <span class="field-value-empty">Not specified</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Notes -->
+                                    <li class="field-item">
+                                        <div class="field-label">
+                                            <i class="fas fa-sticky-note text-success"></i>
+                                            Clinical Notes
+                                        </div>
+                                        <div class="field-value">
+                                            @if ($examination->notes)
+                                                <div class="notes-content" style="white-space: pre-wrap;">
+                                                    {{ $examination->notes }}
+                                                </div>
+                                            @else
+                                                <span class="field-value-empty">No notes added</span>
+                                            @endif
+                                        </div>
+                                    </li>
+
+                                    <!-- Summary Statistics -->
+                                    <li class="field-item bg-light">
+                                        <div class="field-label">
+                                            <i class="fas fa-chart-bar text-primary"></i>
+                                            Summary
+                                        </div>
+                                        <div class="field-value">
+                                            <div class="d-flex gap-3">
+                                                <span class="badge bg-danger">
+                                                    Caries: {{ count($examination->caries ?? []) }}
+                                                </span>
+                                                <span class="badge bg-warning text-dark">
+                                                    Pain: {{ count($examination->pain_op ?? []) }}
+                                                </span>
+                                                <span class="badge bg-dark">
+                                                    Missing: {{ count($examination->missing ?? []) }}
+                                                </span>
+                                                <span class="badge bg-primary">
+                                                    Mobility: {{ count($examination->mobility ?? []) }}
+                                                </span>
+                                                <span class="badge" style="background-color: #800080;">
+                                                    Prosthesis: {{ count($examination->prosthesis ?? []) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Main Form (Existing form remains the same) -->
+                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST"
+                    id="intraoralForm">
+                    @csrf
+                    {{-- <input type="hidden" name="exam_date" value="{{ $selectedDate ?? '' }}"> --}}
+
+                    <!-- The rest of your form remains exactly the same -->
                     <!-- Teeth Type Toggle -->
                     <div class="card mb-3">
                         <div class="card-body text-center">
@@ -228,32 +506,9 @@
                         </div>
                     </div>
 
-                    @if ($examination)
-                        {{-- <div class="alert alert-info mb-3">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <i class="fas fa-calendar-check me-2"></i>
-                                    <strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
-                                    <span class="ms-3">
-                                        <i class="fas fa-user-md me-1"></i>
-                                        <strong>Doctor:</strong> {{ $examination->doctor->name ?? 'N/A' }}
-                                    </span>
-                                </div>
-                                <span class="badge bg-success">Saved</span>
-                            </div>
-                        </div> --}}
-                    @else
-                        {{-- <div class="alert alert-warning mb-3">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            No examination found for {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}.
-                            Fill the form below to create a new examination.
-                        </div> --}}
-                    @endif
-
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
                         <div class="col-lg-8">
-
                             <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
@@ -264,8 +519,8 @@
                                         'section' => 'caries',
                                         'selectedTeeth' => $examination->caries_teeth ?? [],
                                     ])
-                                    <input type="hidden" name="caries_teeth" id="caries_teeth"
-                                        value="{{ implode(',', $examination->caries_teeth ?? []) }}">
+                                    <input type="hidden" name="caries" id="caries_teeth"
+                                        value="{{ implode(',', $examination->caries ?? []) }}">
                                 </div>
                             </div>
 
@@ -279,8 +534,8 @@
                                         'section' => 'pain',
                                         'selectedTeeth' => $examination->pain_op_teeth ?? [],
                                     ])
-                                    <input type="hidden" name="pain_op_teeth" id="pain_teeth"
-                                        value="{{ implode(',', $examination->pain_op_teeth ?? []) }}">
+                                    <input type="hidden" name="pain_op" id="pain_teeth"
+                                        value="{{ implode(',', $examination->pain_op ?? []) }}">
                                 </div>
                             </div>
 
@@ -294,8 +549,8 @@
                                         'section' => 'missing',
                                         'selectedTeeth' => $examination->missing_teeth ?? [],
                                     ])
-                                    <input type="hidden" name="missing_teeth" id="missing_teeth"
-                                        value="{{ implode(',', $examination->missing_teeth ?? []) }}">
+                                    <input type="hidden" name="missing" id="missing_teeth"
+                                        value="{{ implode(',', $examination->missing ?? []) }}">
                                 </div>
                             </div>
 
@@ -309,8 +564,8 @@
                                         'section' => 'mobility',
                                         'selectedTeeth' => $examination->mobility_teeth ?? [],
                                     ])
-                                    <input type="hidden" name="mobility_teeth" id="mobility_teeth"
-                                        value="{{ implode(',', $examination->mobility_teeth ?? []) }}">
+                                    <input type="hidden" name="mobility" id="mobility_teeth"
+                                        value="{{ implode(',', $examination->mobility ?? []) }}">
                                 </div>
                             </div>
 
@@ -324,8 +579,8 @@
                                         'section' => 'prosthesis',
                                         'selectedTeeth' => $examination->prosthesis_teeth ?? [],
                                     ])
-                                    <input type="hidden" name="prosthesis_teeth" id="prosthesis_teeth"
-                                        value="{{ implode(',', $examination->prosthesis_teeth ?? []) }}">
+                                    <input type="hidden" name="prosthesis" id="prosthesis_teeth"
+                                        value="{{ implode(',', $examination->prosthesis ?? []) }}">
                                 </div>
                             </div>
 
@@ -338,11 +593,16 @@
                                     <h5 class="mb-0">Other Parameters</h5>
                                 </div>
                                 <div class="card-body text-parameters">
-
                                     <!-- Text Box Parameters -->
                                     <div class="mb-4">
                                         <h6 class="border-bottom pb-2 mb-3">Text Parameters</h6>
 
+                                        <div class="mb-3">
+                                            <label for="exam_date" class="form-label">Exam Date</label>
+                                            <input type="date" name="exam_date" id="exam_date" class="form-control"
+                                                value="{{ $examination->exam_date ?? ($selectedDate ?? '') }}"
+                                                max="{{ date('Y-m-d') }}">
+                                        </div>
                                         <div class="mb-3">
                                             <label for="impacted" class="form-label">Impacted</label>
                                             <textarea name="impacted" id="impacted" class="form-control" rows="2"
@@ -352,7 +612,7 @@
                                         <div class="mb-3">
                                             <label for="pocket" class="form-label">Pocket</label>
                                             <textarea name="pocket" id="pocket" class="form-control" rows="2"
-                                                placeholder="Describe pocket conditions...">{{ $examination->pocket ?? '' }}</textarea>
+                                                placeholder="Describe pocket conditions...">{{ $examination->Pocket ?? '' }}</textarea>
                                         </div>
 
                                         <div class="mb-3">
@@ -363,7 +623,7 @@
                                         <div class="mb-3">
                                             <label for="sensitivity" class="form-label">Sensitivity</label>
                                             <textarea name="sensitivity" id="sensitivity" class="form-control" rows="2"
-                                                placeholder="Describe sensitivity...">{{ $examination->sensitivity ?? '' }}</textarea>
+                                                placeholder="Describe sensitivity...">{{ $examination->Sensitivity ?? '' }}</textarea>
                                         </div>
                                     </div>
 
@@ -425,16 +685,16 @@
                                                 <select name="bop" id="bop" class="form-control">
                                                     <option value="">Select</option>
                                                     <option value="Present"
-                                                        {{ ($examination->bop ?? '') == 'Present' ? 'selected' : '' }}>
+                                                        {{ ($examination->BOP ?? '') == 'Present' ? 'selected' : '' }}>
                                                         Present</option>
                                                     <option value="Absent"
-                                                        {{ ($examination->bop ?? '') == 'Absent' ? 'selected' : '' }}>
+                                                        {{ ($examination->BOP ?? '') == 'Absent' ? 'selected' : '' }}>
                                                         Absent</option>
                                                     <option value="Localized"
-                                                        {{ ($examination->bop ?? '') == 'Localized' ? 'selected' : '' }}>
+                                                        {{ ($examination->BOP ?? '') == 'Localized' ? 'selected' : '' }}>
                                                         Localized</option>
                                                     <option value="Generalized"
-                                                        {{ ($examination->bop ?? '') == 'Generalized' ? 'selected' : '' }}>
+                                                        {{ ($examination->BOP ?? '') == 'Generalized' ? 'selected' : '' }}>
                                                         Generalized</option>
                                                 </select>
                                             </div>
@@ -455,7 +715,6 @@
                             </div>
 
                             <!-- Summary Card -->
-                            <!-- Enhanced Selected Teeth Summary Card -->
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
@@ -582,7 +841,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    {{-- Delete examination for {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}? --}}
+                    Are you sure you want to delete the examination for
+                    {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -771,72 +1031,10 @@
             }
         }
 
-        // Show toast notification (placeholder - you can implement proper toast)
-        function showToast(message, type = 'info') {
-            alert(message); // For now, using alert
-        }
-
         // Confirm delete
         function confirmDelete(examId) {
             const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();
         }
-
-        // Add dynamic CSS for tooth badges
-        const style = document.createElement('style');
-        style.textContent = `
-        .tooth-number-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            margin: 1px 2px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #495057;
-            transition: all 0.2s ease;
-        }
-        
-        .tooth-number-badge:hover {
-            background-color: #dee2e6;
-            transform: translateY(-1px);
-            cursor: default;
-        }
-        
-        /* Specific colors for each condition */
-        #caries-teeth-list .tooth-number-badge { border-left: 3px solid #dc3545; }
-        #pain-teeth-list .tooth-number-badge { border-left: 3px solid #ffc107; }
-        #missing-teeth-list .tooth-number-badge { border-left: 3px solid #6c757d; }
-        #mobility-teeth-list .tooth-number-badge { border-left: 3px solid #0d6efd; }
-        #prosthesis-teeth-list .tooth-number-badge { border-left: 3px solid #800080; }
-        
-        /* Selected tooth styles */
-        .teeth_wrapper.selected img {
-            transform: scale(1.1);
-            transition: transform 0.3s ease;
-        }
-        
-        /* Condition-specific glow effects */
-        .tooth-selected-caries {
-            filter: drop-shadow(0 0 3px rgba(220, 53, 69, 0.5)) !important;
-        }
-        
-        .tooth-selected-pain {
-            filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.5)) !important;
-        }
-        
-        .tooth-selected-missing {
-            filter: drop-shadow(0 0 3px rgba(108, 117, 125, 0.5)) !important;
-        }
-        
-        .tooth-selected-mobility {
-            filter: drop-shadow(0 0 3px rgba(13, 110, 253, 0.5)) !important;
-        }
-        
-        .tooth-selected-prosthesis {
-            filter: drop-shadow(0 0 3px rgba(128, 0, 128, 0.5)) !important;
-        }
-    `;
-        document.head.appendChild(style);
     </script>
 @endsection
