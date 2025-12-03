@@ -9,18 +9,43 @@ use Illuminate\Support\Facades\Auth;
 
 class IntraoralExaminationController extends Controller
 {
-    public function index($patientId)
+    public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
-        $examination = IntraoralExamination::where('patient_id', $patientId)->first();
 
-        return view('IntraoralExamination.index', compact('patient', 'examination'));
+        // Get the selected date from request, default to today
+        $selectedDate = $request->get('date') ?? date('Y-m-d');
+
+        // Find examination for the selected date
+        $examination = IntraoralExamination::where('patient_id', $patientId)
+            ->whereDate('exam_date', $selectedDate)
+            ->first();
+
+        if ($examination) {
+            foreach (['caries', 'pain_op', 'missing', 'mobility', 'prosthesis'] as $field) {
+                $examination->$field = !empty($examination->$field)
+                    ? explode(',', $examination->$field)
+                    : [];
+            }
+        }
+        // Get all examination dates for this patient (for history navigation)
+        $allExamDates = IntraoralExamination::where('patient_id', $patientId)
+            ->orderBy('exam_date', 'desc')
+            ->get()
+            ->map(function ($exam) {
+                return [
+                    'date' => $exam->exam_date,
+                    'formatted' => \Carbon\Carbon::parse($exam->exam_date)->format('d M Y')
+                ];
+            });
+
+        return view('IntraoralExamination.index', compact('patient', 'examination', 'selectedDate', 'allExamDates'));
     }
 
     public function store(Request $request, $patientId)
     {
         $request->validate([
-            // 'exam_date' => 'required|date',
+            'exam_date' => 'required|date',
             'plaque' => 'nullable|string|in:+,++,+++',
             'calculus' => 'nullable|string|in:+,++,+++',
             'stains' => 'nullable|string|in:+,++,+++',
@@ -32,76 +57,71 @@ class IntraoralExaminationController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Map form field names to your database column names
-        $formToDbMapping = [
-            'caries_teeth' => 'caries',           // form => db
-            'pain_op_teeth' => 'pain_op',         // form => db
-            'missing_teeth' => 'missing',         // form => db
-            'mobility_teeth' => 'mobility',       // form => db
-            'prosthesis_teeth' => 'prosthesis',   // form => db
-            'bop' => 'BOP',                       // form => db
-            'pocket' => 'Pocket',                 // form => db
-            'sensitivity' => 'Sensitivity',       // form => db
+        // Map FORM → DB fields
+        $fields = [
+            'caries_teeth'      => 'caries',
+            'pain_op_teeth'     => 'pain_op',
+            'missing_teeth'     => 'missing',
+            'mobility_teeth'    => 'mobility',
+            'prosthesis_teeth'  => 'prosthesis',
+            'bop'               => 'BOP',
+            'pocket'            => 'Pocket',
+            'sensitivity'       => 'Sensitivity',
         ];
 
-        // Start with basic data
         $data = [
             'patient_id' => $patientId,
-            'doctor_id' => Auth::id(),
-            'exam_date' => $request->exam_date,
-            'plaque' => $request->plaque,
-            'calculus' => $request->calculus,
-            'stains' => $request->stains,
-            'impacted' => $request->impacted,
-            'vitality' => $request->vitality,
-            'notes' => $request->notes,
+            'doctor_id'  => Auth::id(),
+            'exam_date'  => $request->exam_date,
+            'plaque'     => $request->plaque,
+            'calculus'   => $request->calculus,
+            'stains'     => $request->stains,
+            'impacted'   => $request->impacted,
+            'vitality'   => $request->vitality,
+            'notes'      => $request->notes,
         ];
 
-        // Add mapped fields
-        foreach ($formToDbMapping as $formField => $dbField) {
-            if ($request->has($formField)) {
-                if (str_contains($formField, '_teeth')) {
-                    // Process teeth fields (caries, pain_op, etc.)
-                    if (!empty($request->$formField)) {
-                        $teeth = array_filter(
-                            array_map('trim', explode(',', $request->$formField)),
-                            function ($tooth) {
-                                return !empty($tooth) && is_numeric($tooth);
-                            }
-                        );
+        foreach ($fields as $formField => $dbField) {
 
-                        // Sort teeth numerically for consistency
-                        sort($teeth, SORT_NUMERIC);
+            if (str_contains($formField, '_teeth')) {
 
-                        // Store as JSON string (since your columns are likely VARCHAR/TEXT)
-                        $data[$dbField] = implode(',', $teeth);
-                    } else {
-                        $data[$dbField] = null;
-                    }
-                } else {
-                    // Process regular fields (BOP, Pocket, Sensitivity)
-                    $data[$dbField] = $request->$formField;
-                }
+                // Convert CSV string → array
+                $values = collect(explode(',', $request->$formField))
+                    ->map(fn($t) => trim($t))
+                    ->filter(fn($t) => is_numeric($t))
+                    ->map(fn($t) => intval($t))
+                    ->sort()
+                    ->values()
+                    ->toArray();
+
+                // Save JSON array
+                $data[$dbField] = $values;
+            } else {
+
+                // For normal text fields
+                $data[$dbField] = $request->$formField ?? null;
             }
         }
 
-        // Check if examination already exists for this patient and date
-        $existingExam = IntraoralExamination::where('patient_id', $patientId)
+        // Check if exam already exists for this date
+        $exam = IntraoralExamination::where('patient_id', $patientId)
             ->whereDate('exam_date', $request->exam_date)
             ->first();
 
-        if ($existingExam) {
-            // Update existing record
-            $existingExam->update($data);
-            $examination = $existingExam;
+        if ($exam) {
+            $exam->update($data);
+            $message = 'updated';
         } else {
-            // Create new record
-            $examination = IntraoralExamination::create($data);
+            $exam = IntraoralExamination::create($data);
+            $message = 'saved';
         }
 
-        return redirect()->route('IntraoralExamination.index', ['patient' => $patientId, 'date' => $request->exam_date])
-            ->with('success', 'Intraoral examination ' . ($existingExam ? 'updated' : 'saved') . ' successfully!');
+        return redirect()->route('IntraoralExamination.index', [
+            'patient' => $patientId,
+            'date'    => $request->exam_date
+        ])->with('success', "Intraoral examination {$message} successfully!");
     }
+
 
     public function destroy($id)
     {
@@ -109,7 +129,7 @@ class IntraoralExaminationController extends Controller
         $patientId = $examination->patient_id;
         $examination->delete();
 
-        return redirect()->route('intraoral.index', $patientId)
+        return redirect()->route('IntraoralExamination.index', $patientId)
             ->with('success', 'Examination deleted successfully!');
     }
 }
