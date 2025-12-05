@@ -103,7 +103,7 @@
                             '52' => '1B',
                             '51' => '1A',
                         ];
-                        $selectedTeeth = $selectedTeeth ?? [];
+                        // $selectedTeeth = $selectedTeeth ?? [];
                     @endphp
 
                     @foreach (['55', '54', '53', '52', '51'] as $tooth)
@@ -133,7 +133,7 @@
                             '64' => '2D',
                             '65' => '2E',
                         ];
-                        $selectedTeeth = $selectedTeeth ?? [];
+                        // $selectedTeeth = $selectedTeeth ?? [];
                     @endphp
 
                     @foreach (['61', '62', '63', '64', '65'] as $tooth)
@@ -169,7 +169,7 @@
                             '82' => '3B',
                             '81' => '3A',
                         ];
-                        $selectedTeeth = $selectedTeeth ?? [];
+                        // $selectedTeeth = $selectedTeeth ?? [];
                     @endphp
 
                     @foreach (['85', '84', '83', '82', '81'] as $tooth)
@@ -199,7 +199,7 @@
                             '74' => '4D',
                             '75' => '4E',
                         ];
-                        $selectedTeeth = $selectedTeeth ?? [];
+                        //$selectedTeeth = $selectedTeeth ?? [];
                     @endphp
 
                     @foreach (['71', '72', '73', '74', '75'] as $tooth)

@@ -214,284 +214,109 @@
                                         <i class="fas fa-search"></i> Load Date
                                     </button>
                                 </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <a href="{{ route('IntraoralExamination.index', $patient->id) }}"
+                                        class="btn btn-primary w-100">Clear</a>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
                 <!-- LIST DISPLAY SECTION - Only show if examination exists -->
-                @if ($examination)
-                    <div class="card mb-4">
-                        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="fas fa-list me-2"></i>Examination Details
-                                <span class="exam-date-badge ms-3">
-                                    {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}
-                                </span>
-                            </h5>
-                            {{-- <button class="list-toggle-btn" onclick="window.print()">
-                                <i class="fas fa-print"></i> Print
-                            </button> --}}
-                        </div>
-                        <div class="card-body">
-                            <div class="list-display-container">
-                                <div class="list-header">
-                                    <h6 class="mb-0">All Examination Parameters</h6>
-                                    {{-- <small class="text-muted">Doctor: {{ $examination->doctor->name ?? 'N/A' }}</small> --}}
-                                </div>
+                @if ($examinations)
+                    <h4 class="mb-3">Intraoral Examination Records</h4>
 
-                                <ul class="field-list">
-                                    <!-- Caries -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-tooth text-danger"></i>
-                                            Caries
-                                        </div>
-                                        <div class="field-value">
-                                            @if (!empty($examination->caries))
+                    <table class="table table-bordered table-striped">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Date</th>
+                                <th>Caries</th>
+                                <th>Pain OP</th>
+                                <th>Missing</th>
+                                <th>Mobility</th>
+                                <th>Prosthesis</th>
+                                <th>BOP</th>
+                                <th>Notes</th>
+                                <th width="120">Action</th>
+                            </tr>
+                        </thead>
 
-                                                <div class="teeth-list-display">
-                                                    @foreach ($examination->caries as $tooth)
-                                                        <span class="tooth-badge caries">{{ $tooth }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="no-data">No teeth selected</span>
+                        <tbody>
+                            @foreach ($examinations as $exam)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->caries ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
                                             @endif
-                                        </div>
-                                    </li>
+                                        @endforeach
+                                    </td>
 
-                                    <!-- Pain O.P. -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-head-side-virus text-warning"></i>
-                                            Pain O.P.
-                                        </div>
-                                        <div class="field-value">
-                                            @if (!empty($examination->pain_op))
-                                                <div class="teeth-list-display">
-                                                    @foreach ($examination->pain_op as $tooth)
-                                                        <span class="tooth-badge pain">{{ $tooth }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="no-data">No teeth selected</span>
+                                    <td>
+                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
                                             @endif
-                                        </div>
-                                    </li>
+                                        @endforeach
+                                    </td>
 
-                                    <!-- Missing -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-times-circle text-dark"></i>
-                                            Missing
-                                        </div>
-                                        <div class="field-value">
-                                            @if (!empty($examination->missing))
-                                                <div class="teeth-list-display">
-                                                    @foreach ($examination->missing as $tooth)
-                                                        <span class="tooth-badge missing">{{ $tooth }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="no-data">No teeth selected</span>
+                                    <td>
+                                        @foreach (explode(',', $exam->missing ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
                                             @endif
-                                        </div>
-                                    </li>
+                                        @endforeach
+                                    </td>
 
-                                    <!-- Mobility -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-arrows-alt text-primary"></i>
-                                            Mobility
-                                        </div>
-                                        <div class="field-value">
-                                            @if (!empty($examination->mobility))
-                                                <div class="teeth-list-display">
-                                                    @foreach ($examination->mobility as $tooth)
-                                                        <span class="tooth-badge mobility">{{ $tooth }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="no-data">No teeth selected</span>
+                                    <td>
+                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
                                             @endif
-                                        </div>
-                                    </li>
+                                        @endforeach
+                                    </td>
 
-                                    <!-- Prosthesis -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-teeth" style="color: #800080;"></i>
-                                            Prosthesis
-                                        </div>
-                                        <div class="field-value">
-                                            @if (!empty($examination->prosthesis))
-                                                <div class="teeth-list-display">
-                                                    @foreach ($examination->prosthesis as $tooth)
-                                                        <span class="tooth-badge prosthesis">{{ $tooth }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <span class="no-data">No teeth selected</span>
+                                    <td>
+                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
                                             @endif
-                                        </div>
-                                    </li>
+                                        @endforeach
+                                    </td>
 
-                                    <!-- Text Parameters -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-file-alt text-secondary"></i>
-                                            Impacted
-                                        </div>
-                                        <div class="field-value">
-                                            {{ $examination->impacted ?: '<span class="field-value-empty">Not specified</span>' }}
-                                        </div>
-                                    </li>
+                                    <td>{{ $exam->BOP ?? '-' }}</td>
+                                    <td>{{ $exam->notes ?? '-' }}</td>
 
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-ruler text-secondary"></i>
-                                            Pocket
-                                        </div>
-                                        <div class="field-value">
-                                            {{ $examination->Pocket ?: '<span class="field-value-empty">Not specified</span>' }}
-                                        </div>
-                                    </li>
+                                    <td>
+                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
+                                            method="POST" onsubmit="return confirm('Delete this record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
 
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-heartbeat text-secondary"></i>
-                                            Vitality
-                                        </div>
-                                        <div class="field-value">
-                                            {{ $examination->vitality ?: '<span class="field-value-empty">Not specified</span>' }}
-                                        </div>
-                                    </li>
 
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-exclamation-circle text-secondary"></i>
-                                            Sensitivity
-                                        </div>
-                                        <div class="field-value">
-                                            {{ $examination->Sensitivity ?: '<span class="field-value-empty">Not specified</span>' }}
-                                        </div>
-                                    </li>
 
-                                    <!-- Scale Parameters -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-layer-group text-info"></i>
-                                            Plaque
-                                        </div>
-                                        <div class="field-value">
-                                            @if ($examination->plaque)
-                                                <span class="badge bg-info">{{ $examination->plaque }}</span>
-                                            @else
-                                                <span class="field-value-empty">Not specified</span>
-                                            @endif
-                                        </div>
-                                    </li>
+                    </table>
 
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-mountain text-info"></i>
-                                            Calculus
-                                        </div>
-                                        <div class="field-value">
-                                            @if ($examination->calculus)
-                                                <span class="badge bg-info">{{ $examination->calculus }}</span>
-                                            @else
-                                                <span class="field-value-empty">Not specified</span>
-                                            @endif
-                                        </div>
-                                    </li>
-
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-tint text-info"></i>
-                                            Stains
-                                        </div>
-                                        <div class="field-value">
-                                            @if ($examination->stains)
-                                                <span class="badge bg-info">{{ $examination->stains }}</span>
-                                            @else
-                                                <span class="field-value-empty">Not specified</span>
-                                            @endif
-                                        </div>
-                                    </li>
-
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-droplet text-info"></i>
-                                            B.O.P.
-                                        </div>
-                                        <div class="field-value">
-                                            @if ($examination->BOP)
-                                                <span class="badge bg-info">{{ $examination->BOP }}</span>
-                                            @else
-                                                <span class="field-value-empty">Not specified</span>
-                                            @endif
-                                        </div>
-                                    </li>
-
-                                    <!-- Notes -->
-                                    <li class="field-item">
-                                        <div class="field-label">
-                                            <i class="fas fa-sticky-note text-success"></i>
-                                            Clinical Notes
-                                        </div>
-                                        <div class="field-value">
-                                            @if ($examination->notes)
-                                                <div class="notes-content" style="white-space: pre-wrap;">
-                                                    {{ $examination->notes }}
-                                                </div>
-                                            @else
-                                                <span class="field-value-empty">No notes added</span>
-                                            @endif
-                                        </div>
-                                    </li>
-
-                                    <!-- Summary Statistics -->
-                                    <li class="field-item bg-light">
-                                        <div class="field-label">
-                                            <i class="fas fa-chart-bar text-primary"></i>
-                                            Summary
-                                        </div>
-                                        <div class="field-value">
-                                            <div class="d-flex gap-3">
-                                                <span class="badge bg-danger">
-                                                    Caries: {{ count($examination->caries ?? []) }}
-                                                </span>
-                                                <span class="badge bg-warning text-dark">
-                                                    Pain: {{ count($examination->pain_op ?? []) }}
-                                                </span>
-                                                <span class="badge bg-dark">
-                                                    Missing: {{ count($examination->missing ?? []) }}
-                                                </span>
-                                                <span class="badge bg-primary">
-                                                    Mobility: {{ count($examination->mobility ?? []) }}
-                                                </span>
-                                                <span class="badge" style="background-color: #800080;">
-                                                    Prosthesis: {{ count($examination->prosthesis ?? []) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
                 @endif
 
                 <!-- Main Form (Existing form remains the same) -->
-                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST"
-                    id="intraoralForm">
+                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
                     @csrf
                     {{-- <input type="hidden" name="exam_date" value="{{ $selectedDate ?? '' }}"> --}}
 
-                    <!-- The rest of your form remains exactly the same -->
-                    <!-- Teeth Type Toggle -->
                     <div class="card mb-3">
                         <div class="card-body text-center">
                             <label class="me-2"><strong>Teeth Type:</strong></label>
@@ -517,10 +342,12 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'caries',
-                                        'selectedTeeth' => $examination->caries_teeth ?? [],
+                                        'selectedTeeth' => $examination->caries
+                                            ? explode(',', $examination->caries)
+                                            : [],
                                     ])
                                     <input type="hidden" name="caries" id="caries_teeth"
-                                        value="{{ implode(',', $examination->caries ?? []) }}">
+                                        value="{{ $examination->caries ?? '' }}">
                                 </div>
                             </div>
 
@@ -532,10 +359,12 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'pain',
-                                        'selectedTeeth' => $examination->pain_op_teeth ?? [],
+                                        'selectedTeeth' => $examination->pain_op
+                                            ? explode(',', $examination->pain_op)
+                                            : [],
                                     ])
                                     <input type="hidden" name="pain_op" id="pain_teeth"
-                                        value="{{ implode(',', $examination->pain_op ?? []) }}">
+                                        value="{{ $examination->pain_op ?? '' }}">
                                 </div>
                             </div>
 
@@ -547,10 +376,12 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'missing',
-                                        'selectedTeeth' => $examination->missing_teeth ?? [],
+                                        'selectedTeeth' => $examination->missing
+                                            ? explode(',', $examination->missing)
+                                            : [],
                                     ])
                                     <input type="hidden" name="missing" id="missing_teeth"
-                                        value="{{ implode(',', $examination->missing ?? []) }}">
+                                        value="{{ $examination->missing ?? '' }}">
                                 </div>
                             </div>
 
@@ -562,10 +393,12 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'mobility',
-                                        'selectedTeeth' => $examination->mobility_teeth ?? [],
+                                        'selectedTeeth' => $examination->mobility
+                                            ? explode(',', $examination->mobility)
+                                            : [],
                                     ])
                                     <input type="hidden" name="mobility" id="mobility_teeth"
-                                        value="{{ implode(',', $examination->mobility ?? []) }}">
+                                        value="{{ $examination->mobility ?? '' }}">
                                 </div>
                             </div>
 
@@ -580,7 +413,7 @@
                                         'selectedTeeth' => $examination->prosthesis_teeth ?? [],
                                     ])
                                     <input type="hidden" name="prosthesis" id="prosthesis_teeth"
-                                        value="{{ implode(',', $examination->prosthesis ?? []) }}">
+                                        value="{{ $examination->prosthesis ?? '' }}">
                                 </div>
                             </div>
 
@@ -600,8 +433,7 @@
                                         <div class="mb-3">
                                             <label for="exam_date" class="form-label">Exam Date</label>
                                             <input type="date" name="exam_date" id="exam_date" class="form-control"
-                                                value="{{ $examination->exam_date ?? ($selectedDate ?? '') }}"
-                                                max="{{ date('Y-m-d') }}">
+                                                value="{{ date('Y-m-d') }}">
                                         </div>
                                         <div class="mb-3">
                                             <label for="impacted" class="form-label">Impacted</label>
@@ -812,14 +644,8 @@
                             <!-- Submit Button -->
                             <div class="card mt-3">
                                 <div class="card-body text-center">
-                                    @if ($examination)
-                                        <button type="button" class="btn btn-danger me-2"
-                                            onclick="confirmDelete({{ $examination->id }})">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    @endif
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save"></i> {{ $examination ? 'Update' : 'Save' }} Examination
+                                        <i class="fas fa-save"></i> {{ 'Save' }} Examination
                                     </button>
                                 </div>
                             </div>
@@ -828,33 +654,6 @@
                     </div>
                 </form>
 
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete the examination for
-                    {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    @if ($examination)
-                        <form id="deleteForm" method="POST"
-                            action="{{ route('IntraoralExamination.destroy', $examination->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    @endif
-                </div>
             </div>
         </div>
     </div>
