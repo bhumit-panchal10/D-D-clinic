@@ -12,35 +12,29 @@ class IntraoralExaminationController extends Controller
     public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
-
-        // Get the selected date from request, default to today
         $selectedDate = $request->get('date') ?? date('Y-m-d');
 
-        // Find examination for the selected date
+        // All examinations for the date (for the table/list)
+        $examinations = IntraoralExamination::where('patient_id', $patientId)
+            ->whereDate('exam_date', $selectedDate)
+            ->orderBy('exam_date', 'desc')
+            ->get();
+
+        // Single examination record used to populate the form/chart (take latest)
         $examination = IntraoralExamination::where('patient_id', $patientId)
             ->whereDate('exam_date', $selectedDate)
-            ->first();
+            ->orderBy('id', 'desc')
+            ->first() ?? new IntraoralExamination();
 
-        if ($examination) {
-            foreach (['caries', 'pain_op', 'missing', 'mobility', 'prosthesis'] as $field) {
-                $examination->$field = !empty($examination->$field)
-                    ? explode(',', $examination->$field)
-                    : [];
-            }
-        }
-        // Get all examination dates for this patient (for history navigation)
-        $allExamDates = IntraoralExamination::where('patient_id', $patientId)
-            ->orderBy('exam_date', 'desc')
-            ->get()
-            ->map(function ($exam) {
-                return [
-                    'date' => $exam->exam_date,
-                    'formatted' => \Carbon\Carbon::parse($exam->exam_date)->format('d M Y')
-                ];
-            });
-
-        return view('IntraoralExamination.index', compact('patient', 'examination', 'selectedDate', 'allExamDates'));
+        return view('IntraoralExamination.index', compact(
+            'patient',
+            'examinations',
+            'examination',
+            'selectedDate'
+        ));
     }
+
+
 
     public function store(Request $request, $patientId)
     {
@@ -57,36 +51,36 @@ class IntraoralExaminationController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Map FORM → DB fields
-        $fields = [
-            'caries_teeth'      => 'caries',
-            'pain_op_teeth'     => 'pain_op',
-            'missing_teeth'     => 'missing',
-            'mobility_teeth'    => 'mobility',
-            'prosthesis_teeth'  => 'prosthesis',
-            'bop'               => 'BOP',
-            'pocket'            => 'Pocket',
-            'sensitivity'       => 'Sensitivity',
+        // These form fields will contain CSV (11,12,13 etc)
+        $csvFields = [
+            'caries',
+            'pain_op',
+            'missing',
+            'mobility',
+            'prosthesis'
         ];
 
         $data = [
-            'patient_id' => $patientId,
-            'doctor_id'  => Auth::id(),
-            'exam_date'  => $request->exam_date,
-            'plaque'     => $request->plaque,
-            'calculus'   => $request->calculus,
-            'stains'     => $request->stains,
-            'impacted'   => $request->impacted,
-            'vitality'   => $request->vitality,
-            'notes'      => $request->notes,
+            'patient_id'  => $patientId,
+            'doctor_id'   => Auth::id(),
+            'exam_date'   => $request->exam_date,
+            'plaque'      => $request->plaque,
+            'calculus'    => $request->calculus,
+            'stains'      => $request->stains,
+            'impacted'    => $request->impacted,
+            'Pocket'      => $request->pocket,
+            'vitality'    => $request->vitality,
+            'Sensitivity' => $request->sensitivity,
+            'BOP'         => $request->bop,
+            'notes'       => $request->notes,
         ];
 
-        foreach ($fields as $formField => $dbField) {
 
-            if (str_contains($formField, '_teeth')) {
+        // Convert CSV → JSON
+        foreach ($csvFields as $field) {
 
-                // Convert CSV string → array
-                $values = collect(explode(',', $request->$formField))
+            if ($request->$field) {
+                $values = collect(explode(',', $request->$field))
                     ->map(fn($t) => trim($t))
                     ->filter(fn($t) => is_numeric($t))
                     ->map(fn($t) => intval($t))
@@ -94,35 +88,22 @@ class IntraoralExaminationController extends Controller
                     ->values()
                     ->toArray();
 
-                // Save JSON array
-                $data[$dbField] = $values;
+                // ✔ Save as "21,22"
+                $data[$field] = implode(',', $values);
             } else {
-
-                // For normal text fields
-                $data[$dbField] = $request->$formField ?? null;
+                $data[$field] = null;
             }
         }
 
-        // Check if exam already exists for this date
-        $exam = IntraoralExamination::where('patient_id', $patientId)
-            ->whereDate('exam_date', $request->exam_date)
-            ->first();
 
-        if ($exam) {
-            $exam->update($data);
-            $message = 'updated';
-        } else {
-            $exam = IntraoralExamination::create($data);
-            $message = 'saved';
-        }
+        // ALWAYS INSERT NEW RECORD — no update
+        IntraoralExamination::create($data);
 
         return redirect()->route('IntraoralExamination.index', [
             'patient' => $patientId,
-            'date'    => $request->exam_date
-        ])->with('success', "Intraoral examination {$message} successfully!");
+            'date' => $request->exam_date
+        ])->with('success', "Intraoral examination saved successfully!");
     }
-
-
     public function destroy($id)
     {
         $examination = IntraoralExamination::findOrFail($id);
