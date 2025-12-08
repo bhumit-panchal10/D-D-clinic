@@ -14,7 +14,7 @@
     </li> --}}
 
     <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('IntraoralExamination.index')) active @endif"
+        <a class="nav-link @if (request()->routeIs('IntraoralExamination.index', 'IntraoralExamination.add')) active @endif"
             href="{{ route('IntraoralExamination.index', $id) }}" role="tab">
             Intraoral Examination
         </a>

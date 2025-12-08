@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Payments')
+@section('title', 'Reason For Visit Today')
 
 @section('content')
 
@@ -39,34 +39,30 @@
                                 <form action="{{ route('ReasonForVisitToday.store', $patient->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                                    <div class="mb-3">
-                                        <label for="facial_asymmetry" class="form-label">Facial Asymmetry<span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" name="facial_asymmetry" id="facial_asymmetry"
-                                            class="form-control" value="" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="TMJ" class="form-label">TMJ<span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" name="TMJ" id="TMJ" class="form-control"
-                                            value="" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="TMJ" class="form-label">Lymphadenopathy<span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" name="Lymphadenopathy" id="Lymphadenopathy"
-                                            class="form-control" value="" required>
+                                    <div class="row mt-3">
+                                        <div class="mb-3">
+                                            <label for="comments" class="form-label">Reason For Visit Today</label>
+                                            <textarea name="comments" id="comments" class="form-control"></textarea>
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label>Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" id="date" name="date" required>
                                     </div>
-
-                                    <div class="row mt-3">
-                                        <div class="mb-3">
-                                            <label for="comments" class="form-label">Comments</label>
-                                            <textarea name="comments" id="comments" class="form-control"></textarea>
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="facial_asymmetry" class="form-label">Facial Asymmetry</label>
+                                        <input type="text" name="facial_asymmetry" id="facial_asymmetry"
+                                            class="form-control" value="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="TMJ" class="form-label">TMJ</label>
+                                        <input type="text" name="TMJ" id="TMJ" class="form-control"
+                                            value="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="TMJ" class="form-label">Lymphadenopathy</label>
+                                        <input type="text" name="Lymphadenopathy" id="Lymphadenopathy"
+                                            class="form-control" value="">
                                     </div>
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary">Save</button>
@@ -156,32 +152,30 @@
                         <input type="hidden" name="id" id="reasonforvisit_id" value="">
 
                         <div class="mb-3">
-                            <label for="edit_facial_asymmetry" class="form-label">Facial Asymmetry<span
-                                    class="text-danger">*</span></label>
-                            <input type="text" name="edit_facial_asymmetry" id="edit_facial_asymmetry"
-                                class="form-control" value="{{ old('edit_facial_asymmetry') }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_TMJ" class="form-label">TMJ<span class="text-danger">*</span></label>
-                            <input type="text" name="edit_TMJ" id="edit_TMJ" class="form-control"
-                                value="{{ old('edit_TMJ') }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_Lymphadenopathy" class="form-label">Lymphadenopathy<span
-                                    class="text-danger">*</span></label>
-                            <input type="text" name="edit_Lymphadenopathy" id="edit_Lymphadenopathy"
-                                class="form-control" value="{{ old('edit_Lymphadenopathy') }}" required>
+                            <label for="comments" class="form-label">Reason For Visit Today</label>
+                            <textarea name="comments" id="edit_comments" class="form-control">{{ old('comments') }}</textarea>
                         </div>
                         <div class="mb-3">
                             <label for="edit_date" class="form-label">Date<span class="text-danger">*</span></label>
                             <input type="date" name="edit_date" id="edit_date" class="form-control"
                                 value="{{ old('edit_date') }}" required>
                         </div>
-
                         <div class="mb-3">
-                            <label for="comments" class="form-label">Comments</label>
-                            <textarea name="comments" id="edit_comments" class="form-control">{{ old('comments') }}</textarea>
+                            <label for="edit_facial_asymmetry" class="form-label">Facial Asymmetry</label>
+                            <input type="text" name="edit_facial_asymmetry" id="edit_facial_asymmetry"
+                                class="form-control" value="{{ old('edit_facial_asymmetry') }}">
                         </div>
+                        <div class="mb-3">
+                            <label for="edit_TMJ" class="form-label">TMJ</label>
+                            <input type="text" name="edit_TMJ" id="edit_TMJ" class="form-control"
+                                value="{{ old('edit_TMJ') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_Lymphadenopathy" class="form-label">Lymphadenopathy</label>
+                            <input type="text" name="edit_Lymphadenopathy" id="edit_Lymphadenopathy"
+                                class="form-control" value="{{ old('edit_Lymphadenopathy') }}">
+                        </div>
+
 
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary">Update</button>

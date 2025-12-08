@@ -484,6 +484,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{patient}', [IntraoralExaminationController::class, 'index'])
             ->name('IntraoralExamination.index');  // Changed name here
 
+        // Show Add Form
+        Route::get('/add/{patient}', [IntraoralExaminationController::class, 'add'])
+            ->name('IntraoralExamination.add');
+
         Route::post('/{patient}', [IntraoralExaminationController::class, 'store'])
             ->name('IntraoralExamination.store');
 

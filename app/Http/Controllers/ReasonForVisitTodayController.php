@@ -22,7 +22,7 @@ class ReasonForVisitTodayController extends Controller
 
         $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'facial_asymmetry' => 'required',
+            'facial_asymmetry' => 'nullable',
             'TMJ' => 'nullable',
             'Lymphadenopathy' => 'nullable',
             'date' => 'required|date',
