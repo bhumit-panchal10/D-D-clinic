@@ -12,13 +12,22 @@ class IntraoralExaminationController extends Controller
     public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
-        $selectedDate = $request->get('date') ?? date('Y-m-d');
+        $selectedDate = $request->get('date') ?? '';
+
 
         // All examinations for the date (for the table/list)
-        $examinations = IntraoralExamination::where('patient_id', $patientId)
-            ->whereDate('exam_date', $selectedDate)
-            ->orderBy('exam_date', 'desc')
-            ->get();
+        if ($selectedDate) {
+
+            $examinations = IntraoralExamination::where('patient_id', $patientId)
+                ->whereDate('exam_date', $selectedDate)
+                ->orderBy('exam_date', 'desc')
+                ->get();
+        } else {
+
+            $examinations = IntraoralExamination::where('patient_id', $patientId)
+                ->orderBy('exam_date', 'desc')
+                ->get();
+        }
 
         // Single examination record used to populate the form/chart (take latest)
         $examination = IntraoralExamination::where('patient_id', $patientId)
@@ -34,6 +43,13 @@ class IntraoralExaminationController extends Controller
         ));
     }
 
+
+    public function add(Request $request, $patientId)
+    {
+        $patient = Patient::findOrFail($patientId);
+        $selectedTeeth = [];
+        return view('IntraoralExamination.add', compact('patient', 'selectedTeeth'));
+    }
 
 
     public function store(Request $request, $patientId)
@@ -100,10 +116,11 @@ class IntraoralExaminationController extends Controller
         IntraoralExamination::create($data);
 
         return redirect()->route('IntraoralExamination.index', [
-            'patient' => $patientId,
-            'date' => $request->exam_date
+            'patient' => $patientId
+            //'date' => $request->exam_date
         ])->with('success', "Intraoral examination saved successfully!");
     }
+
     public function destroy($id)
     {
         $examination = IntraoralExamination::findOrFail($id);
