@@ -18,7 +18,7 @@
                                 <h5 class="card-title mb-0">Patient List</h5>
 
                                 <div class="d-flex align-items-center gap-2">
-                                     <form action="{{ route('patient.index') }}" method="GET"
+                                    <form action="{{ route('patient.index') }}" method="GET"
                                         class="d-flex align-items-center gap-2 position-relative">
                                         <input type="text" name="search" id="patient-search"
                                             value="{{ request()->search }}" class="form-control form-control-sm"
@@ -54,7 +54,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                         <?php $i = 1; ?>
+                                        <?php $i = 1; ?>
                                         @foreach ($patients as $key => $patient)
                                             <tr>
                                                 <!--<td>{{ $key + 1 }}</td>-->
@@ -63,7 +63,7 @@
                                                 </td>
                                                 <td>{{ $patient->case_no }}</td>
                                                 <td>
-                                                    <a href="{{ route('patient_treatments.index', $patient->id) }}"
+                                                    <a href="{{ route('ReasonForVisitToday.index', $patient->id) }}"
                                                         class="text-primary">
                                                         {{ $patient->name }}
                                                     </a>
@@ -77,10 +77,10 @@
 
                                                 <td>
 
-                                                {{ $patient->gender ?? '-' }}
+                                                    {{ $patient->gender ?? '-' }}
 
                                                 </td>
-                                                 <td>
+                                                <td>
                                                     {{ $patient->created_at && strtotime($patient->created_at)
                                                         ? date('d-m-Y', strtotime($patient->created_at))
                                                         : '-' }}
@@ -100,8 +100,8 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                
-                                 <div class="d-flex justify-content-between">
+
+                                <div class="d-flex justify-content-between">
                                     <form class="">
                                         Pagination : &nbsp;<select id="pagination">
                                             {{-- <option value="">Page</option> --}}
@@ -239,21 +239,54 @@
 
 
 <!--@section('scripts')-->
-<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-<!--    <script>-->
-<!--        $(document).ready(function() {-->
-<!--            $(".delete-patient").on("click", function() {-->
-<!--                let id = $(this).data("id");-->
-<!--                $("#deleteid").val(id);-->
-<!--            });-->
+    <!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+    <!--    <script>
+        -- >
+        <
+        !--$(document).ready(function() {
+            -- >
+            <
+            !--$(".delete-patient").on("click", function() {
+                -- >
+                <
+                !--
+                let id = $(this).data("id");
+                -- >
+                <
+                !--$("#deleteid").val(id);
+                -- >
+                <
+                !--
+            });
+            -- >
 
             // Confirm Delete Button Click
-<!--            $("#confirmDelete").on("click", function() {-->
-<!--                let id = $("#deleteid").val();-->
-<!--                let actionUrl = "{{ route('patient.destroy', ':id') }}".replace(':id', id);-->
-<!--                $("#deleteForm").attr("action", actionUrl);-->
-<!--                $("#deleteForm").submit();-->
-<!--            });-->
-<!--        });-->
-<!--    </script>-->
+            <
+            !--$("#confirmDelete").on("click", function() {
+                -- >
+                <
+                !--
+                let id = $("#deleteid").val();
+                -- >
+                <
+                !--
+                let actionUrl = "{{ route('patient.destroy', ':id') }}".replace(':id', id);
+                -- >
+                <
+                !--$("#deleteForm").attr("action", actionUrl);
+                -- >
+                <
+                !--$("#deleteForm").submit();
+                -- >
+                <
+                !--
+            });
+            -- >
+            <
+            !--
+        });
+        -- >
+        <
+        !--
+    </script>-->
 <!--@endsection-->

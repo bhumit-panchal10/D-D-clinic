@@ -201,17 +201,32 @@
                                 <div class="col-md-6">
                                     <label for="exam_date" class="form-label">Examination Date</label>
                                     <div class="input-group">
-                                        <input type="date" name="date" id="exam_date" class="form-control"
-                                            value="{{ $selectedDate ?? '' }}" max="{{ date('Y-m-d') }}">
-                                        <button type="button" class="btn btn-outline-secondary" onclick="setToday()">
+                                        <select name="date" id="exam_date" class="form-control">
+                                            <option value="">-- Select Date --</option>
+                                            @foreach ($examinations as $exam)
+                                                @php
+                                                    $value = date('Y-m-d', strtotime($exam->exam_date));
+                                                    $label = date('d-m-Y', strtotime($exam->exam_date));
+                                                @endphp
+
+                                                <option value="{{ $value }}"
+                                                    {{ $selectedDate == $value ? 'selected' : '' }}>
+                                                    {{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                        {{-- <input type="date" name="date" id="exam_date" class="form-control"
+                                            value="{{ $selectedDate ?? '' }}" max="{{ date('Y-m-d') }}"> --}}
+                                        {{-- <button type="button" class="btn btn-outline-secondary" onclick="setToday()">
                                             Today
-                                        </button>
+                                        </button> --}}
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">&nbsp;</label>
                                     <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-search"></i> Load Date
+                                        <i class="fas fa-search"></i> Search
                                     </button>
                                 </div>
                                 <div class="col-md-3">
@@ -224,93 +239,6 @@
                     </div>
                 </div>
 
-                <!-- LIST DISPLAY SECTION - Only show if examination exists -->
-                @if ($examinations)
-                    <h4 class="mb-3">Intraoral Examination Records</h4>
-
-                    <table class="table table-bordered table-striped">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th>Date</th>
-                                <th>Caries</th>
-                                <th>Pain OP</th>
-                                <th>Missing</th>
-                                <th>Mobility</th>
-                                <th>Prosthesis</th>
-                                <th>BOP</th>
-                                <th>Notes</th>
-                                <th width="120">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach ($examinations as $exam)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->caries ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->missing ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>{{ $exam->BOP ?? '-' }}</td>
-                                    <td>{{ $exam->notes ?? '-' }}</td>
-
-                                    <td>
-                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
-                                            method="POST" onsubmit="return confirm('Delete this record?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-
-
-
-                    </table>
-
-                @endif
 
                 <!-- Main Form (Existing form remains the same) -->
                 <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
@@ -331,7 +259,7 @@
                         </div>
                         <div class="text-end">
                             <a href="{{ route('IntraoralExamination.add', $patient->id) }}"
-                                class="btn btn-outline-primary">
+                                class="btn btn-outline-primary teeth-toggle-btn active">
                                 <i class="fas fa-plus"></i> Add
                             </a>
 
@@ -764,6 +692,95 @@
                         </div>
                     </div>
                 </form>
+
+                <!-- LIST DISPLAY SECTION - Only show if examination exists -->
+                @if ($examinations)
+                    <h4 class="mb-3">Intraoral Examination Records</h4>
+
+                    <table class="table table-bordered table-striped">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Date</th>
+                                <th>Caries</th>
+                                <th>Pain OP</th>
+                                <th>Missing</th>
+                                <th>Mobility</th>
+                                <th>Prosthesis</th>
+                                <th>BOP</th>
+                                <th>Notes</th>
+                                <th width="120">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($examinations as $exam)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->caries ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->missing ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>{{ $exam->BOP ?? '-' }}</td>
+                                    <td>{{ $exam->notes ?? '-' }}</td>
+
+                                    <td>
+                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
+                                            method="POST" onsubmit="return confirm('Delete this record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+
+
+                    </table>
+
+                @endif
+
 
             </div>
         </div>

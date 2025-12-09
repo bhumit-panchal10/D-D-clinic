@@ -1,7 +1,7 @@
 <ul class="nav nav-pills animation-nav nav-justified mb-3" role="tablist">
     <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('patient_treatments.index', 'patient_treatments.create')) active @endif"
-            href="{{ route('patient_treatments.index', $id) }}" role="tab">
+        <a class="nav-link @if (request()->routeIs('ReasonForVisitToday.index', 'ReasonForVisitToday.index')) active @endif"
+            href="{{ route('ReasonForVisitToday.index', $id) }}" role="tab">
             Patient Treatments
         </a>
     </li>
