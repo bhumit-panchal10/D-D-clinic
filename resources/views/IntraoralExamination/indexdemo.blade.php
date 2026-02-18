@@ -185,12 +185,12 @@
                 @include('common.alert')
                 @include('patient.show', ['id' => $patient->id])
                 @include('patient_treatments.Submenu', ['id' => $patient->id])
-                {{-- @if (session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif --}}
+                @endif
 
                 <!-- Date Selector -->
                 <div class="card mb-4">
@@ -258,7 +258,7 @@
                             </button>
                         </div>
                         <div class="text-end">
-                            <a href="{{ route('IntraoralExamination.add', $patient->id) }}"
+                            <a href="{{ route('IntraoralExamination.adddemo', $patient->id) }}"
                                 class="btn btn-outline-primary teeth-toggle-btn active">
                                 <i class="fas fa-plus"></i> Add
                             </a>
@@ -269,7 +269,7 @@
 
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
@@ -288,7 +288,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Pain O.P. Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-warning text-dark">
@@ -307,7 +307,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Missing Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-dark text-white">
@@ -326,7 +326,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Mobility Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-primary text-white">
@@ -345,7 +345,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-purple text-white" style="background: pink;">
                                     <i class="fas fa-teeth me-2"></i>Prosthesis
@@ -590,11 +590,13 @@
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
+                                    {{-- <button type="button" class="btn btn-sm btn-outline-primary"
+                                        onclick="clearAllSelections()">
+                                        <i class="fas fa-times"></i> Clear All
+                                    </button> --}}
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
-                                        <input type="hidden" name="intraoralexamination_id" id="intraoralexamination_id"
-                                            value="{{ $examination->id }}">
                                         <!-- Caries -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
@@ -608,12 +610,6 @@
                                                             class="badge bg-danger rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-1" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[1]->comment ?? '' }}">
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="1">
-                                                    Save
-                                                </button>
                                             </div>
                                         </div>
 
@@ -630,11 +626,6 @@
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-2" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[2]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="2">Save</button>
                                             </div>
                                         </div>
 
@@ -651,11 +642,6 @@
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-3" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[3]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="3">Save</button>
                                             </div>
                                         </div>
 
@@ -672,11 +658,6 @@
                                                             class="badge bg-primary rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-4" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[4]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="4">Save</button>
                                             </div>
                                         </div>
 
@@ -694,17 +675,20 @@
                                                             style="background-color: #800080;">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-5" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[5]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="5">Save</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Submit Button -->
+                            {{-- <div class="card mt-3">
+                                <div class="card-body text-center">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> {{ 'Save' }} Examination
+                                    </button>
+                                </div>
+                            </div> --}}
                         </div>
                     </div>
                 </form>
@@ -805,59 +789,6 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).on('click', '.save-condition', function() {
-
-            let typeId = $(this).data('type');
-            let intraoralexaminationid = $('#intraoralexamination_id').val();
-            let comment = $('#comment-' + typeId).val();
-            let patientId = "{{ $patient->id }}";
-
-            $.ajax({
-                url: "{{ route('save.condition') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    patient_id: patientId,
-                    type_id: typeId,
-                    comment: comment,
-                    intraoralexaminationid: intraoralexaminationid
-                },
-                success: function(response) {
-
-                    if (response.status) {
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                    }
-
-                },
-                error: function(xhr) {
-
-                    let errorMessage = "Something went wrong!";
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage
-                    });
-
-                }
-            });
-
-        });
-    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

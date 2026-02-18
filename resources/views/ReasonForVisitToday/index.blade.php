@@ -90,10 +90,11 @@
                                     <thead>
                                         <tr>
                                             <th>Sr. No</th>
-                                            <th>Facial Asymmetry</th>
+                                            {{-- <th>Facial Asymmetry</th>
                                             <th>TMJ</th>
-                                            <th>Lymphadenopathy</th>
+                                            <th>Lymphadenopathy</th> --}}
                                             <th>Date</th>
+                                            <th>Reason For Visit Today</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -101,16 +102,16 @@
                                         @foreach ($ReasonForVisitToday as $key => $ReasonForVisit)
                                             <tr>
                                                 <td class="text-center">{{ $ReasonForVisitToday->firstItem() + $key }}</td>
-                                                <td>{{ $ReasonForVisit->facial_asymmetry ?? '-' }}</td>
+                                                {{-- <td>{{ $ReasonForVisit->facial_asymmetry ?? '-' }}</td>
                                                 <td>{{ $ReasonForVisit->TMJ ?? '-' }}</td>
-                                                <td>{{ $ReasonForVisit->Lymphadenopathy ?? '-' }}</td>
+                                                <td>{{ $ReasonForVisit->Lymphadenopathy ?? '-' }}</td> --}}
                                                 <td>{{ date('d-m-Y', strtotime($ReasonForVisit->date)) }}</td>
-
+                                                <td>{{ Str::limit($ReasonForVisit->comment ?? '-', 50) }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-primary edit-btn"
                                                         onclick="getEditData(<?= $ReasonForVisit->id ?>)"
                                                         data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                                                        Edit
+                                                        View
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-primary delete-btn"
                                                         data-id="{{ $ReasonForVisit->id }}"

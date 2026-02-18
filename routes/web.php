@@ -50,7 +50,7 @@ use App\Http\Controllers\ConcernFormMasterController;
 use App\Http\Controllers\PatientConcernFormController;
 use App\Http\Controllers\ReasonForVisitTodayController;
 use App\Http\Controllers\IntraoralExaminationController;
-
+use App\Http\Controllers\TreatmentPlanController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -482,11 +482,30 @@ Route::middleware(['auth'])->group(function () {
     // Intraoral Examination Routes
     Route::prefix('intraoral')->group(function () {
         Route::get('/{patient}', [IntraoralExaminationController::class, 'index'])
-            ->name('IntraoralExamination.index');  // Changed name here
+            ->name('IntraoralExamination.index');
+
+        Route::get('/demo/{patient}', [IntraoralExaminationController::class, 'indexdemo'])
+            ->name('IntraoralExaminationdemo.index');
 
         // Show Add Form
         Route::get('/add/{patient}', [IntraoralExaminationController::class, 'add'])
             ->name('IntraoralExamination.add');
+
+        Route::post('/save-condition', [IntraoralExaminationController::class, 'saveCondition'])
+            ->name('save.condition');
+
+        Route::get(
+            '/intraoral/{patient}/edit/{id}',
+            [IntraoralExaminationController::class, 'edit']
+        )->name('IntraoralExamination.edit');
+
+        Route::put(
+            '/intraoral/{patient}/update/{id}',
+            [IntraoralExaminationController::class, 'update']
+        )->name('IntraoralExamination.update');
+
+        Route::get('/demo/add/{patient}', [IntraoralExaminationController::class, 'adddemo'])
+            ->name('IntraoralExamination.adddemo');
 
         Route::post('/{patient}', [IntraoralExaminationController::class, 'store'])
             ->name('IntraoralExamination.store');
@@ -494,6 +513,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{examination}', [IntraoralExaminationController::class, 'destroy'])
             ->name('IntraoralExamination.destroy');
     });
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Intraoral Examination Routes
+
+    Route::prefix('TreatmentPlan')->group(function () {
+        Route::get('/{patient}', [TreatmentPlanController::class, 'index'])
+            ->name('TreatmentPlan.index');
+    });
+
+    // Show Add Form
+    Route::get('TreatmentPlan/add/{patient}', [TreatmentPlanController::class, 'add'])
+        ->name('TreatmentPlan.add');
 });
 
 
