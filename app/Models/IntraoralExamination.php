@@ -38,4 +38,9 @@ class IntraoralExamination extends Model
         'mobility'   => 'array',
         'prosthesis' => 'array',
     ];
+
+    public function teethComments()
+    {
+        return $this->hasMany(TeethComment::class, 'intraoralexamination_id');
+    }
 }

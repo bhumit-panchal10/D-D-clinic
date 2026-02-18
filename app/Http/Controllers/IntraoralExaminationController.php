@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\IntraoralExamination;
 use App\Models\Patient;
+use App\Models\ReasonForVisitToday;
+use App\Models\TeethComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IntraoralExaminationController extends Controller
 {
-    public function index(Request $request, $patientId)
+
+    public function indexdemo(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
         $selectedDate = $request->get('date') ?? '';
-
 
         // All examinations for the date (for the table/list)
         if ($selectedDate) {
@@ -35,7 +37,7 @@ class IntraoralExaminationController extends Controller
             ->orderBy('id', 'desc')
             ->first() ?? new IntraoralExamination();
 
-        return view('IntraoralExamination.index', compact(
+        return view('IntraoralExamination.indexdemo', compact(
             'patient',
             'examinations',
             'examination',
@@ -44,6 +46,87 @@ class IntraoralExaminationController extends Controller
     }
 
 
+    // public function index(Request $request, $patientId)
+    // {
+    //     $patient = Patient::findOrFail($patientId);
+    //     $selectedDate = $request->get('date') ?? '';
+    //     $conditions = '';
+
+    //     if ($selectedDate) {
+
+    //         $examinations = IntraoralExamination::where('patient_id', $patientId)
+    //             ->whereDate('exam_date', $selectedDate)
+    //             ->orderBy('exam_date', 'desc')
+    //             ->get();
+
+    //         $conditions = TeethComment::where(['patient_id' => $patientId, 'intraoralexamination_id' => $examinations->id])
+    //             ->get()
+    //             ->keyBy('type_id');
+    //     } else {
+
+    //         $examinations = IntraoralExamination::where('patient_id', $patientId)
+    //             ->orderBy('exam_date', 'desc')
+    //             ->get();
+    //     }
+
+    //     // Single examination record used to populate the form/chart (take latest)
+    //     $examination = IntraoralExamination::where('patient_id', $patientId)
+    //         ->whereDate('exam_date', $selectedDate)
+    //         ->orderBy('id', 'desc')
+    //         ->first() ?? new IntraoralExamination();
+    //     return view('IntraoralExamination.index', compact(
+    //         'patient',
+    //         'examinations',
+    //         'examination',
+    //         'selectedDate',
+    //         'conditions'
+    //     ));
+    // }
+
+    public function index(Request $request, $patientId)
+    {
+        $patient = Patient::findOrFail($patientId);
+        $selectedDate = $request->get('date') ?? '';
+
+        $conditions = collect(); // default empty collection
+        $examination = null;
+
+        if ($selectedDate) {
+
+            $examination = IntraoralExamination::where('patient_id', $patientId)
+                ->whereDate('exam_date', $selectedDate)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($examination) {
+
+                $conditions = TeethComment::where('patient_id', $patientId)
+                    ->where('intraoralexamination_id', $examination->id)
+                    ->get()
+                    ->keyBy('type_id');
+            }
+
+            $examinations = IntraoralExamination::where('patient_id', $patientId)
+                ->orderBy('exam_date', 'desc')
+                ->get();
+        } else {
+
+            $examinations = IntraoralExamination::where('patient_id', $patientId)
+                ->orderBy('exam_date', 'desc')
+                ->get();
+
+            $examination = new IntraoralExamination();
+        }
+
+        return view('IntraoralExamination.index', compact(
+            'patient',
+            'examinations',
+            'examination',
+            'selectedDate',
+            'conditions'
+        ));
+    }
+
     public function add(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
@@ -51,6 +134,40 @@ class IntraoralExaminationController extends Controller
         return view('IntraoralExamination.add', compact('patient', 'selectedTeeth'));
     }
 
+    public function saveCondition(Request $request)
+    {
+        $request->validate([
+            'patient_id' => 'required',
+            'type_id'    => 'required',
+            'intraoralexaminationid' => 'required',
+            'comment'    => 'nullable|string|max:1000',
+        ]);
+
+        TeethComment::updateOrCreate(
+            [
+                'patient_id' => $request->patient_id,
+                'type_id'    => $request->type_id,
+                'intraoralexamination_id' => $request->intraoralexaminationid,
+            ],
+            [
+                'comment' => $request->comment,
+            ]
+        );
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Saved successfully'
+        ]);
+    }
+
+    public function adddemo(Request $request, $patientId)
+    {
+        $patient = Patient::findOrFail($patientId);
+        $ReasonForVisitToday = ReasonForVisitToday::where('patient_id', $patientId)->paginate(config('app.per_page'));
+
+        $selectedTeeth = [];
+        return view('IntraoralExamination.demoadd', compact('patient', 'selectedTeeth', 'ReasonForVisitToday'));
+    }
 
     public function store(Request $request, $patientId)
     {
@@ -119,6 +236,68 @@ class IntraoralExaminationController extends Controller
             'patient' => $patientId
             //'date' => $request->exam_date
         ])->with('success', "Intraoral examination saved successfully!");
+    }
+
+    public function edit($patientId, $id)
+    {
+        $patient = Patient::findOrFail($patientId);
+        $examination = IntraoralExamination::findOrFail($id);
+
+        return view('IntraoralExamination.edit', compact(
+            'patient',
+            'examination'
+        ));
+    }
+
+    public function update(Request $request, $patientId, $id)
+    {
+        $request->validate([
+            'exam_date' => 'required|date',
+        ]);
+
+        $examination = IntraoralExamination::findOrFail($id);
+
+        $csvFields = [
+            'caries',
+            'pain_op',
+            'missing',
+            'mobility',
+            'prosthesis'
+        ];
+
+        $data = [
+            'exam_date'   => $request->exam_date,
+            'plaque'      => $request->plaque,
+            'calculus'    => $request->calculus,
+            'stains'      => $request->stains,
+            'impacted'    => $request->impacted,
+            'pocket'      => $request->pocket,
+            'vitality'    => $request->vitality,
+            'sensitivity' => $request->sensitivity,
+            'bop'         => $request->bop,
+            'notes'       => $request->notes,
+        ];
+
+        foreach ($csvFields as $field) {
+            if ($request->$field) {
+                $values = collect(explode(',', $request->$field))
+                    ->map(fn($t) => trim($t))
+                    ->filter(fn($t) => is_numeric($t))
+                    ->map(fn($t) => intval($t))
+                    ->sort()
+                    ->values()
+                    ->toArray();
+
+                $data[$field] = implode(',', $values);
+            } else {
+                $data[$field] = null;
+            }
+        }
+
+        $examination->update($data);
+
+        return redirect()->route('IntraoralExamination.index', $patientId)
+            ->with('success', 'Examination updated successfully!');
     }
 
     public function destroy($id)

@@ -20,4 +20,18 @@
         </a>
     </li>
 
+    {{-- <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('IntraoralExaminationdemo.index', 'IntraoralExamination.adddemo')) active @endif"
+            href="{{ route('IntraoralExaminationdemo.index', $id) }}" role="tab">
+            Intraoral Examination demo
+        </a>
+    </li> --}}
+
+    <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('TreatmentPlan.index', 'TreatmentPlan.add')) active @endif"
+            href="{{ route('TreatmentPlan.index', $id) }}" role="tab">
+            Treatment Plan
+        </a>
+    </li>
+
 </ul>

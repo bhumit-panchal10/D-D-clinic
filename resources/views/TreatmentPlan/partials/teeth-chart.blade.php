@@ -3,12 +3,11 @@
     <!-- Adult Teeth -->
     <div class="adult-teeth">
         <!-- Upper Jaw -->
-        <div class="mb-0">
+        <div class="mb-3">
             <div class="text-center mb-2 small text-muted"><strong>Upper Jaw</strong></div>
-            <div class="d-flex flex-row justify-content-center ">
+            <div class="d-flex justify-content-center mb-2">
                 <!-- Upper Right -->
-                <div class="d-flex justify-content-center  "
-                    style="border-right : 1px solid #000;border-bottom : 1px solid #000; padding: 20px;">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @foreach ([18, 17, 16, 15, 14, 13, 12, 11] as $tooth)
                         @php
                             $isSelected = in_array($tooth, $selectedTeeth ?? []);
@@ -21,16 +20,12 @@
                                 data-green="{{ asset('assets/images/TeethGreen/' . $tooth . '.png') }}"
                                 class="{{ $isSelected ? 'selected tooth-selected-' . $section : '' }}">
                             <div class="tooth-text">{{ $tooth }}</div>
-                            <div class="tooth-note-wrapper mt-1" style="display:none;">
-                                <input type="text" class="form-control form-control-sm tooth-note"
-                                    name="{{ $section }}_note[{{ $tooth }}]" placeholder="Enter note">
-                            </div>
                         </div>
                     @endforeach
                 </div>
 
                 <!-- Upper Left -->
-                <div class="d-flex justify-content-center " style="border-bottom : 1px solid #000; padding: 20px;">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @foreach ([21, 22, 23, 24, 25, 26, 27, 28] as $tooth)
                         @php
                             $isSelected = in_array($tooth, $selectedTeeth ?? []);
@@ -50,11 +45,11 @@
         </div>
 
         <!-- Lower Jaw -->
-        <div class="mb-0">
-            <div class="d-flex flex-row justify-content-center ">
+        <div>
+            <div class="text-center mb-2 small text-muted"><strong>Lower Jaw</strong></div>
+            <div class="d-flex justify-content-center">
                 <!-- Lower Right -->
-                <div class="d-flex justify-content-center mb-2"
-                    style="border-right : 1px solid #000;border-top:1px solid #000; padding: 20px;">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @foreach ([48, 47, 46, 45, 44, 43, 42, 41] as $tooth)
                         @php
                             $isSelected = in_array($tooth, $selectedTeeth ?? []);
@@ -72,7 +67,7 @@
                 </div>
 
                 <!-- Lower Left -->
-                <div class="d-flex justify-content-center mb-2" style="border-top:1px solid #000; padding: 20px;">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @foreach ([31, 32, 33, 34, 35, 36, 37, 38] as $tooth)
                         @php
                             $isSelected = in_array($tooth, $selectedTeeth ?? []);
@@ -89,7 +84,6 @@
                     @endforeach
                 </div>
             </div>
-            <div class="text-center mb-2 small text-muted"><strong>Lower Jaw</strong></div>
         </div>
     </div>
 
@@ -100,7 +94,7 @@
             <div class="text-center mb-2 small text-muted"><strong>Upper Jaw (Primary)</strong></div>
             <div class="d-flex justify-content-center mb-2">
                 <!-- Upper Left Primary -->
-                <div class="d-flex d-flex justify-content-center mb-2">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @php
                         $upperLeftMapping = [
                             '55' => '1E',
@@ -130,7 +124,7 @@
                 </div>
 
                 <!-- Upper Right Primary -->
-                <div class="d-flex d-flex justify-content-center mb-2">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @php
                         $upperRightMapping = [
                             '61' => '2A',
@@ -166,7 +160,7 @@
             <div class="text-center mb-2 small text-muted"><strong>Lower Jaw (Primary)</strong></div>
             <div class="d-flex justify-content-center">
                 <!-- Lower Left Primary -->
-                <div class="d-flex d-flex justify-content-center mb-2">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @php
                         $lowerLeftMapping = [
                             '85' => '3E',
@@ -196,7 +190,7 @@
                 </div>
 
                 <!-- Lower Right Primary -->
-                <div class="d-flex d-flex justify-content-center mb-2">
+                <div class="d-flex flex-wrap" style="width: 180px;">
                     @php
                         $lowerRightMapping = [
                             '71' => '4A',

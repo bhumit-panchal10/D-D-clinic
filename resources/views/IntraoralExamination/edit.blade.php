@@ -185,60 +185,12 @@
                 @include('common.alert')
                 @include('patient.show', ['id' => $patient->id])
                 @include('patient_treatments.Submenu', ['id' => $patient->id])
-                {{-- @if (session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif --}}
-
-                <!-- Date Selector -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form method="GET" action="{{ route('IntraoralExamination.index', $patient->id) }}"
-                            id="dateForm">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <label for="exam_date" class="form-label">Examination Date</label>
-                                    <div class="input-group">
-                                        <select name="date" id="exam_date" class="form-control">
-                                            <option value="">-- Select Date --</option>
-                                            @foreach ($examinations as $exam)
-                                                @php
-                                                    $value = date('Y-m-d', strtotime($exam->exam_date));
-                                                    $label = date('d-m-Y', strtotime($exam->exam_date));
-                                                @endphp
-
-                                                <option value="{{ $value }}"
-                                                    {{ $selectedDate == $value ? 'selected' : '' }}>
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-                                        {{-- <input type="date" name="date" id="exam_date" class="form-control"
-                                            value="{{ $selectedDate ?? '' }}" max="{{ date('Y-m-d') }}"> --}}
-                                        {{-- <button type="button" class="btn btn-outline-secondary" onclick="setToday()">
-                                            Today
-                                        </button> --}}
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-search"></i> Search
-                                    </button>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">&nbsp;</label>
-                                    <a href="{{ route('IntraoralExamination.index', $patient->id) }}"
-                                        class="btn btn-primary w-100">Clear</a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
+                @endif
 
                 <!-- Main Form (Existing form remains the same) -->
                 <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
@@ -258,18 +210,17 @@
                             </button>
                         </div>
                         <div class="text-end">
-                            <a href="{{ route('IntraoralExamination.add', $patient->id) }}"
-                                class="btn btn-outline-primary teeth-toggle-btn active">
-                                <i class="fas fa-plus"></i> Add
+                            <a href="{{ route('IntraoralExamination.index', $patient->id) }}"
+                                class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back
                             </a>
-
                         </div>
                     </div>
 
 
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
@@ -278,9 +229,9 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'caries',
-                                        'selectedTeeth' => $examination->caries
-                                            ? explode(',', $examination->caries)
-                                            : [],
+                                        // 'selectedTeeth' => $examination->caries
+                                        //     ? explode(',', $examination->caries)
+                                        //     : [],
                                     ])
                                     <input type="hidden" name="caries" id="caries_teeth"
                                         value="{{ $examination->caries ?? '' }}">
@@ -288,7 +239,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Pain O.P. Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-warning text-dark">
@@ -297,9 +248,9 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'pain',
-                                        'selectedTeeth' => $examination->pain_op
-                                            ? explode(',', $examination->pain_op)
-                                            : [],
+                                        // 'selectedTeeth' => $examination->pain_op
+                                        //     ? explode(',', $examination->pain_op)
+                                        //     : [],
                                     ])
                                     <input type="hidden" name="pain_op" id="pain_teeth"
                                         value="{{ $examination->pain_op ?? '' }}">
@@ -307,7 +258,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Missing Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-dark text-white">
@@ -316,9 +267,9 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'missing',
-                                        'selectedTeeth' => $examination->missing
-                                            ? explode(',', $examination->missing)
-                                            : [],
+                                        // 'selectedTeeth' => $examination->missing
+                                        //     ? explode(',', $examination->missing)
+                                        //     : [],
                                     ])
                                     <input type="hidden" name="missing" id="missing_teeth"
                                         value="{{ $examination->missing ?? '' }}">
@@ -326,7 +277,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Mobility Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-primary text-white">
@@ -335,9 +286,9 @@
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'mobility',
-                                        'selectedTeeth' => $examination->mobility
-                                            ? explode(',', $examination->mobility)
-                                            : [],
+                                        // 'selectedTeeth' => $examination->mobility
+                                        //     ? explode(',', $examination->mobility)
+                                        //     : [],
                                     ])
                                     <input type="hidden" name="mobility" id="mobility_teeth"
                                         value="{{ $examination->mobility ?? '' }}">
@@ -345,7 +296,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-purple text-white" style="background: pink;">
                                     <i class="fas fa-teeth me-2"></i>Prosthesis
@@ -460,8 +411,8 @@
 
                                             <div class="mb-3 col-lg-12">
                                                 <label for="exam_date" class="form-label">Exam Date</label>
-                                                <input type="date" name="exam_date" id="exam_date"
-                                                    class="form-control" value="{{ date('Y-m-d') }}">
+                                                <input type="date" name="exam_date" id="exam_date" class="form-control"
+                                                    value="{{ date('Y-m-d') }}">
                                             </div>
                                             <div class="mb-3 col-lg-6">
                                                 <label for="impacted" class="form-label">Impacted</label>
@@ -490,8 +441,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
 
                         </div>
 
@@ -590,11 +539,13 @@
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
+                                    {{-- <button type="button" class="btn btn-sm btn-outline-primary"
+                                        onclick="clearAllSelections()">
+                                        <i class="fas fa-times"></i> Clear All
+                                    </button> --}}
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
-                                        <input type="hidden" name="intraoralexamination_id" id="intraoralexamination_id"
-                                            value="{{ $examination->id }}">
                                         <!-- Caries -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
@@ -608,12 +559,6 @@
                                                             class="badge bg-danger rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-1" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[1]->comment ?? '' }}">
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="1">
-                                                    Save
-                                                </button>
                                             </div>
                                         </div>
 
@@ -630,11 +575,6 @@
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-2" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[2]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="2">Save</button>
                                             </div>
                                         </div>
 
@@ -651,11 +591,6 @@
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-3" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[3]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="3">Save</button>
                                             </div>
                                         </div>
 
@@ -672,11 +607,6 @@
                                                             class="badge bg-primary rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-4" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[4]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="4">Save</button>
                                             </div>
                                         </div>
 
@@ -694,109 +624,23 @@
                                                             style="background-color: #800080;">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-5" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[5]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="5">Save</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Submit Button -->
+                            <div class="card mt-3">
+                                <div class="card-body text-center">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> {{ 'Save' }} Examination
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
-
-                <!-- LIST DISPLAY SECTION - Only show if examination exists -->
-                @if ($examinations)
-                    <h4 class="mb-3">Intraoral Examination Records</h4>
-
-                    <table class="table table-bordered table-striped">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th>Date</th>
-                                <th>Caries</th>
-                                <th>Pain OP</th>
-                                <th>Missing</th>
-                                <th>Mobility</th>
-                                <th>Prosthesis</th>
-                                <th>BOP</th>
-                                <th>Notes</th>
-                                <th width="120">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach ($examinations as $exam)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->caries ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->missing ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>{{ $exam->BOP ?? '-' }}</td>
-                                    <td>{{ $exam->notes ?? '-' }}</td>
-
-                                    <td>
-                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
-                                            method="POST" onsubmit="return confirm('Delete this record?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-
-
-
-                    </table>
-
-                @endif
-
 
             </div>
         </div>
@@ -805,60 +649,6 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).on('click', '.save-condition', function() {
-
-            let typeId = $(this).data('type');
-            let intraoralexaminationid = $('#intraoralexamination_id').val();
-            let comment = $('#comment-' + typeId).val();
-            let patientId = "{{ $patient->id }}";
-
-            $.ajax({
-                url: "{{ route('save.condition') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    patient_id: patientId,
-                    type_id: typeId,
-                    comment: comment,
-                    intraoralexaminationid: intraoralexaminationid
-                },
-                success: function(response) {
-
-                    if (response.status) {
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                    }
-
-                },
-                error: function(xhr) {
-
-                    let errorMessage = "Something went wrong!";
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage
-                    });
-
-                }
-            });
-
-        });
-    </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize teeth type to adult

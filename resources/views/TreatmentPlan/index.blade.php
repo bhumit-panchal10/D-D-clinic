@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Intraoral Examination')
+@section('title', 'Treatment Plan')
 
 @section('content')
     <style>
@@ -185,21 +185,21 @@
                 @include('common.alert')
                 @include('patient.show', ['id' => $patient->id])
                 @include('patient_treatments.Submenu', ['id' => $patient->id])
-                {{-- @if (session('success'))
+                @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif --}}
+                @endif
 
                 <!-- Date Selector -->
-                <div class="card mb-4">
+                {{-- <div class="card mb-4">
                     <div class="card-body">
                         <form method="GET" action="{{ route('IntraoralExamination.index', $patient->id) }}"
                             id="dateForm">
                             <div class="row align-items-center">
                                 <div class="col-md-6">
-                                    <label for="exam_date" class="form-label">Examination Date</label>
+                                    <label for="exam_date" class="form-label">Date</label>
                                     <div class="input-group">
                                         <select name="date" id="exam_date" class="form-control">
                                             <option value="">-- Select Date --</option>
@@ -215,12 +215,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-
-                                        {{-- <input type="date" name="date" id="exam_date" class="form-control"
-                                            value="{{ $selectedDate ?? '' }}" max="{{ date('Y-m-d') }}"> --}}
-                                        {{-- <button type="button" class="btn btn-outline-secondary" onclick="setToday()">
-                                            Today
-                                        </button> --}}
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -237,7 +231,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </div> --}}
 
 
                 <!-- Main Form (Existing form remains the same) -->
@@ -258,22 +252,20 @@
                             </button>
                         </div>
                         <div class="text-end">
-                            <a href="{{ route('IntraoralExamination.add', $patient->id) }}"
+                            <a href="{{ route('TreatmentPlan.add', $patient->id) }}"
                                 class="btn btn-outline-primary teeth-toggle-btn active">
                                 <i class="fas fa-plus"></i> Add
                             </a>
-
                         </div>
                     </div>
 
-
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
-                                    <i class="fas fa-tooth me-2"></i>Caries
+                                    <i class="fas fa-tooth me-2"></i>RCT/IPC
                                 </div>
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
@@ -288,11 +280,11 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Pain O.P. Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-warning text-dark">
-                                    <i class="fas fa-head-side-virus me-2"></i>Pain O.P.
+                                    <i class="fas fa-head-side-virus me-2"></i>Extraction
                                 </div>
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
@@ -307,11 +299,11 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <!-- Missing Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-dark text-white">
-                                    <i class="fas fa-times-circle me-2"></i>Missing
+                                    <i class="fas fa-times-circle me-2"></i>Restoration
                                 </div>
                                 <div class="card-body">
                                     @include('IntraoralExamination.partials.teeth-chart', [
@@ -326,26 +318,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12">
-                            <!-- Mobility Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-primary text-white">
-                                    <i class="fas fa-arrows-alt me-2"></i>Mobility
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'mobility',
-                                        'selectedTeeth' => $examination->mobility
-                                            ? explode(',', $examination->mobility)
-                                            : [],
-                                    ])
-                                    <input type="hidden" name="mobility" id="mobility_teeth"
-                                        value="{{ $examination->mobility ?? '' }}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-purple text-white" style="background: pink;">
                                     <i class="fas fa-teeth me-2"></i>Prosthesis
@@ -459,32 +432,67 @@
                                         <div class="row">
 
                                             <div class="mb-3 col-lg-12">
-                                                <label for="exam_date" class="form-label">Exam Date</label>
-                                                <input type="date" name="exam_date" id="exam_date"
-                                                    class="form-control" value="{{ date('Y-m-d') }}">
+                                                <label for="exam_date" class="form-label">Date</label>
+                                                <input type="date" name="exam_date" id="exam_date" class="form-control"
+                                                    value="{{ date('Y-m-d') }}">
                                             </div>
+
+                                            @php
+                                                $treatments = [
+                                                    'scaling' => 'Scaling',
+                                                    'polishing' => 'Polishing',
+                                                    'grinding' => 'Grinding',
+                                                    'bleaching' => 'Bleaching',
+                                                    'smile_design' => 'Smile Design',
+                                                    'orthodontics' => 'Orthodontics',
+                                                    'surgery' => 'Surgery',
+                                                    'biopsy' => 'Biopsy',
+                                                ];
+                                            @endphp
+
+                                            @foreach ($treatments as $key => $label)
+                                                <div class="mb-3 col-lg-12">
+                                                    <div class="row align-items-start">
+                                                        <!-- Checkbox -->
+                                                        <div class="col-lg-2 col-md-3 col-sm-4">
+                                                            <div class="form-check mt-2">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="treatment[{{ $key }}][checked]"
+                                                                    id="{{ $key }}" value="1"
+                                                                    {{ !empty($examination->$key) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="{{ $key }}">
+                                                                    {{ $label }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Textarea -->
+                                                        <div class="col-lg-10 col-md-9 col-sm-8">
+                                                            <textarea name="treatment[{{ $key }}][note]" class="form-control" rows="2"
+                                                                placeholder="Describe {{ strtolower($label) }} details...">{{ $examination->$key ?? '' }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+
                                             <div class="mb-3 col-lg-6">
-                                                <label for="impacted" class="form-label">Impacted</label>
+                                                <label for="impacted" class="form-label">Dentures:CD / RPD / CPD /
+                                                    Overdenture/</label>
                                                 <textarea name="impacted" id="impacted" class="form-control" rows="2"
                                                     placeholder="Describe impacted teeth...">{{ $examination->impacted ?? '' }}</textarea>
                                             </div>
 
                                             <div class="mb-3 col-lg-6">
-                                                <label for="pocket" class="form-label">Pocket</label>
+                                                <label for="pocket" class="form-label">implants</label>
                                                 <textarea name="pocket" id="pocket" class="form-control" rows="2"
                                                     placeholder="Describe pocket conditions...">{{ $examination->Pocket ?? '' }}</textarea>
                                             </div>
 
                                             <div class="mb-3 col-lg-12">
-                                                <label for="vitality" class="form-label">Vitality</label>
+                                                <label for="vitality" class="form-label">Other treatment</label>
                                                 <textarea name="vitality" id="vitality" class="form-control" rows="2" placeholder="Describe vitality...">{{ $examination->vitality ?? '' }}</textarea>
                                             </div>
 
-                                            <div class="mb-3 col-lg-12">
-                                                <label for="sensitivity" class="form-label">Sensitivity</label>
-                                                <textarea name="sensitivity" id="sensitivity" class="form-control" rows="2"
-                                                    placeholder="Describe sensitivity...">{{ $examination->Sensitivity ?? '' }}</textarea>
-                                            </div>
                                         </div>
 
                                     </div>
@@ -495,110 +503,22 @@
 
                         </div>
 
-                        <div class="col-lg-6 bg-white">
-                            <div class="mb-4">
-                                <h6 class="border-bottom pb-2 mb-3">Scale Parameters</h6>
-
-                                <div class="row">
-                                    <div class="col-6 mb-3">
-                                        <label for="plaque" class="form-label">Plaque</label>
-                                        <select name="plaque" id="plaque" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="+"
-                                                {{ ($examination->plaque ?? '') == '+' ? 'selected' : '' }}>+
-                                            </option>
-                                            <option value="++"
-                                                {{ ($examination->plaque ?? '') == '++' ? 'selected' : '' }}>++
-                                            </option>
-                                            <option value="+++"
-                                                {{ ($examination->plaque ?? '') == '+++' ? 'selected' : '' }}>
-                                                +++
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-6 mb-3">
-                                        <label for="calculus" class="form-label">Calculus</label>
-                                        <select name="calculus" id="calculus" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="+"
-                                                {{ ($examination->calculus ?? '') == '+' ? 'selected' : '' }}>+
-                                            </option>
-                                            <option value="++"
-                                                {{ ($examination->calculus ?? '') == '++' ? 'selected' : '' }}>
-                                                ++
-                                            </option>
-                                            <option value="+++"
-                                                {{ ($examination->calculus ?? '') == '+++' ? 'selected' : '' }}>
-                                                +++
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-6 mb-3">
-                                        <label for="stains" class="form-label">Stains</label>
-                                        <select name="stains" id="stains" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="+"
-                                                {{ ($examination->stains ?? '') == '+' ? 'selected' : '' }}>+
-                                            </option>
-                                            <option value="++"
-                                                {{ ($examination->stains ?? '') == '++' ? 'selected' : '' }}>++
-                                            </option>
-                                            <option value="+++"
-                                                {{ ($examination->stains ?? '') == '+++' ? 'selected' : '' }}>
-                                                +++
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-6 mb-3">
-                                        <label for="bop" class="form-label">B.O.P</label>
-                                        <select name="bop" id="bop" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="Present"
-                                                {{ ($examination->BOP ?? '') == 'Present' ? 'selected' : '' }}>
-                                                Present</option>
-                                            <option value="Absent"
-                                                {{ ($examination->BOP ?? '') == 'Absent' ? 'selected' : '' }}>
-                                                Absent</option>
-                                            <option value="Localized"
-                                                {{ ($examination->BOP ?? '') == 'Localized' ? 'selected' : '' }}>
-                                                Localized</option>
-                                            <option value="Generalized"
-                                                {{ ($examination->BOP ?? '') == 'Generalized' ? 'selected' : '' }}>
-                                                Generalized</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Notes -->
-                            <div>
-                                <h6 class="border-bottom pb-2 mb-3">Additional Notes</h6>
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Clinical Notes</label>
-                                    <textarea name="notes" id="notes" class="form-control" rows="4"
-                                        placeholder="Enter any additional clinical notes...">{{ $examination->notes ?? '' }}</textarea>
-                                </div>
-                            </div>
-
-                        </div>
-
                         <div class="col-lg-6">
                             <!-- Summary Card -->
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
+                                    {{-- <button type="button" class="btn btn-sm btn-outline-primary"
+                                        onclick="clearAllSelections()">
+                                        <i class="fas fa-times"></i> Clear All
+                                    </button> --}}
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
-                                        <input type="hidden" name="intraoralexamination_id" id="intraoralexamination_id"
-                                            value="{{ $examination->id }}">
                                         <!-- Caries -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-danger" style="min-width: 90px;">Caries:</strong>
+                                                <strong class="text-danger" style="min-width: 90px;">RCT/IPC:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
                                                     <div id="caries-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
@@ -608,19 +528,13 @@
                                                             class="badge bg-danger rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-1" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[1]->comment ?? '' }}">
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="1">
-                                                    Save
-                                                </button>
                                             </div>
                                         </div>
 
                                         <!-- Pain O.P. -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-warning" style="min-width: 90px;">Pain O.P.:</strong>
+                                                <strong class="text-warning" style="min-width: 90px;">Extraction:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
                                                     <div id="pain-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
@@ -630,18 +544,13 @@
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-2" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[2]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="2">Save</button>
                                             </div>
                                         </div>
 
                                         <!-- Missing -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-dark" style="min-width: 90px;">Missing:</strong>
+                                                <strong class="text-dark" style="min-width: 90px;">Restoration:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
                                                     <div id="missing-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
@@ -651,18 +560,13 @@
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-3" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[3]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="3">Save</button>
                                             </div>
                                         </div>
 
                                         <!-- Mobility -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-primary" style="min-width: 90px;">Mobility:</strong>
+                                                <strong class="text-primary" style="min-width: 90px;">Prosthesis:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
                                                     <div id="mobility-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
@@ -672,46 +576,27 @@
                                                             class="badge bg-primary rounded-pill">0</span>
                                                     </div>
                                                 </div>
-                                                <input type="text" id="comment-4" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[4]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="4">Save</button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Prosthesis -->
-                                        <div class="condition-summary mb-3">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-purple"
-                                                    style="min-width: 90px; color: #800080;">Prosthesis:</strong>
-                                                <div class="teeth-list-container flex-grow-1">
-                                                    <div id="prosthesis-teeth-list" class="teeth-list">
-                                                        <span class="text-muted small">No teeth selected</span>
-                                                    </div>
-                                                    <div class="count-badge">
-                                                        <span id="prosthesis-count" class="badge rounded-pill"
-                                                            style="background-color: #800080;">0</span>
-                                                    </div>
-                                                </div>
-                                                <input type="text" id="comment-5" class="form-control me-2"
-                                                    style="width:50%;" value="{{ $conditions[5]->comment ?? '' }}">
-
-                                                <button type="button" class="btn btn-primary save-condition"
-                                                    data-type="5">Save</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Submit Button -->
+                            {{-- <div class="card mt-3">
+                                <div class="card-body text-center">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save"></i> {{ 'Save' }} Examination
+                                    </button>
+                                </div>
+                            </div> --}}
                         </div>
                     </div>
                 </form>
 
                 <!-- LIST DISPLAY SECTION - Only show if examination exists -->
                 @if ($examinations)
-                    <h4 class="mb-3">Intraoral Examination Records</h4>
+                    <h4 class="mb-3">Treatment Plan Records</h4>
 
                     <table class="table table-bordered table-striped">
                         <thead class="bg-primary text-white">
@@ -805,60 +690,6 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).on('click', '.save-condition', function() {
-
-            let typeId = $(this).data('type');
-            let intraoralexaminationid = $('#intraoralexamination_id').val();
-            let comment = $('#comment-' + typeId).val();
-            let patientId = "{{ $patient->id }}";
-
-            $.ajax({
-                url: "{{ route('save.condition') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    patient_id: patientId,
-                    type_id: typeId,
-                    comment: comment,
-                    intraoralexaminationid: intraoralexaminationid
-                },
-                success: function(response) {
-
-                    if (response.status) {
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                    }
-
-                },
-                error: function(xhr) {
-
-                    let errorMessage = "Something went wrong!";
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message;
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage
-                    });
-
-                }
-            });
-
-        });
-    </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize teeth type to adult
