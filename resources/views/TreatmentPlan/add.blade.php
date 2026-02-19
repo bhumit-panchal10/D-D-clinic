@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Treatment Plan')
+@section('title', 'Treatment Plan')
 
 @section('content')
     <style>
@@ -192,9 +192,8 @@
                     </div>
                 @endif
 
-
                 <!-- Main Form (Existing form remains the same) -->
-                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
+                <form action="{{ route('TreatmentPlan.store', $patient->id) }}" method="POST" id="TreatmentPlanForm">
                     @csrf
                     {{-- <input type="hidden" name="exam_date" value="{{ $selectedDate ?? '' }}"> --}}
 
@@ -211,12 +210,12 @@
                             </button>
                         </div>
                         <div class="text-end">
-                            <a href="{{ route('TreatmentPlan.index', $patient->id) }}" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back
+                            <a href="{{ route('TreatmentPlan.add', $patient->id) }}"
+                                class="btn btn-outline-primary teeth-toggle-btn active">
+                                <i class="fas fa-plus"></i> Add
                             </a>
                         </div>
                     </div>
-
 
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
@@ -227,14 +226,11 @@
                                     <i class="fas fa-tooth me-2"></i>RCT/IPC
                                 </div>
                                 <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'caries',
-                                        // 'selectedTeeth' => $examination->caries
-                                        //     ? explode(',', $examination->caries)
-                                        //     : [],
+                                    @include('TreatmentPlan.partials.teeth-chart', [
+                                        'section' => 'RCT_IPC',
                                     ])
-                                    <input type="hidden" name="caries" id="caries_teeth"
-                                        value="{{ $examination->caries ?? '' }}">
+                                    <input type="hidden" name="RCT_IPC" id="RCT_IPC_teeth"
+                                        value="{{ $examination->RCT_IPC ?? '' }}">
                                 </div>
                             </div>
                         </div>
@@ -246,14 +242,11 @@
                                     <i class="fas fa-head-side-virus me-2"></i>Extraction
                                 </div>
                                 <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'pain',
-                                        // 'selectedTeeth' => $examination->pain_op
-                                        //     ? explode(',', $examination->pain_op)
-                                        //     : [],
+                                    @include('TreatmentPlan.partials.teeth-chart', [
+                                        'section' => 'Extraction',
                                     ])
-                                    <input type="hidden" name="pain_op" id="pain_teeth"
-                                        value="{{ $examination->pain_op ?? '' }}">
+                                    <input type="hidden" name="Extraction" id="Extraction_teeth"
+                                        value="{{ $examination->Extraction ?? '' }}">
                                 </div>
                             </div>
                         </div>
@@ -265,33 +258,26 @@
                                     <i class="fas fa-times-circle me-2"></i>Restoration
                                 </div>
                                 <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'missing',
-                                        // 'selectedTeeth' => $examination->missing
-                                        //     ? explode(',', $examination->missing)
-                                        //     : [],
+                                    @include('TreatmentPlan.partials.teeth-chart', [
+                                        'section' => 'Restoration',
                                     ])
-                                    <input type="hidden" name="missing" id="missing_teeth"
-                                        value="{{ $examination->missing ?? '' }}">
+                                    <input type="hidden" name="Restoration" id="Restoration_teeth"
+                                        value="{{ $examination->Restoration ?? '' }}">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-lg-12">
-                            <!-- Mobility Section -->
                             <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-primary text-white">
-                                    <i class="fas fa-arrows-alt me-2"></i>Prosthesis
+                                <div class="chart-title bg-purple text-white" style="background: pink;">
+                                    <i class="fas fa-teeth me-2"></i>Prosthesis
                                 </div>
                                 <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'mobility',
-                                        // 'selectedTeeth' => $examination->mobility
-                                        //     ? explode(',', $examination->mobility)
-                                        //     : [],
+                                    @include('TreatmentPlan.partials.teeth-chart', [
+                                        'section' => 'Prosthesis',
                                     ])
-                                    <input type="hidden" name="mobility" id="mobility_teeth"
-                                        value="{{ $examination->mobility ?? '' }}">
+                                    <input type="hidden" name="Prosthesis" id="Prosthesis_teeth"
+                                        value="{{ $examination->Prosthesis ?? '' }}">
                                 </div>
                             </div>
                         </div>
@@ -328,15 +314,22 @@
                                             @endphp
 
                                             @foreach ($treatments as $key => $label)
+                                                @php
+                                                    $columnName = $key; // Scaling
+                                                    $descColumn = $key . '_desc'; // scaling_desc
+                                                @endphp
+
                                                 <div class="mb-3 col-lg-12">
                                                     <div class="row align-items-start">
+
                                                         <!-- Checkbox -->
                                                         <div class="col-lg-2 col-md-3 col-sm-4">
                                                             <div class="form-check mt-2">
                                                                 <input class="form-check-input" type="checkbox"
                                                                     name="treatment[{{ $key }}][checked]"
                                                                     id="{{ $key }}" value="1"
-                                                                    {{ !empty($examination->$key) ? 'checked' : '' }}>
+                                                                    {{ !empty($treatmentPlan->$columnName ?? null) ? 'checked' : '' }}>
+
                                                                 <label class="form-check-label" for="{{ $key }}">
                                                                     {{ $label }}
                                                                 </label>
@@ -346,8 +339,9 @@
                                                         <!-- Textarea -->
                                                         <div class="col-lg-10 col-md-9 col-sm-8">
                                                             <textarea name="treatment[{{ $key }}][note]" class="form-control" rows="2"
-                                                                placeholder="Describe {{ strtolower($label) }} details...">{{ $examination->$key ?? '' }}</textarea>
+                                                                placeholder="Describe {{ strtolower($label) }} details...">{{ $treatmentPlan->$descColumn ?? '' }}</textarea>
                                                         </div>
+
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -369,11 +363,13 @@
                                                 <label for="vitality" class="form-label">Other treatment</label>
                                                 <textarea name="vitality" id="vitality" class="form-control" rows="2" placeholder="Describe vitality...">{{ $examination->vitality ?? '' }}</textarea>
                                             </div>
+
                                         </div>
 
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="col-lg-6">
@@ -381,55 +377,51 @@
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
-                                    {{-- <button type="button" class="btn btn-sm btn-outline-primary"
-                                        onclick="clearAllSelections()">
-                                        <i class="fas fa-times"></i> Clear All
-                                    </button> --}}
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
-                                        <!-- Caries -->
+                                        <!-- RCT_IPC -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-danger" style="min-width: 90px;">RCT/IPC:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="caries-teeth-list" class="teeth-list">
+                                                    <div id="RCT_IPC-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="caries-count"
+                                                        <span id="RCT_IPC-count"
                                                             class="badge bg-danger rounded-pill">0</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Pain O.P. -->
+                                        <!-- Extraction -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-warning" style="min-width: 90px;">Extraction:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="pain-teeth-list" class="teeth-list">
+                                                    <div id="Extraction-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="pain-count"
+                                                        <span id="Extraction-count"
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Missing -->
+                                        <!-- Restoration -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-dark" style="min-width: 90px;">Restoration:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="missing-teeth-list" class="teeth-list">
+                                                    <div id="Restoration-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="missing-count"
+                                                        <span id="Restoration-count"
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
                                                 </div>
@@ -439,15 +431,14 @@
                                         <!-- Prosthesis -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-purple"
-                                                    style="min-width: 90px; color: #800080;">Prosthesis:</strong>
+                                                <strong class="text-primary" style="min-width: 90px;">Prosthesis:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="prosthesis-teeth-list" class="teeth-list">
+                                                    <div id="Prosthesis-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="prosthesis-count" class="badge rounded-pill"
-                                                            style="background-color: #800080;">0</span>
+                                                        <span id="Prosthesis-count"
+                                                            class="badge bg-primary rounded-pill">0</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -467,6 +458,95 @@
                         </div>
                     </div>
                 </form>
+
+                <!-- LIST DISPLAY SECTION - Only show if examination exists -->
+                {{-- @if ($examinations)
+                    <h4 class="mb-3">Treatment Plan Records</h4>
+
+                    <table class="table table-bordered table-striped">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Date</th>
+                                <th>RCT IPC</th>
+                                <th>Extraction</th>
+                                <th>Restoration</th>
+                                <th>Prosthesis</th>
+                                <th>Dentures</th>
+                                <th>implants</th>
+                                <th>Other Treatment</th>
+                                <th width="120">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($examinations as $exam)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->caries ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->missing ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
+                                            @if ($t != '')
+                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>
+                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
+                                            @if ($t != '')
+                                                <span
+                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
+                                            @endif
+                                        @endforeach
+                                    </td>
+
+                                    <td>{{ $exam->BOP ?? '-' }}</td>
+                                    <td>{{ $exam->notes ?? '-' }}</td>
+
+                                    <td>
+                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
+                                            method="POST" onsubmit="return confirm('Delete this record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+
+
+                    </table>
+
+                @endif --}}
+
 
             </div>
         </div>
@@ -594,7 +674,7 @@
 
         // Update summary display with tooth numbers
         function updateSummaryDisplay() {
-            const sections = ['caries', 'pain', 'missing', 'mobility', 'prosthesis'];
+            const sections = ['RCT_IPC', 'Extraction', 'Restoration', 'Prosthesis'];
 
             sections.forEach(section => {
                 const hiddenInput = document.getElementById(`${section}_teeth`);

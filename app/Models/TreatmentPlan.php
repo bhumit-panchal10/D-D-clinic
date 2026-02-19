@@ -15,6 +15,12 @@ class TreatmentPlan extends Model
         'Dentures',
         'implants',
         'other_treatment',
+
+        'RCT_IPC',
+        'Extraction',
+        'Restoration',
+        'Prosthesis',
+
         'Scaling',
         'polishing',
         'Grinding',
@@ -32,12 +38,8 @@ class TreatmentPlan extends Model
         'surgery_desc',
         'biopsy_desc',
         'created_at',
-        'updated_at'
-    ];
-    protected $casts = [
-        'RCT_IPC'     => 'array',
-        'Extraction'    => 'array',
-        'Restoration'    => 'array',
-        'Prosthesis' => 'array',
+        'updated_at',
+        'date',
+        'patient_id'
     ];
 }

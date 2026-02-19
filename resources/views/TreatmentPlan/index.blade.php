@@ -185,157 +185,164 @@
                 @include('common.alert')
                 @include('patient.show', ['id' => $patient->id])
                 @include('patient_treatments.Submenu', ['id' => $patient->id])
-                @if (session('success'))
+                {{-- @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif
+                @endif --}}
 
                 <!-- Date Selector -->
-                {{-- <div class="card mb-4">
+                <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ route('IntraoralExamination.index', $patient->id) }}"
-                            id="dateForm">
+                        <form method="GET" action="{{ route('TreatmentPlan.index', $patient->id) }}" id="dateForm">
                             <div class="row align-items-center">
                                 <div class="col-md-6">
-                                    <label for="exam_date" class="form-label">Date</label>
-                                    <div class="input-group">
-                                        <select name="date" id="exam_date" class="form-control">
-                                            <option value="">-- Select Date --</option>
-                                            @foreach ($examinations as $exam)
-                                                @php
-                                                    $value = date('Y-m-d', strtotime($exam->exam_date));
-                                                    $label = date('d-m-Y', strtotime($exam->exam_date));
-                                                @endphp
+                                    <label for="date" class="form-label">Treatment Date</label>
 
-                                                <option value="{{ $value }}"
-                                                    {{ $selectedDate == $value ? 'selected' : '' }}>
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <select name="date" id="date" class="form-control">
+                                        <option value="">-- Select Date --</option>
+
+                                        @foreach ($examinations->unique('date') as $exam)
+                                            <option value="{{ $exam->date }}"
+                                                {{ request('date') == $exam->date ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::parse($exam->date)->format('d-m-Y') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
                                 <div class="col-md-3">
                                     <label class="form-label">&nbsp;</label>
                                     <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-search"></i> Search
+                                        Search
                                     </button>
                                 </div>
+
                                 <div class="col-md-3">
                                     <label class="form-label">&nbsp;</label>
-                                    <a href="{{ route('IntraoralExamination.index', $patient->id) }}"
-                                        class="btn btn-primary w-100">Clear</a>
+                                    <a href="{{ route('TreatmentPlan.index', $patient->id) }}"
+                                        class="btn btn-secondary w-100">Clear</a>
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div> --}}
+                </div>
 
 
                 <!-- Main Form (Existing form remains the same) -->
-                <form action="{{ route('IntraoralExamination.store', $patient->id) }}" method="POST" id="intraoralForm">
-                    @csrf
-                    {{-- <input type="hidden" name="exam_date" value="{{ $selectedDate ?? '' }}"> --}}
+                {{-- <input type="hidden" name="exam_date" value="{{ $selectedDate ?? '' }}"> --}}
 
-                    <div class="card mb-3 d-flex justify-content-center">
-                        <div class="card-body ">
-                            <label class="me-2"><strong>Teeth Type:</strong></label>
-                            <button type="button" class="btn btn-outline-primary teeth-toggle-btn active" id="adultBtn"
-                                onclick="toggleTeethType('adult')">
-                                <i class="fas fa-user"></i> Adult Teeth
-                            </button>
-                            <button type="button" class="btn btn-outline-primary teeth-toggle-btn" id="childBtn"
-                                onclick="toggleTeethType('child')">
-                                <i class="fas fa-child"></i> Child Teeth
-                            </button>
-                        </div>
-                        <div class="text-end">
-                            <a href="{{ route('TreatmentPlan.add', $patient->id) }}"
-                                class="btn btn-outline-primary teeth-toggle-btn active">
-                                <i class="fas fa-plus"></i> Add
-                            </a>
-                        </div>
+                <div class="card mb-3 d-flex justify-content-center">
+                    <div class="card-body ">
+                        <label class="me-2"><strong>Teeth Type:</strong></label>
+                        <button type="button" class="btn btn-outline-primary teeth-toggle-btn active" id="adultBtn"
+                            onclick="toggleTeethType('adult')">
+                            <i class="fas fa-user"></i> Adult Teeth
+                        </button>
+                        <button type="button" class="btn btn-outline-primary teeth-toggle-btn" id="childBtn"
+                            onclick="toggleTeethType('child')">
+                            <i class="fas fa-child"></i> Child Teeth
+                        </button>
                     </div>
+                    <div class="text-end">
+                        <a href="{{ route('TreatmentPlan.add', $patient->id) }}"
+                            class="btn btn-outline-primary teeth-toggle-btn active">
+                            <i class="fas fa-plus"></i> Add
+                        </a>
+                    </div>
+                </div>
 
-                    <div class="row">
-                        <!-- LEFT COLUMN: Teeth Charts -->
+                <div class="row">
+                    <!-- LEFT COLUMN: Teeth Charts -->
+                    @if (request()->filled('date') && isset($examination))
+                        {{-- ================= RCT / IPC ================= --}}
                         <div class="col-lg-12">
-                            <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
                                     <i class="fas fa-tooth me-2"></i>RCT/IPC
                                 </div>
                                 <div class="card-body">
+
                                     @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'caries',
-                                        'selectedTeeth' => $examination->caries
-                                            ? explode(',', $examination->caries)
+                                        'section' => 'rct',
+                                        'selectedTeeth' => $examination->RCT_IPC
+                                            ? explode(',', $examination->RCT_IPC)
                                             : [],
                                     ])
-                                    <input type="hidden" name="caries" id="caries_teeth"
-                                        value="{{ $examination->caries ?? '' }}">
+
+                                    <input type="hidden" name="RCT_IPC" id="rct_teeth"
+                                        value="{{ $examination->RCT_IPC ?? '' }}">
                                 </div>
                             </div>
                         </div>
 
+                        {{-- ================= Extraction ================= --}}
                         <div class="col-lg-12">
-                            <!-- Pain O.P. Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-warning text-dark">
                                     <i class="fas fa-head-side-virus me-2"></i>Extraction
                                 </div>
                                 <div class="card-body">
+
                                     @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'pain',
-                                        'selectedTeeth' => $examination->pain_op
-                                            ? explode(',', $examination->pain_op)
+                                        'section' => 'extraction',
+                                        'selectedTeeth' => $examination->Extraction
+                                            ? explode(',', $examination->Extraction)
                                             : [],
                                     ])
-                                    <input type="hidden" name="pain_op" id="pain_teeth"
-                                        value="{{ $examination->pain_op ?? '' }}">
+
+                                    <input type="hidden" name="Extraction" id="extraction_teeth"
+                                        value="{{ $examination->Extraction ?? '' }}">
                                 </div>
                             </div>
                         </div>
 
+                        {{-- ================= Restoration ================= --}}
                         <div class="col-lg-12">
-                            <!-- Missing Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-dark text-white">
                                     <i class="fas fa-times-circle me-2"></i>Restoration
                                 </div>
                                 <div class="card-body">
+
                                     @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'missing',
-                                        'selectedTeeth' => $examination->missing
-                                            ? explode(',', $examination->missing)
+                                        'section' => 'restoration',
+                                        'selectedTeeth' => $examination->Restoration
+                                            ? explode(',', $examination->Restoration)
                                             : [],
                                     ])
-                                    <input type="hidden" name="missing" id="missing_teeth"
-                                        value="{{ $examination->missing ?? '' }}">
+
+                                    <input type="hidden" name="Restoration" id="restoration_teeth"
+                                        value="{{ $examination->Restoration ?? '' }}">
                                 </div>
                             </div>
                         </div>
 
+                        {{-- ================= Prosthesis ================= --}}
                         <div class="col-lg-12">
                             <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-purple text-white" style="background: pink;">
+                                <div class="chart-title text-white" style="background: pink;">
                                     <i class="fas fa-teeth me-2"></i>Prosthesis
                                 </div>
                                 <div class="card-body">
+
                                     @include('IntraoralExamination.partials.teeth-chart', [
                                         'section' => 'prosthesis',
-                                        'selectedTeeth' => $examination->prosthesis_teeth ?? [],
+                                        'selectedTeeth' => $examination->Prosthesis
+                                            ? explode(',', $examination->Prosthesis)
+                                            : [],
                                     ])
-                                    <input type="hidden" name="prosthesis" id="prosthesis_teeth"
-                                        value="{{ $examination->prosthesis ?? '' }}">
+
+                                    <input type="hidden" name="Prosthesis" id="prosthesis_teeth"
+                                        value="{{ $examination->Prosthesis ?? '' }}">
                                 </div>
                             </div>
                         </div>
+                    @endif
 
+                    @if (request()->filled('date') && isset($examination))
 
-                        <!-- RIGHT COLUMN: Text Parameters -->
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-header bg-secondary text-white">
@@ -355,39 +362,29 @@
 
                                             @php
                                                 $treatments = [
-                                                    'scaling' => 'Scaling',
-                                                    'polishing' => 'Polishing',
-                                                    'grinding' => 'Grinding',
-                                                    'bleaching' => 'Bleaching',
-                                                    'smile_design' => 'Smile Design',
-                                                    'orthodontics' => 'Orthodontics',
-                                                    'surgery' => 'Surgery',
-                                                    'biopsy' => 'Biopsy',
+                                                    'Scaling',
+                                                    'polishing',
+                                                    'Grinding',
+                                                    'Bleaching',
+                                                    'smile_design',
+                                                    'orthodontics',
+                                                    'surgery',
+                                                    'biopsy',
                                                 ];
                                             @endphp
 
-                                            @foreach ($treatments as $key => $label)
-                                                <div class="mb-3 col-lg-12">
-                                                    <div class="row align-items-start">
-                                                        <!-- Checkbox -->
-                                                        <div class="col-lg-2 col-md-3 col-sm-4">
-                                                            <div class="form-check mt-2">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    name="treatment[{{ $key }}][checked]"
-                                                                    id="{{ $key }}" value="1"
-                                                                    {{ !empty($examination->$key) ? 'checked' : '' }}>
-                                                                <label class="form-check-label" for="{{ $key }}">
-                                                                    {{ $label }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
+                                            @foreach ($treatments as $treatment)
+                                                <div class="mb-3">
+                                                    <strong>{{ str_replace('_', ' ', $treatment) }}:</strong>
 
-                                                        <!-- Textarea -->
-                                                        <div class="col-lg-10 col-md-9 col-sm-8">
-                                                            <textarea name="treatment[{{ $key }}][note]" class="form-control" rows="2"
-                                                                placeholder="Describe {{ strtolower($label) }} details...">{{ $examination->$key ?? '' }}</textarea>
+                                                    @if ($examination->$treatment == 1)
+                                                        <span class="badge bg-success">Yes</span>
+                                                        <div class="mt-1 text-muted">
+                                                            {{ $examination->{$treatment . '_desc'} ?? '' }}
                                                         </div>
-                                                    </div>
+                                                    @else
+                                                        <span class="text-muted">No</span>
+                                                    @endif
                                                 </div>
                                             @endforeach
 
@@ -395,18 +392,18 @@
                                                 <label for="impacted" class="form-label">Dentures:CD / RPD / CPD /
                                                     Overdenture/</label>
                                                 <textarea name="impacted" id="impacted" class="form-control" rows="2"
-                                                    placeholder="Describe impacted teeth...">{{ $examination->impacted ?? '' }}</textarea>
+                                                    placeholder="Describe impacted teeth...">{{ $examination->Dentures ?? '' }}</textarea>
                                             </div>
 
                                             <div class="mb-3 col-lg-6">
                                                 <label for="pocket" class="form-label">implants</label>
                                                 <textarea name="pocket" id="pocket" class="form-control" rows="2"
-                                                    placeholder="Describe pocket conditions...">{{ $examination->Pocket ?? '' }}</textarea>
+                                                    placeholder="Describe pocket conditions...">{{ $examination->implants ?? '' }}</textarea>
                                             </div>
 
                                             <div class="mb-3 col-lg-12">
                                                 <label for="vitality" class="form-label">Other treatment</label>
-                                                <textarea name="vitality" id="vitality" class="form-control" rows="2" placeholder="Describe vitality...">{{ $examination->vitality ?? '' }}</textarea>
+                                                <textarea name="vitality" id="vitality" class="form-control" rows="2" placeholder="Describe vitality...">{{ $examination->other_treatment ?? '' }}</textarea>
                                             </div>
 
                                         </div>
@@ -418,16 +415,14 @@
 
 
                         </div>
+                    @endif
 
+                    @if (request()->filled('date') && isset($examination))
                         <div class="col-lg-6">
                             <!-- Summary Card -->
                             <div class="card mt-3">
                                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0">Selected Teeth Summary</h6>
-                                    {{-- <button type="button" class="btn btn-sm btn-outline-primary"
-                                        onclick="clearAllSelections()">
-                                        <i class="fas fa-times"></i> Clear All
-                                    </button> --}}
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
@@ -436,12 +431,11 @@
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-danger" style="min-width: 90px;">RCT/IPC:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="caries-teeth-list" class="teeth-list">
+                                                    <div id="rct-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="caries-count"
-                                                            class="badge bg-danger rounded-pill">0</span>
+                                                        <span id="rct-count" class="badge bg-danger rounded-pill">0</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -452,11 +446,11 @@
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-warning" style="min-width: 90px;">Extraction:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="pain-teeth-list" class="teeth-list">
+                                                    <div id="extraction-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="pain-count"
+                                                        <span id="extraction-count"
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
                                                 </div>
@@ -468,11 +462,11 @@
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-dark" style="min-width: 90px;">Restoration:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="missing-teeth-list" class="teeth-list">
+                                                    <div id="restoration-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="missing-count"
+                                                        <span id="restoration-count"
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
                                                 </div>
@@ -484,11 +478,11 @@
                                             <div class="d-flex align-items-start mb-2">
                                                 <strong class="text-primary" style="min-width: 90px;">Prosthesis:</strong>
                                                 <div class="teeth-list-container flex-grow-1">
-                                                    <div id="mobility-teeth-list" class="teeth-list">
+                                                    <div id="prosthesis-teeth-list" class="teeth-list">
                                                         <span class="text-muted small">No teeth selected</span>
                                                     </div>
                                                     <div class="count-badge">
-                                                        <span id="mobility-count"
+                                                        <span id="prosthesis-count"
                                                             class="badge bg-primary rounded-pill">0</span>
                                                     </div>
                                                 </div>
@@ -497,107 +491,90 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Submit Button -->
-                            {{-- <div class="card mt-3">
-                                <div class="card-body text-center">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save"></i> {{ 'Save' }} Examination
-                                    </button>
-                                </div>
-                            </div> --}}
                         </div>
-                    </div>
-                </form>
+                    @endif
+                </div>
 
                 <!-- LIST DISPLAY SECTION - Only show if examination exists -->
-                @if ($examinations)
-                    <h4 class="mb-3">Treatment Plan Records</h4>
+                @if ($examinations->count())
+                    <h4 class="mt-4">Treatment Plan Records</h4>
 
                     <table class="table table-bordered table-striped">
                         <thead class="bg-primary text-white">
                             <tr>
                                 <th>Date</th>
-                                <th>Caries</th>
-                                <th>Pain OP</th>
-                                <th>Missing</th>
-                                <th>Mobility</th>
+                                <th>RCT</th>
+                                <th>Extraction</th>
+                                <th>Restoration</th>
                                 <th>Prosthesis</th>
-                                <th>BOP</th>
-                                <th>Notes</th>
-                                <th width="120">Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @foreach ($examinations as $exam)
                                 <tr>
-                                    <td>{{ \Carbon\Carbon::parse($exam->exam_date)->format('d M Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($exam->date)->format('d M Y') }}</td>
+
+                                    <td>{{ $exam->RCT_IPC }}</td>
+                                    <td>{{ $exam->Extraction }}</td>
+                                    <td>{{ $exam->Restoration }}</td>
+                                    <td>{{ $exam->Prosthesis }}</td>
 
                                     <td>
-                                        @foreach (explode(',', $exam->caries ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-success text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->pain_op ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-warning text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->missing ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-dark text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->mobility ?? '') as $t)
-                                            @if ($t != '')
-                                                <span class="badge badge-info text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>
-                                        @foreach (explode(',', $exam->prosthesis ?? '') as $t)
-                                            @if ($t != '')
-                                                <span
-                                                    class="badge badge-primary text-black fs-6">{{ $t }}</span>
-                                            @endif
-                                        @endforeach
-                                    </td>
-
-                                    <td>{{ $exam->BOP ?? '-' }}</td>
-                                    <td>{{ $exam->notes ?? '-' }}</td>
-
-                                    <td>
-                                        <form action="{{ route('IntraoralExamination.destroy', $exam->id) }}"
-                                            method="POST" onsubmit="return confirm('Delete this record?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                            data-id="{{ $exam->id }}">
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
-
-
-
                     </table>
-
                 @endif
 
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-center">
+
+                    <div class="mt-2 text-center">
+                        <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                            colors="primary:#f7b84b,secondary:#f06548" style="width: 100px; height: 100px">
+                        </lord-icon>
+                        <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                            <h4>Are you Sure?</h4>
+                            <p class="text-muted mx-4 mb-0">Are you sure you want to remove this payment?</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2 mt-4">
+
+                        <form id="deleteForm" method="POST">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit" class="btn btn-danger">
+                                Yes, Delete It!
+                            </button>
+                        </form>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -606,6 +583,24 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $(".delete-btn").on("click", function() {
+
+                let id = $(this).data("id");
+
+                // Route change karo yahan
+                let actionUrl = "{{ route('TreatmentPlan.destroy', ':id') }}";
+                actionUrl = actionUrl.replace(':id', id);
+
+                $("#deleteForm").attr("action", actionUrl);
+
+                $("#deleteRecordModal").modal("show");
+            });
+
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize teeth type to adult
@@ -672,13 +667,6 @@
             }
         }
 
-        // Set today's date
-        function setToday() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('exam_date').value = today;
-            document.getElementById('dateForm').submit();
-        }
-
         // Update hidden input function
         function updateHiddenInput(section, toothNumber, isSelected) {
             const hiddenInput = document.getElementById(`${section}_teeth`);
@@ -725,60 +713,52 @@
 
         // Update summary display with tooth numbers
         function updateSummaryDisplay() {
-            const sections = ['caries', 'pain', 'missing', 'mobility', 'prosthesis'];
+
+            const sections = [
+                'rct',
+                'extraction',
+                'restoration',
+                'prosthesis'
+            ];
 
             sections.forEach(section => {
+
                 const hiddenInput = document.getElementById(`${section}_teeth`);
+
                 const teeth = hiddenInput && hiddenInput.value ?
                     hiddenInput.value.split(',').filter(t => t.trim() !== '') : [];
 
                 const countElement = document.getElementById(`${section}-count`);
                 const listElement = document.getElementById(`${section}-teeth-list`);
 
-                // Update count
+                // Update Count
                 if (countElement) {
                     countElement.textContent = teeth.length;
                 }
 
-                // Update tooth numbers list
+                // Update List
                 if (listElement) {
+
                     if (teeth.length > 0) {
-                        // Create a comma-separated list
+
                         listElement.innerHTML = teeth.map(tooth =>
                             `<span class="tooth-number-badge">${tooth}</span>`
-                        ).join(', ');
+                        ).join(' ');
+
                     } else {
-                        listElement.innerHTML = '<span class="text-muted small">No teeth selected</span>';
+
+                        listElement.innerHTML =
+                            '<span class="text-muted small">No teeth selected</span>';
                     }
                 }
             });
         }
 
-        // Clear all selections
-        function clearAllSelections() {
-            if (confirm('Are you sure you want to clear all tooth selections?')) {
-                const sections = ['caries', 'pain', 'missing', 'mobility', 'prosthesis'];
-
-                sections.forEach(section => {
-                    // Clear hidden inputs
-                    const hiddenInput = document.getElementById(`${section}_teeth`);
-                    if (hiddenInput) hiddenInput.value = '';
-
-                    // Clear visual selections
-                    document.querySelectorAll(`.teeth-selectable[data-section="${section}"]`).forEach(el => {
-                        toggleToothColorAndSelection(el, false);
-                    });
-                });
-
-                // Update summary
-                updateSummaryDisplay();
-            }
-        }
 
         // Confirm delete
-        function confirmDelete(examId) {
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            modal.show();
-        }
+        // function confirmDelete(examId) {
+        //     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        //     modal.show();
+        // }
     </script>
 @endsection
