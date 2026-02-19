@@ -524,6 +524,12 @@ Route::middleware(['auth'])->group(function () {
     // Show Add Form
     Route::get('TreatmentPlan/add/{patient}', [TreatmentPlanController::class, 'add'])
         ->name('TreatmentPlan.add');
+
+    Route::post('/{patient}', [TreatmentPlanController::class, 'store'])
+        ->name('TreatmentPlan.store');
+
+    Route::delete('/{examination}', [TreatmentPlanController::class, 'destroy'])
+        ->name('TreatmentPlan.destroy');
 });
 
 Route::get('/concentform/{patient_id?}/{iConcernFormId?}/{PatientsConcernFormId?}', [PatientConcernFormController::class, 'concentform'])->name('concentform');

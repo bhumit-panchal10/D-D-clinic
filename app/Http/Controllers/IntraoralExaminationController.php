@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 class IntraoralExaminationController extends Controller
 {
 
-
     public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
