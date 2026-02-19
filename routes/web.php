@@ -242,8 +242,6 @@ Route::get('/export-due-payments', function () {
     return Excel::download(new DuePaymentsExport, 'due_payments.xlsx');
 })->name('export.due_payments');
 
-
-
 Route::prefix('admin/Caseno')->name('Caseno.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [CasenoController::class, 'index'])->name('index');
     Route::get('/edit/{id}', [CasenoController::class, 'edit'])->name('edit');
@@ -527,7 +525,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('TreatmentPlan/add/{patient}', [TreatmentPlanController::class, 'add'])
         ->name('TreatmentPlan.add');
 });
-
 
 Route::get('/concentform/{patient_id?}/{iConcernFormId?}/{PatientsConcernFormId?}', [PatientConcernFormController::class, 'concentform'])->name('concentform');
 Route::post('/signature/upload', [PatientConcernFormController::class, 'upload'])->name('patient.upload');
