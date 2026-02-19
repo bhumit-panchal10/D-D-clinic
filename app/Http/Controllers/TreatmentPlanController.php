@@ -15,7 +15,6 @@ class TreatmentPlanController extends Controller
         $patient = Patient::findOrFail($patientId);
         $selectedDate = $request->get('date') ?? '';
 
-
         // // All examinations for the date (for the table/list)
         if ($selectedDate) {
 

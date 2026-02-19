@@ -220,7 +220,7 @@
 
                     <div class="row">
                         <!-- LEFT COLUMN: Teeth Charts -->
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <!-- Caries Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-danger text-white">
@@ -239,7 +239,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <!-- Pain O.P. Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-warning text-dark">
@@ -258,7 +258,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <!-- Missing Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-dark text-white">
@@ -277,7 +277,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <!-- Mobility Section -->
                             <div class="card teeth-section mb-3">
                                 <div class="chart-title bg-primary text-white">
@@ -295,91 +295,6 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="col-lg-8">
-                            <!-- Caries Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-danger text-white">
-                                    <i class="fas fa-tooth me-2"></i>Caries
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'caries',
-                                        'selectedTeeth' => $examination->caries
-                                            ? explode(',', $examination->caries)
-                                            : [],
-                                    ])
-                                    <input type="hidden" name="caries" id="caries_teeth"
-                                        value="{{ $examination->caries ?? '' }}">
-                                </div>
-                            </div>
-
-                            <!-- Pain O.P. Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-warning text-dark">
-                                    <i class="fas fa-head-side-virus me-2"></i>Pain O.P.
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'pain',
-                                        'selectedTeeth' => $examination->pain_op
-                                            ? explode(',', $examination->pain_op)
-                                            : [],
-                                    ])
-                                    <input type="hidden" name="pain_op" id="pain_teeth"
-                                        value="{{ $examination->pain_op ?? '' }}">
-                                </div>
-                            </div>
-
-                            <!-- Missing Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-dark text-white">
-                                    <i class="fas fa-times-circle me-2"></i>Missing
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'missing',
-                                        'selectedTeeth' => $examination->missing
-                                            ? explode(',', $examination->missing)
-                                            : [],
-                                    ])
-                                    <input type="hidden" name="missing" id="missing_teeth"
-                                        value="{{ $examination->missing ?? '' }}">
-                                </div>
-                            </div>
-
-                            <!-- Mobility Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-primary text-white">
-                                    <i class="fas fa-arrows-alt me-2"></i>Mobility
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'mobility',
-                                        'selectedTeeth' => $examination->mobility
-                                            ? explode(',', $examination->mobility)
-                                            : [],
-                                    ])
-                                    <input type="hidden" name="mobility" id="mobility_teeth"
-                                        value="{{ $examination->mobility ?? '' }}">
-                                </div>
-                            </div>
-
-                            <!-- Prosthesis Section -->
-                            <div class="card teeth-section mb-3">
-                                <div class="chart-title bg-purple text-white" style="background: pink;">
-                                    <i class="fas fa-teeth me-2"></i>Prosthesis
-                                </div>
-                                <div class="card-body">
-                                    @include('IntraoralExamination.partials.teeth-chart', [
-                                        'section' => 'prosthesis',
-                                        'selectedTeeth' => $examination->prosthesis_teeth ?? [],
-                                    ])
-                                    <input type="hidden" name="prosthesis" id="prosthesis_teeth"
-                                        value="{{ $examination->prosthesis ?? '' }}">
-                                </div>
-                            </div>
-
-                        </div> --}}
 
                         <!-- RIGHT COLUMN: Text Parameters -->
                         <div class="col-lg-6">
