@@ -123,6 +123,7 @@ class IntraoralExaminationController extends Controller
             'vitality' => 'nullable|string|max:500',
             'sensitivity' => 'nullable|string|max:500',
             'notes' => 'nullable|string|max:1000',
+            'diagnosis' => 'nullable|string|max:1000',
         ]);
 
         // These form fields will contain CSV (11,12,13 etc)
@@ -147,6 +148,7 @@ class IntraoralExaminationController extends Controller
             'Sensitivity' => $request->sensitivity,
             'BOP'         => $request->bop,
             'notes'       => $request->notes,
+            'diagnosis'       => $request->diagnosis,
         ];
 
         // Convert CSV → JSON

@@ -449,6 +449,11 @@
                                     <textarea name="notes" id="notes" class="form-control" rows="4"
                                         placeholder="Enter any additional clinical notes...">{{ $examination->notes ?? '' }}</textarea>
                                 </div>
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Diagnosis</label>
+                                    <textarea name="diagnosis" id="diagnosis" class="form-control" rows="4" placeholder="Enter Diagnosis...">{{ $examination->diagnosis ?? '' }}</textarea>
+                                </div>
                             </div>
 
                         </div>
