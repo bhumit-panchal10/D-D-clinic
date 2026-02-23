@@ -1062,7 +1062,6 @@
                     }
                 }
 
-                // 🔥🔥🔥 YE LINE MISSING THI
                 renderTextboxes(section, getTypeId(section));
 
             });

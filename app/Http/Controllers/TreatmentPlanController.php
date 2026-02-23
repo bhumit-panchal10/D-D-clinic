@@ -12,34 +12,83 @@ use Illuminate\Support\Facades\Auth;
 class TreatmentPlanController extends Controller
 {
 
+    // public function index(Request $request, $patientId)
+    // {
+    //     $patient = Patient::findOrFail($patientId);
+
+    //     $selectedDate = $request->get('date');
+
+    //     $query = TreatmentPlan::where('patient_id', $patientId);
+
+    //     if ($selectedDate) {
+    //         $query->whereDate('date', $selectedDate);
+    //     }
+
+    //     $examinations = $query->orderBy('date', 'desc')->get();
+
+    //     // Default selected record
+    //     if ($selectedDate) {
+    //         $examination = $examinations->first();
+    //     } else {
+    //         $examination = TreatmentPlan::where('patient_id', $patientId)
+    //             ->orderBy('date', 'desc')
+    //             ->first();
+    //     }
+
+    //     return view('TreatmentPlan.index', compact(
+    //         'patient',
+    //         'examinations',
+    //         'examination',
+    //         'selectedDate'
+    //     ));
+    // }
+
     public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);
 
-        $selectedDate = $request->get('date');
+        $selectedDate = $request->get('date') ?? '';
 
-        $query = TreatmentPlan::where('patient_id', $patientId);
+        $conditions = collect(); // default empty
+        $examination = null;
 
         if ($selectedDate) {
-            $query->whereDate('date', $selectedDate);
-        }
 
-        $examinations = $query->orderBy('date', 'desc')->get();
-
-        // Default selected record
-        if ($selectedDate) {
-            $examination = $examinations->first();
-        } else {
+            // Selected date ka TreatmentPlan
             $examination = TreatmentPlan::where('patient_id', $patientId)
-                ->orderBy('date', 'desc')
+                ->whereDate('date', $selectedDate)
+                ->orderBy('id', 'desc')
                 ->first();
+
+            if ($examination) {
+
+                // Detail table se data fetch
+                $conditions = TreatmentPlanDetail::where('patient_id', $patientId)
+                    ->where('Treatment_plan_id', $examination->id)
+                    ->get()
+                    ->groupBy(['type_id', 'tooth_no']);
+            }
+
+            // Sidebar list ke liye sab records
+            $examinations = TreatmentPlan::where('patient_id', $patientId)
+                ->orderBy('date', 'desc')
+                ->get();
+        } else {
+
+            // Agar date select nahi ki
+            $examinations = TreatmentPlan::where('patient_id', $patientId)
+                ->orderBy('date', 'desc')
+                ->get();
+
+            $examination = new TreatmentPlan();
         }
 
         return view('TreatmentPlan.index', compact(
             'patient',
             'examinations',
             'examination',
-            'selectedDate'
+            'selectedDate',
+            'conditions'
         ));
     }
 
@@ -51,27 +100,27 @@ class TreatmentPlanController extends Controller
         return view('TreatmentPlan.add', compact('patient', 'examination', 'selectedTeeth'));
     }
 
+    public function saveCondition(Request $request)
+    {
 
-    // public function saveCondition(Request $request)
-    // {
-    //     foreach ($request->notes as $note) {
+        foreach ($request->notes as $note) {
 
-    //         if (!empty($note['comment'])) {
+            if (!empty($note['comment'])) {
 
-    //             TreatmentPlanDetail::where('intraoralexamination_id', $request->intraoralexaminationid)
-    //                 ->where('type_id', $request->type_id)
-    //                 ->where('tooth_no', $note['tooth_no'])
-    //                 ->update([
-    //                     'comment' => $note['comment']
-    //                 ]);
-    //         }
-    //     }
+                TreatmentPlanDetail::where('Treatment_plan_id', $request->treatmentplan_id)
+                    ->where('type_id', $request->type_id)
+                    ->where('tooth_no', $note['tooth_no'])
+                    ->update([
+                        'comment' => $note['comment']
+                    ]);
+            }
+        }
 
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Saved Successfully'
-    //     ]);
-    // }
+        return response()->json([
+            'status' => true,
+            'message' => 'Saved Successfully'
+        ]);
+    }
 
     public function store(Request $request, $patientId)
     {

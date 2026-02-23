@@ -426,6 +426,8 @@
                                 </div>
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
+                                        <input type="hidden" name="treatmentplan_id" id="treatmentplan_id"
+                                            value="{{ $examination->id }}">
                                         <!-- Caries -->
                                         <div class="condition-summary mb-3">
                                             <div class="d-flex align-items-start mb-2">
@@ -437,6 +439,11 @@
                                                     <div class="count-badge">
                                                         <span id="rct-count" class="badge bg-danger rounded-pill">0</span>
                                                     </div>
+                                                    <div id="rct-textbox-container"></div>
+                                                    <button type="button" class="btn btn-primary save-condition"
+                                                        data-type="1">
+                                                        Save
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -453,6 +460,11 @@
                                                         <span id="extraction-count"
                                                             class="badge bg-warning rounded-pill">0</span>
                                                     </div>
+                                                    <div id="extraction-textbox-container"></div>
+                                                    <button type="button" class="btn btn-primary save-condition"
+                                                        data-type="2">
+                                                        Save
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -469,6 +481,11 @@
                                                         <span id="restoration-count"
                                                             class="badge bg-dark rounded-pill">0</span>
                                                     </div>
+                                                    <div id="restoration-textbox-container"></div>
+                                                    <button type="button" class="btn btn-primary save-condition"
+                                                        data-type="3">
+                                                        Save
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -485,6 +502,11 @@
                                                         <span id="prosthesis-count"
                                                             class="badge bg-primary rounded-pill">0</span>
                                                     </div>
+                                                    <div id="prosthesis-textbox-container"></div>
+                                                    <button type="button" class="btn btn-primary save-condition"
+                                                        data-type="4">
+                                                        Save
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -583,6 +605,8 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).ready(function() {
 
@@ -600,6 +624,59 @@
             });
 
         });
+    </script>
+
+    <script>
+        $(document).on('click', '.save-condition', function() {
+
+            let typeId = $(this).data('type');
+            let treatmentplan_id = $('#treatmentplan_id').val();
+            let patientId = "{{ $patient->id }}";
+
+            let notes = [];
+
+            $('.tooth-comment[data-type="' + typeId + '"]').each(function() {
+
+                let comment = $(this).val().trim();
+
+                if (comment !== '') {
+
+                    notes.push({
+                        tooth_no: $(this).data('tooth'),
+                        comment: comment
+                    });
+
+                }
+
+            });
+
+            $.ajax({
+                url: "{{ route('save.comments') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    patient_id: patientId,
+                    type_id: typeId,
+                    treatmentplan_id: treatmentplan_id,
+                    notes: notes
+                },
+                success: function(response) {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+        let oldConditions = @json($conditions ?? []);
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -689,9 +766,61 @@
             updateSummaryDisplay();
         }
 
+        function getTypeId(section) {
+            switch (section) {
+                case 'rct':
+                    return 1;
+                case 'extraction':
+                    return 2;
+                case 'restoration':
+                    return 3;
+                case 'prosthesis':
+                    return 4;
+            }
+        }
+
+        function renderTextboxes(section, typeId) {
+
+            const hiddenInput = document.getElementById(section + '_teeth');
+            const container = document.getElementById(section + '-textbox-container');
+
+            if (!hiddenInput || !container) return;
+
+            let teeth = hiddenInput.value ?
+                hiddenInput.value.split(',').filter(t => t.trim() !== '') : [];
+
+            container.innerHTML = '';
+
+            teeth.forEach(function(tooth) {
+
+                let commentValue = '';
+
+                if (oldConditions[typeId] &&
+                    oldConditions[typeId][tooth] &&
+                    oldConditions[typeId][tooth][0]) {
+
+                    let dbValue = oldConditions[typeId][tooth][0].comment;
+
+                    commentValue = dbValue ? dbValue : '';
+                }
+
+                container.innerHTML += `
+            <div class="mb-2 d-flex align-items-center">
+                <label style="width:80px;">Tooth ${tooth}</label>
+                <input type="text"
+                       class="form-control tooth-comment"
+                       data-tooth="${tooth}"
+                       data-type="${typeId}"
+                       value="${commentValue}"
+                       placeholder="Enter comment">
+            </div>
+        `;
+            });
+        }
+
         // Initialize with selected teeth from saved data
         function initializeSelectedTeeth() {
-            const sections = ['caries', 'pain', 'missing', 'mobility', 'prosthesis'];
+            const sections = ['rct', 'extraction', 'restoration', 'prosthesis'];
 
             sections.forEach(section => {
                 const hiddenInput = document.getElementById(`${section}_teeth`);
@@ -743,7 +872,7 @@
 
                         listElement.innerHTML = teeth.map(tooth =>
                             `<span class="tooth-number-badge">${tooth}</span>`
-                        ).join(' ');
+                        ).join(', ');
 
                     } else {
 
@@ -751,14 +880,16 @@
                             '<span class="text-muted small">No teeth selected</span>';
                     }
                 }
+                // Dynamic textbox generate
+                renderTextboxes(section, getTypeId(section));
             });
         }
 
 
         // Confirm delete
         // function confirmDelete(examId) {
-        //     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        //     modal.show();
+        // const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        // modal.show();
         // }
     </script>
 @endsection
