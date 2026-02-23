@@ -28,6 +28,7 @@ class IntraoralExamination extends Model
         'patient_id',
         'exam_date',
         'notes',
+        'diagnosis',
         'created_at',
         'updated_at'
     ];

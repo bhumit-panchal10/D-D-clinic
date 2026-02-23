@@ -210,9 +210,9 @@
                             </button>
                         </div>
                         <div class="text-end">
-                            <a href="{{ route('TreatmentPlan.add', $patient->id) }}"
+                            <a href="{{ route('TreatmentPlan.index', $patient->id) }}"
                                 class="btn btn-outline-primary teeth-toggle-btn active">
-                                <i class="fas fa-plus"></i> Add
+                                Back
                             </a>
                         </div>
                     </div>
