@@ -525,6 +525,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('TreatmentPlan/add/{patient}', [TreatmentPlanController::class, 'add'])
         ->name('TreatmentPlan.add');
 
+    Route::post('/save-condition', [TreatmentPlanController::class, 'saveCondition'])
+        ->name('save.comments');
+
     Route::post('/{patient}', [TreatmentPlanController::class, 'store'])
         ->name('TreatmentPlan.store');
 

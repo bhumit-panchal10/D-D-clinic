@@ -42,4 +42,9 @@ class TreatmentPlan extends Model
         'date',
         'patient_id'
     ];
+
+    public function details()
+    {
+        return $this->hasMany(TreatmentPlanDetail::class, 'Treatment_plan_id');
+    }
 }
