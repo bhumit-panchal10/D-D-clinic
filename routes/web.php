@@ -28,6 +28,7 @@ use App\Http\Controllers\PayToDrController;
 use App\Http\Controllers\PatientTreatmentItemController;
 
 use App\Http\Controllers\SubTreatmentController;
+use App\Http\Controllers\NoteController;
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PaymentsController;
@@ -193,6 +194,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('payments/update', [PaymentsController::class, 'update'])->name('payments.update');
     Route::delete('payments/{id}', [PaymentsController::class, 'destroy'])->name('payments.destroy');
     Route::get('/payments/pdf/{id}/', [PaymentsController::class, 'generateInvoice'])->name('payments.invoice');
+});
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('notes/{patient_id}', [NoteController::class, 'index'])->name('notes.index');
+    Route::post('notes/store', [NoteController::class, 'store'])->name('notes.store');
+    Route::get('notes/{payment}/edit', [NoteController::class, 'edit'])->name('notes.edit');
+    Route::post('notes/update', [NoteController::class, 'update'])->name('notes.update');
+    Route::delete('notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
+    Route::get('/notes/pdf/{id}/', [NoteController::class, 'generateInvoice'])->name('notes.invoice');
 });
 
 // Reports Routes
@@ -449,7 +459,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/quotation/from-treatments/{patient_id}', [QuatationController::class, 'storeFromTreatments'])
         ->name('quotation.storeFromTreatments');
 });
-
 
 // Concern Master 
 Route::prefix('admin/concern/form/master')->name('concern_form_master.')->middleware(['auth', 'admin'])->group(function () {

@@ -13,12 +13,12 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('patient_notes.index')) active @endif"
             href="{{ route('patient_notes.index', $id) }}" role="tab">
             Notes
         </a>
-    </li>
+    </li> --}}
 
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('orders.index', 'orders.create')) active @endif" href="{{ route('orders.index', $id) }}"
@@ -31,6 +31,13 @@
         <a class="nav-link @if (request()->routeIs('payments.index', 'payments.edit')) active @endif" href="{{ route('payments.index', $id) }}"
             role="tab">
             Payments
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('notes.index', 'notes.edit')) active @endif" href="{{ route('notes.index', $id) }}"
+            role="tab">
+            Notes
         </a>
     </li>
 
