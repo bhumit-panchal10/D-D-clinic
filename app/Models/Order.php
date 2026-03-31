@@ -11,6 +11,11 @@ class Order extends Model
 
     protected $fillable = ['patient_id', 'invoice_no', 'amount', 'discount', 'net_amount', 'date'];
 
+    public function details()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
     public function patient()
     {
         return $this->belongsTo(Patient::class);

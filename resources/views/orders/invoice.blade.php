@@ -1,24 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
     <title>Invoice</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
         }
 
         .container {
             width: 100%;
-            padding: 20px;
+            padding: 10px;
         }
 
-        .header {
-            text-align: center;
-            font-size: 20px;
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .clinic-name {
+            font-size: 16px;
             font-weight: bold;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .info {
+            margin-top: 10px;
         }
 
         table {
@@ -27,69 +40,108 @@
             margin-top: 10px;
         }
 
+        table,
         th,
         td {
             border: 1px solid black;
-            padding: 8px;
-            text-align: left;
         }
 
-        .total {
-            text-align: right;
+        th {
+            text-align: center;
             font-weight: bold;
+        }
+
+        td {
+            padding: 5px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .clinic-footer {
+            margin-top: 40px;
+            font-size: 11px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="header">Invoice #{{ $order->invoice_no }}</div>
-        <p><strong>Patient Name:</strong> {{ $order->patient->name }}</p>
-        <p><strong>Date:</strong> {{ $order->created_at->format('d-m-Y') }}</p>
 
+        <!-- Top Section -->
+        <div class="top-section">
+            <div>
+                <strong>{{ $order->patient->name }}</strong><br>
+                {{ \Carbon\Carbon::parse($order->patient->dob)->age }} Years, {{ $order->patient->gender }}
+            </div>
+
+            <div class="right">
+                Date: {{ date('d-M-Y', strtotime($order->date)) }}<br>
+                Bill No: {{ $order->invoice_no }}
+            </div>
+        </div>
+
+        <!-- Table -->
         <table>
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Treatment</th>
+                    <th>Tooth no</th>
                     <th>Qty</th>
-                    <th>Rate</th>
+                    <th>Cost</th>
                     <th>Amount</th>
-                    {{-- <th>Discount</th> --}}
-                    {{-- <th>Net Amount</th> --}}
+                    <th>Paid</th>
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $totalAmount = 0;
-                    $totalDiscount = 0;
-                    $totalNetAmount = 0;
-                @endphp
+                @php $total = 0; @endphp
 
-                @foreach ($order->orderDetails as $detail)
-                    @php
-                        $totalAmount += $detail->amount;
-                        $totalDiscount += $detail->discount;
-                        $totalNetAmount += $detail->net_amount;
-                    @endphp
+                @foreach ($order->orderDetails as $key => $detail)
+                    @php $total += $detail->amount; @endphp
                     <tr>
-                        <td>{{ $detail->patientTreatmentItem->treatment->treatment_name }}</td>
-                        <td>{{ $detail->qty }}</td>
-                        <td>{{ number_format($detail->rate, 2) }}</td>
-                        <td>{{ number_format($detail->amount, 2) }}</td>
-                        {{-- <td>{{ number_format($detail->discount, 2) }}</td> --}}
-                        {{-- <td>{{ number_format($detail->net_amount, 2) }}</td> --}}
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td>{{ $detail->treatment->treatment_name }}</td>
+                        <td>{{ $detail->tooth_no }}</td>
+                        <td class="text-center">{{ $detail->qty }}</td>
+                        <td class="text-right">{{ number_format($detail->rate, 2) }}</td>
+                        <td class="text-right">{{ number_format($detail->amount, 2) }}</td>
+                        <td class="text-right">{{ number_format($detail->amount, 2) }}</td>
                     </tr>
                 @endforeach
 
-                <!-- Total Row -->
+                <!-- Total -->
                 <tr>
-                    <td colspan="3" class="total">Total:</td>
-                    <td><strong>{{ number_format($totalAmount, 2) }}</strong></td>
-                    {{-- <td><strong>{{ number_format($totalDiscount, 2) }}</strong></td> --}}
-                    {{-- <td><strong>{{ number_format($totalNetAmount, 2) }}</strong></td> --}}
+                    <td colspan="5" class="text-right"><strong>Total Amount :</strong></td>
+                    <td class="text-right"><strong> {{ number_format($total, 2) }}</strong></td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
+
+        <!-- Footer -->
+        {{-- <div class="footer">
+            <br><br>
+            <strong>Authorized Sign</strong>
+        </div>
+
+        <div class="clinic-footer">
+            <strong>D & D Dental Clinic</strong><br>
+            1st Floor, Tavish Avenue,<br>
+            Chandkheda Road, Ahmedabad<br>
+            Mo: 97248 81458<br>
+        </div> --}}
+
     </div>
 </body>
 

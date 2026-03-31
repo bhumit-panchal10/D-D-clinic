@@ -26,6 +26,7 @@ class OrderController extends Controller
     {
         $patient = Patient::findOrFail($patient_id);
         $invoice_no = Order::max('invoice_no') + 1; // Auto-increment invoice
+        $Treatment = Treatment::get();
         $patientTreatments = PatientTreatmentItem::query()
             ->from('PatientTreatmentItem as pti')
             ->select([
@@ -49,65 +50,53 @@ class OrderController extends Controller
             ->where('pti.is_billed', 1)
             ->get();
 
-        return view('orders.create', compact('patient', 'invoice_no', 'patientTreatments'));
+        return view('orders.create', compact('Treatment', 'patient', 'invoice_no', 'patientTreatments'));
     }
 
     // STORE ORDER & ORDER DETAILS
     public function store(Request $request)
     {
-        // Validate request
+        // Validation
+
         $request->validate([
             'patient_id' => 'required',
-            'invoice_no' => 'required|unique:orders,invoice_no',
-            'date'       => 'required|date',
-            'patient_treatment_id' => 'required|array',
-            'qty'        => 'required|array',
-            'rate'       => 'required|array',
-            'amount'     => 'required|array',
-            // 'discount'   => 'nullable|array',
-            // 'net_amount' => 'required|array',
+            'invoice_no' => 'required',
+            'date' => 'required',
+            'treatment_id' => 'required|array',
         ]);
 
+        // Calculate total
+        $total = array_sum($request->amount);
 
-        // Calculate Order Total
-        $total_amount = array_sum($request->amount);
-        // $total_discount = array_sum($request->discount);
-        // $total_net_amount = array_sum($request->net_amount);
-
-        // Create Order Entry
+        // Save Order (Master)
         $order = Order::create([
             'patient_id' => $request->patient_id,
             'invoice_no' => $request->invoice_no,
-            'date'       => $request->date,
-            'amount'     => $total_amount,
-            'discount'   => 0,
-            'net_amount' => 0,
+            'date' => $request->date,
+            'amount' => $total
         ]);
 
+        // Save Order Details
+        foreach ($request->treatment_id as $key => $treatment) {
 
-        // Store OrderDetails
-        foreach ($request->patient_treatment_id as $key => $pt_id) {
+            $rate = $request->rate[$key] ?? 0;
+            $qty  = $request->qty[$key] ?? 0;
 
-
-            $patientTreatment = PatientTreatmentItem::where('patient_treatment_id', $pt_id)->first();
+            $amount = $rate * $qty;
 
             OrderDetail::create([
-                'order_id'           => $order->id,
-                'patient_id'         => $request->patient_id,
-                'treatment_id'       => $request->treatment_id[$key],
-                'patient_treatment_id' => $patientTreatment->patient_treatment_id,
-                'qty'                => $request->qty[$key],
-                'rate'               => $request->rate[$key],
-                'amount'             => $request->amount[$key],
-                'discount'           => 0,
-                'net_amount'         => 0,
+                'order_id' => $order->id,
+                'treatment_id' => $treatment,
+                'tooth_no' => $request->tooth_no[$key],
+                'rate' => $rate,
+                'qty' => $qty,
+                'patient_id' => $request->patient_id,
+                'amount' => $amount,
             ]);
-
-            // Update `is_billed = 1` for each patient_treatment_id
-            $patientTreatment->update(['is_billed' => 1]);
         }
 
-        return redirect()->route('orders.index', $request->patient_id)->with('success', 'Order created successfully.');
+        return redirect()->route('orders.index', $request->patient_id)
+            ->with('success', 'Invoice created successfully');
     }
 
 

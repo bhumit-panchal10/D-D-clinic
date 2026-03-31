@@ -33,32 +33,38 @@
 
                             <!-- First Row: Invoice No, Date, Patient Name -->
                             <div class="row mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label>Invoice No</label>
                                     <input type="text" name="invoice_no" class="form-control"
                                         oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                                         value="{{ str_pad($invoice_no, 4, '0', STR_PAD_LEFT) }}">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label>Date</label>
                                     <input type="date" name="date" class="form-control" value="{{ date('Y-m-d') }}"
                                         readonly>
                                 </div>
-                                <div class="col-md-4">
-                                    <label>Patient Name</label>
-                                    <input type="text" class="form-control" value="{{ $patient->name }}" readonly>
-                                    <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                <div class="col-md-3">
+                                    <label>Tooth No</label>
+                                    <input type="text" name="tooth_number" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Rate</label>
+                                    <input type="text" name="rate" class="form-control">
                                 </div>
                             </div>
 
                             <!-- Second Row: Treatment Selection -->
                             <div class="row mb-3 align-items-end">
-                                <div class="col-md-5">
-                                    <label>Select Treatment & Tooth</label>
-                                    <select id="patient_treatment_select" class="form-control select2" multiple>
+                                <div class="col-md-2">
+                                    <label>Qty</label>
+                                    <input type="text" name="qty" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Select Treatment</label>
+                                    {{-- <select id="patient_treatment_select" class="form-control select2" multiple>
                                         @foreach ($patientTreatments as $treatment)
                                             @if ($treatment->is_billed == 1)
-                                                {{-- Only show treatments that are NOT billed --}}
                                                 <option value="{{ $treatment->item_id }}"
                                                     data-treatment-name="{{ $treatment->treatment_name }}"
                                                     data-patienttreatment-id="{{ $treatment->patient_treatment_id }}"
@@ -71,9 +77,16 @@
                                                 </option>
                                             @endif
                                         @endforeach
+                                    </select> --}}
+                                    <select id="treatment_id" name="treatment_id" class="form-control">
+                                        <option value="">--Please Select--</option>
+                                        @foreach ($Treatment as $treatment)
+                                            <option value="{{ $treatment->id }}">
+                                                {{ $treatment->treatment_name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
-
                                 <div class="col-md-2 text-end">
                                     <button type="button" id="addToInvoice" class="btn btn-primary w-100">Add to
                                         Invoice</button>
@@ -138,50 +151,57 @@
 
             // Add to Invoice Button
             document.getElementById('addToInvoice').addEventListener('click', function() {
-                let selectedOptions = document.querySelectorAll('#patient_treatment_select option:checked');
-                let invoiceTable = document.querySelector('#invoiceTable tbody');
 
-                selectedOptions.forEach(option => {
-                    let treatmentId = option.value;
-                    let patienttreatmentId = option.dataset.patienttreatmentId;
-                    let treatmentName = option.dataset.treatmentName;
-                    let toothSelection = option.dataset.toothSelection;
-                    let rate = parseFloat(option.dataset.rate) || 0;
-                    let qty = parseInt(option.dataset.qty) || 0;
-                    let amount = rate * qty;
+                let treatmentDropdown = document.getElementById('treatment_id');
+                let treatmentId = treatmentDropdown.value;
+                let treatmentName = treatmentDropdown.options[treatmentDropdown.selectedIndex].text;
 
-                    // Prevent duplicates
-                    if (document.getElementById('row-' + treatmentId)) {
-                        alert("This treatment is already added to the invoice.");
-                        return;
-                    }
+                let tooth = document.querySelector('[name="tooth_number"]').value;
+                let rate = parseFloat(document.querySelector('[name="rate"]').value) || 0;
+                let qty = parseInt(document.querySelector('[name="qty"]').value) || 0;
 
-                    // Append new row
-                    let row = `
-                <tr id="row-${treatmentId}">
-                    <td>
-                        <input type="hidden" name="patient_treatment_id[]" value="${patienttreatmentId}">
-                        ${treatmentName}
-                    </td>
-                  
-                        <input type="hidden" name="treatment_id[]" value="${treatmentId}">
-                       
-                  
-                    <td>${toothSelection}</td>
-                    <td><input type="number" name="rate[]" value="${rate}" class="form-control rate"></td>
-                    <td><input type="number" name="qty[]" value="${qty}" class="form-control qty"></td>
-                    <td><input type="text" name="amount[]" value="${amount.toFixed(2)}" class="form-control amount" readonly></td>
-                    <td><button type="button" class="btn btn-primary btn-sm remove-row">X</button></td>
-                </tr>
-            `;
-                    invoiceTable.insertAdjacentHTML('beforeend', row);
-                });
+                if (!treatmentId || qty === 0 || rate === 0) {
+                    alert("Please fill all fields");
+                    return;
+                }
 
-                // Reset dropdown
-                jQuery("#patient_treatment_select").val(null).trigger("change");
+                let amount = rate * qty;
 
-                // Update totals
+                let table = document.querySelector('#invoiceTable tbody');
+
+                let row = `
+                    <tr>
+                        <td>
+                            ${treatmentName}
+                            <input type="hidden" name="treatment_id[]" value="${treatmentId}">
+                        </td>
+                        <td>
+                            ${tooth}
+                            <input type="hidden" name="tooth_no[]" value="${tooth}">
+                        </td>
+                        <td>
+                            <input type="number" name="rate[]" value="${rate}" class="form-control rate">
+                        </td>
+                        <td>
+                            <input type="number" name="qty[]" value="${qty}" class="form-control qty">
+                        </td>
+                        <td>
+                            <input type="text" name="amount[]" value="${amount.toFixed(2)}" class="form-control amount" readonly>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                        </td>
+                    </tr>
+                `;
+
+                table.insertAdjacentHTML('beforeend', row);
+
                 updateTotals();
+                // 🔥 CLEAR FIELDS (IMPORTANT)
+                document.querySelector('[name="tooth_number"]').value = '';
+                document.querySelector('[name="rate"]').value = '';
+                document.querySelector('[name="qty"]').value = '';
+                document.getElementById('treatment_id').value = '';
             });
 
             // Update row amount
