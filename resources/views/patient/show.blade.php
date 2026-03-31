@@ -6,12 +6,12 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('quotation.index', 'quotation.create')) active @endif" href="{{ route('quotation.index', $id) }}"
             role="tab">
             Quotation
         </a>
-    </li>
+    </li> --}}
 
     {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('patient_notes.index')) active @endif"
@@ -41,7 +41,7 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('patientconcernform.index')) active @endif"
             href="{{ route('patientconcernform.index', $id) }}" role="tab">
             Consent Form
@@ -53,7 +53,7 @@
             role="tab">
             Documents
         </a>
-    </li>
+    </li> --}}
 
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('labworks.index')) active @endif" href="{{ route('labworks.index', $id) }}"
@@ -75,10 +75,10 @@
             Appointments
         </a>
     </li>
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('pay_to_dr.index')) active @endif || @if (request()->routeIs('pay_to_dr.create')) active @endif || @if (request()->routeIs('pay_to_dr.edit')) active @endif"
             href="{{ route('pay_to_dr.index', $id) }}" role="tab">
             Pay To Dr
         </a>
-    </li>
+    </li> --}}
 </ul>
