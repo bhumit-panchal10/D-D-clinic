@@ -10,7 +10,7 @@ class Patient extends Model
     use HasFactory;
 
     protected $fillable = [
-         'name',
+        'name',
         'mobile1',
         'mobile2',
         'dob',
@@ -18,6 +18,17 @@ class Patient extends Model
         'pincode',
         'reference_by',
         'case_no',
-        'gender'
+        'gender',
+
+        'medical_history',
+        'medications',
+        'previous_surgery',
+        'allergy',
+        'habit',
+        'referred_by',
+        'reminder',
+        'email',
+        'other_disease_comments',
+        'referred_name'
     ];
 }
