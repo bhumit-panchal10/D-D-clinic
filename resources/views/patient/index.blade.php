@@ -46,10 +46,14 @@
                                             <th>Case No</th>
                                             <th>Patient Name</th>
                                             <th>Mobile</th>
-                                            <th>Mobile - 2</th>
+                                            {{-- <th>Mobile - 2</th> --}}
                                             <th>DOB</th>
                                             <th>Gender</th>
-                                            <th>Entry Date</th>
+                                            {{-- <th>Entry Date</th> --}}
+                                            <th>Medical</th>
+                                            <th>Habit</th>
+                                            <th>Referred</th>
+                                            {{-- <th>Reminder</th> --}}
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -69,7 +73,7 @@
                                                     </a>
                                                 </td>
                                                 <td>{{ $patient->mobile1 }}</td>
-                                                <td>{{ $patient->mobile2 ?? '-' }}</td>
+                                                {{-- <td>{{ $patient->mobile2 ?? '-' }}</td> --}}
 
                                                 <td>
                                                     {{ $patient->dob && $patient->dob !== '0000-00-00' ? date('d-m-Y', strtotime($patient->dob)) : '-' }}
@@ -80,11 +84,26 @@
                                                     {{ $patient->gender ?? '-' }}
 
                                                 </td>
-                                                <td>
+                                                {{-- <td>
                                                     {{ $patient->created_at && strtotime($patient->created_at)
                                                         ? date('d-m-Y', strtotime($patient->created_at))
                                                         : '-' }}
+                                                </td> --}}
+                                                <td>
+                                                    {{ implode(', ', json_decode($patient->medical_history ?? '[]', true) ?? []) }}
                                                 </td>
+
+                                                <td>
+                                                    {{ implode(', ', json_decode($patient->habit ?? '[]', true) ?? []) }}
+                                                </td>
+
+                                                <td>
+                                                    {{ implode(', ', json_decode($patient->referred_by ?? '[]', true) ?? []) }}
+                                                </td>
+
+                                                {{-- <td>
+                                                    {{ implode(', ', json_decode($patient->reminder ?? '[]', true) ?? []) }}
+                                                </td> --}}
 
                                                 <td>
                                                     <a href="{{ route('patient.edit', $patient->id) }}"

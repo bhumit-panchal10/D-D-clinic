@@ -118,11 +118,14 @@ class PatientController extends Controller
         $clinicId = auth()->user()->clinic_id;
         $request->validate([
             'case_no' => 'required',
-            'name' => 'required|string|max:30',
+            'name' => 'nullable|string|max:30',
             'mobile1' => 'required',
-            'mobile2' => 'required',
+            'email' => 'nullable',
+            'referred_name' => 'nullable',
+            'other_disease_comments' => 'nullable',
+            //'mobile2' => 'required',
             'dob' => 'nullable|date',
-            'gender' => 'required',
+            'gender' => 'nullable',
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
@@ -143,6 +146,12 @@ class PatientController extends Controller
         $data['clinic_id'] = auth()->user()->clinic_id;
         $data['case_no'] = $caseno;
 
+        // Convert array to JSON
+        $data['medical_history'] = json_encode($request->medical_history ?? []);
+        $data['habit'] = json_encode($request->habit ?? []);
+        $data['referred_by'] = json_encode($request->referred_by ?? []);
+        $data['reminder'] = json_encode($request->reminder ?? []);
+
         $patient = Patient::create($data);
 
         $caseMaster->last_number += 1;
@@ -160,20 +169,29 @@ class PatientController extends Controller
     // Update patient data
     public function update(Request $request, Patient $patient)
     {
+
         $request->validate([
             'case_no' => 'required',
             'name' => 'required|string|max:30',
             'mobile1' => 'required',
-            'mobile2' => 'required',
+            'mobile2' => 'nullable',
+            'email' => 'nullable',
+            'referred_name' => 'nullable',
+            'other_disease_comments' => 'nullable',
             'dob' => 'nullable|date',
             'gender' => 'required',
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
         ]);
+        $data = $request->all();
 
-        $patient->update($request->all());
+        $data['medical_history'] = json_encode($request->medical_history ?? []);
+        $data['habit'] = json_encode($request->habit ?? []);
+        $data['referred_by'] = json_encode($request->referred_by ?? []);
+        $data['reminder'] = json_encode($request->reminder ?? []);
 
+        $patient->update($data);
         return redirect()->route('patient.index')->with('success', 'Patient updated successfully.');
     }
 

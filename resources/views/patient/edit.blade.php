@@ -53,7 +53,7 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
                                             <label>Mobile 2 <span class="text-danger">*</span></label>
                                             <input type="text"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
@@ -63,21 +63,26 @@
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
                                             <label>DOB</label>
                                             <input type="date" class="form-control" name="dob"
                                                 value="{{ $patient->dob }}">
                                         </div>
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
                                             <label>Gender <span class="text-danger">*</span></label>
                                             <select class="form-control" name="gender" id="gender">
                                                 <option value="">Select Gender</option>
-                                                <option value="Male" @if ($patient->gender == "Male") selected @endif>
+                                                <option value="Male" @if ($patient->gender == 'Male') selected @endif>
                                                     Male</option>
-                                                <option value="Female" @if ($patient->gender == "Female") selected @endif>
+                                                <option value="Female" @if ($patient->gender == 'Female') selected @endif>
                                                     Female</option>
 
                                             </select>
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Email</label>
+                                            <input type="text" class="form-control" name="email"
+                                                value="{{ $patient->email }}">
                                         </div>
 
                                     </div>
@@ -99,6 +104,139 @@
                                             <input type="text" class="form-control" placeholder="Enter Reference By"
                                                 maxlength="30" name="reference_by" value="{{ $patient->reference_by }}">
                                         </div>
+                                    </div>
+
+                                    @php
+                                        $medicalHistory = json_decode($patient->medical_history ?? '[]', true);
+                                        $habit = json_decode($patient->habit ?? '[]', true);
+                                        $referred = json_decode($patient->referred_by ?? '[]', true);
+                                        $reminder = json_decode($patient->reminder ?? '[]', true);
+                                    @endphp
+
+                                    <hr>
+                                    <h5>Medical History</h5>
+
+                                    <div class="row">
+                                        @php
+                                            $medicalList = [
+                                                'diabetes' => 'Diabetes',
+                                                'hepatitis' => 'Hepatitis',
+                                                'bleeding_disorder' => 'Bleeding Disorder',
+                                                'hiv' => 'HIV/AIDS',
+                                                'pregnancy' => 'Pregnancy',
+                                                'bp' => 'Blood Pressure',
+                                                'tb' => 'Tuberculosis (TB)',
+                                                'asthma' => 'Asthma',
+                                                'epilepsy' => 'Epilepsy',
+                                                'lactation' => 'Lactation',
+                                                'heart' => 'Heart Disease',
+                                                'kidney' => 'Kidney Disease',
+                                                'liver' => 'Liver Disease',
+                                                'thyroid' => 'Thyroid Disease',
+                                                'other_disease' => 'Other Disease',
+                                            ];
+                                        @endphp
+
+                                        @foreach ($medicalList as $key => $label)
+                                            <div class="col-lg-3">
+                                                <label>
+                                                    <input type="checkbox" name="medical_history[]"
+                                                        value="{{ $key }}"
+                                                        {{ in_array($key, $medicalHistory) ? 'checked' : '' }}>
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 col-lg-4">
+                                            <label>Medications</label>
+
+                                            <textarea class="form-control" placeholder="Enter Medications" maxlength="255" name="medications">{{ $patient->medications }}</textarea>
+
+                                        </div>
+
+                                        <div class="mb-3 col-lg-4">
+                                            <label>Previous Surgery</label>
+                                            <textarea class="form-control" placeholder="Enter Previous Surgery" maxlength="255" name="previous_surgery">{{ $patient->previous_surgery }}</textarea>
+
+                                        </div>
+
+                                        <div class="mb-3 col-lg-4">
+                                            <label>Allergy</label>
+                                            <textarea class="form-control" placeholder="Enter Allergy" maxlength="255" name="allergy">{{ $patient->allergy }}</textarea>
+
+                                        </div>
+
+                                        <div class="mb-3 col-lg-8">
+                                            <label>Other Disease Comments</label>
+                                            <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments">{{ $patient->other_disease_comments }}</textarea>
+
+                                        </div>
+                                        <div class="mb-3 col-lg-4">
+                                            <label>Referred To Us By Name</label>
+                                            <input class="form-control" placeholder="Enter Referred Name" maxlength="255"
+                                                name="referred_name" value="{{ $patient->referred_name }}">
+
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <h5>Habit</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <label>
+                                                <input type="checkbox" name="habit[]" value="smoking"
+                                                    {{ in_array('smoking', $habit) ? 'checked' : '' }}>
+                                                Smoking / E-cigarette
+                                            </label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <label>
+                                                <input type="checkbox" name="habit[]" value="gutka"
+                                                    {{ in_array('gutka', $habit) ? 'checked' : '' }}>
+                                                Gutka / Betel Nut
+                                            </label>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <label>
+                                                <input type="checkbox" name="habit[]" value="alcohol"
+                                                    {{ in_array('alcohol', $habit) ? 'checked' : '' }}>
+                                                Alcohol
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <h5>Referred To Us By</h5>
+                                    <div class="row">
+                                        @foreach (['google', 'facebook', 'instagram', 'twitter', 'justdial'] as $ref)
+                                            <div class="col-lg-2">
+                                                <label>
+                                                    <input type="checkbox" name="referred_by[]"
+                                                        value="{{ $ref }}"
+                                                        {{ in_array($ref, $referred) ? 'checked' : '' }}>
+                                                    {{ ucfirst($ref) }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <hr>
+
+                                    <h5>Reminder</h5>
+                                    <div class="row">
+                                        @foreach (['6_months' => '6 Months', '1_year' => '1 Year', '2_years' => '2 Years', 'never' => 'Never'] as $key => $label)
+                                            <div class="col-lg-2">
+                                                <label>
+                                                    <input type="checkbox" name="reminder[]" value="{{ $key }}"
+                                                        {{ in_array($key, $reminder) ? 'checked' : '' }}>
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
                                     </div>
 
                                     <div class="text-end">
