@@ -18,13 +18,20 @@ class DocumentController extends Controller
         $patient_id = $request->patient_id;
         $treatment_id = $request->treatment_id;
         $patient_treatment_id = $request->patient_treatment_id;
+        $tooth_no = $request->tooth_no;
 
         $patient = $patient_id ? Patient::findOrFail($patient_id) : null;
-        $documents = Document::where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        // $documents = Document::where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        $documents = Document::where('patient_id', $patient_id)
+            ->when($tooth_no, function ($query) use ($tooth_no) {
+                $query->where('tooth_no', 'LIKE', '%' . $tooth_no . '%');
+            })
+            ->paginate(config('app.per_page'))
+            ->appends($request->all());
         $treatments = Treatment::all();
         $patientTreatments = PatientTreatment::all();
 
-        return view('documents.index', compact('patient', 'documents', 'treatments', 'patientTreatments', 'treatment_id', 'patient_treatment_id'));
+        return view('documents.index', compact('patient', 'documents', 'treatments', 'patientTreatments', 'treatment_id', 'patient_treatment_id', 'tooth_no'));
     }
 
     public function store(Request $request, $id)
@@ -43,7 +50,6 @@ class DocumentController extends Controller
             'document.mimes' => 'Allowed extensions are only .jpg, .png, .pdf',
             'document.max' => 'The file size should not exceed 5MB.',
         ]);
-
 
         $img = "";
         if ($request->hasFile('document')) {
@@ -64,6 +70,7 @@ class DocumentController extends Controller
             'patient_treatment_id' => $request->filled('patient_treatment_id') ? $request->patient_treatment_id : null, // Store NULL instead of 0
             'document' => $img, // Store only the filename in the database
             'comment' => $request->comment,
+            'tooth_no' => $request->tooth_no,
             'date' => $request->date,
         ]);
 
@@ -90,7 +97,7 @@ class DocumentController extends Controller
 
         $PatientTreatment = PatientTreatment::where('id', $request->patient_treatment_id)->first();
         $date = $PatientTreatment->created_at->format('Y/m/d'); // e.g. 2025/06/27
-      
+
         if ($request->hasFile('document')) {
             $root = $_SERVER['DOCUMENT_ROOT'];
             $destinationpath = $root . '/dental_clinic/patient_treatments/' . $date . '/' . $PatientTreatment->id;
@@ -122,7 +129,7 @@ class DocumentController extends Controller
     {
 
         $patienttreatmentdoc = PatientTreatmentDocument::with('patientTreatment')->where('patient_treatment_id', $id)->get();
-       // dd($patienttreatmentdoc);
+        // dd($patienttreatmentdoc);
         return view('documents.document', compact('patienttreatmentdoc'));
     }
 

@@ -46,14 +46,14 @@
             href="{{ route('patientconcernform.index', $id) }}" role="tab">
             Consent Form
         </a>
-    </li>
+    </li> --}}
 
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('document.index')) active @endif" href="{{ route('document.index', $id) }}"
             role="tab">
             Documents
         </a>
-    </li> --}}
+    </li>
 
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('labworks.index')) active @endif" href="{{ route('labworks.index', $id) }}"

@@ -15,6 +15,7 @@ class Document extends Model
         'patient_treatment_id',
         'document',
         'date',
+        'tooth_no',
         'comment',
     ];
 

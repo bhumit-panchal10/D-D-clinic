@@ -70,10 +70,16 @@
                                         <input type="file" name="document" class="form-control"
                                             accept="image/jpeg, image/png, application/pdf" required>
                                     </div>
-                                    
-                                     <div class="mb-3">
+
+                                    <div class="mb-3">
                                         <label>Date</label>
                                         <input type="date" name="date" class="form-control">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label>Tooth No</label>
+                                        <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                            name="tooth_no" class="form-control">
                                     </div>
 
                                     <div class="mb-3">
@@ -96,8 +102,24 @@
                     <div class="col-lg-7">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Document List</h5>
+                                <h5 class="card-title mb-2">Document List</h5>
                             </div>
+                            <form method="GET" action="{{ route('document.index', $patient->id) }}" class="mb-0 p-3">
+                                <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+
+                                <div class="row mt-0">
+                                    <div class="col-md-6">
+                                        <input type="text" name="tooth_no" value="{{ request('tooth_no') }}"
+                                            class="form-control" placeholder="Search by Tooth No">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-primary">Search</button>
+                                        <a href="{{ route('document.index', $patient->id) }}"
+                                            class="btn btn-secondary">Reset</a>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="card-body">
                                 <table class="table table-striped">
                                     <thead>
@@ -106,6 +128,7 @@
                                             <th>Document Name</th>
                                             <th>Date</th>
                                             <th>Comment</th>
+                                            <th>Tooth No</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -115,12 +138,13 @@
                                                 <td>{{ $documents->firstItem() + $key }}</td>
                                                 <td>{{ $document->document ?? 'N/A' }}</td>
                                                 <td>
-                                                    {{ ($document->date && $document->date != '0000-00-00') ? date('d-m-Y', strtotime($document->date)) : '' }}
+                                                    {{ $document->date && $document->date != '0000-00-00' ? date('d-m-Y', strtotime($document->date)) : '' }}
                                                 </td>
 
                                                 <td>{{ $document->comment }}</td>
+                                                <td>{{ $document->tooth_no ?? '' }}</td>
                                                 <td>
-                                                    <a href="{{ asset('/D&D_DENTAL_CLINIC/documents/' . $document->document) }}"
+                                                    <a href="{{ asset('/dental_clinic/D&D_DENTAL_CLINIC/documents/' . $document->document) }}"
                                                         target="_blank" class="btn btn-sm btn-primary">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
