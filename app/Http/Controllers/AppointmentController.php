@@ -87,8 +87,9 @@ class AppointmentController extends Controller
         $results = $patients->map(function ($patient) {
             return [
                 'id' => $patient->id,
-                'label' => $patient->name,
-                'value' => $patient->name
+                'label' => $patient->name . ' (Case No: ' . $patient->case_no . ')',
+                'value' => $patient->name,
+                'caseno' => $patient->case_no
             ];
         });
         return response()->json($results);

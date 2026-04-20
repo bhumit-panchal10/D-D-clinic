@@ -13,8 +13,6 @@
             min-height: 20px !important;
         }
 
-
-
         .fc .fc-event {
             font-size: 11px;
             padding: 2px 4px;
@@ -46,7 +44,67 @@
         }
     </style>
 
+    <style>
+        /* =========================
+               FULLCALENDAR CUSTOM UI
+            ========================== */
 
+        /* Remove all-day row */
+        .fc .fc-timegrid-allday,
+        .fc .fc-timegrid-divider {
+            display: none !important;
+        }
+
+        /* Dark vertical borders */
+        .fc-theme-standard td,
+        .fc-theme-standard th,
+        .fc .fc-scrollgrid,
+        .fc .fc-scrollgrid td,
+        .fc .fc-scrollgrid th {
+            border-color: #b8b8b8 !important;
+        }
+
+        /* Half-hour horizontal line light */
+        .fc .fc-timegrid-slot-minor td,
+        .fc .fc-timegrid-slot-minor th {
+            border-top: 1px solid #ececec !important;
+        }
+
+        /* One-hour horizontal line dark */
+        .fc .fc-timegrid-slot-major td,
+        .fc .fc-timegrid-slot-major th {
+            border-top: 1px solid #9c9c9c !important;
+        }
+
+        /* Keep background visible */
+        .fc .fc-bg-event {
+            opacity: 1 !important;
+        }
+
+        /* Gray background 1 PM to 4 PM */
+        .fc .fc-bg-event.gray-time-block {
+            background: #e3e3e3 !important;
+            border: none !important;
+        }
+
+        /* Time label style */
+        .fc .fc-timegrid-slot-label-cushion {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Day header style */
+        .fc .fc-col-header-cell-cushion {
+            text-decoration: none !important;
+            color: #333 !important;
+            font-weight: 600;
+        }
+
+        /* Optional cleaner toolbar buttons */
+        .fc .fc-button {
+            box-shadow: none !important;
+        }
+    </style>
 
     <div class="main-content">
         <div class="page-content">
@@ -106,8 +164,6 @@
         </div>
     </div>
 
-
-
     <!-- Appointment Modal -->
     <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -117,8 +173,6 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="appointmentModalLabel">Add Appointment</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
-
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -126,10 +180,7 @@
                             <input type="text" class="form-control" id="patient_search"
                                 placeholder="Search patient name">
                             <input type="hidden" id="patient_id" name="patient_id">
-
-
                         </div>
-
 
                         <div class="form-group">
                             <label>Doctor</label>
@@ -210,7 +261,7 @@
                         url: '/dental_clinic/admin/get-patient-details/' + ui.item.id,
                         method: 'GET',
                         success: function(data) {
-                            
+
                             $('#contact_no').val(data.contact_no || '');
                             $('#email').val(data.email || '');
                         }
@@ -221,44 +272,69 @@
 
             // ✅ FullCalendar Setup
             var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                initialView: 'dayGridMonth',
+                initialView: 'timeGridWeek',
                 selectable: true,
                 eventDisplay: 'block',
                 slotEventOverlap: false,
-                slotMinTime: "08:00:00",
+                selectable: true,
+                selectMirror: true,
+                slotMinTime: "09:00:00",
+                slotMaxTime: "22:00:00",
                 firstDay: 1,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: function(info, successCallback, failureCallback) {
-                    $.ajax({
-                        url: '{{ route('patient_appointment.getAppointments') }}',
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            const events = data.map(item => ({
-                                title: item.title,
-                                start: item.start,
-                                allDay: false,
-                                // backgroundColor: '#4caf50',
-                                color: item.color
-                                // color: '#4caf50'
-                            }));
-                            successCallback(events);
-                        },
-                        error: function() {
-                            failureCallback();
-                            alert('Failed to fetch appointments.');
-                        }
-                    });
-                },
-                dateClick: function(info) {
+                // events: function(info, successCallback, failureCallback) {
+                //     $.ajax({
+                //         url: '{{ route('patient_appointment.getAppointments') }}',
+                //         method: 'GET',
+                //         dataType: 'json',
+                //         success: function(data) {
+                //             const events = data.map(item => ({
+                //                 title: item.title,
+                //                 start: item.start,
+                //                 allDay: false,
+                //                 // backgroundColor: '#4caf50',
+                //                 color: item.color
+                //                 // color: '#4caf50'
+                //             }));
+                //             successCallback(events);
+                //         },
+                //         error: function() {
+                //             failureCallback();
+                //             alert('Failed to fetch appointments.');
+                //         }
+                //     });
+                // },
 
-                    $('#schedule_date').val(info.dateStr);
+                select: function(info) {
+
+                    let start = new Date(info.start);
+
+                    let date = start.toISOString().split('T')[0];
+
+                    let hours = start.getHours().toString().padStart(2, '0');
+                    let minutes = start.getMinutes().toString().padStart(2, '0');
+
+                    // ✅ Convert to 12-hour format
+                    let ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; // 0 => 12
+
+                    let formattedTime = hours + ':' + minutes + ' ' + ampm;
+
+                    $('#schedule_date').val(date);
+                    $('#followup_datetime').val(formattedTime);
+
                     $('#appointmentModal').modal('show');
                 },
+                // dateClick: function(info) {
+
+                //     $('#schedule_date').val(info.dateStr);
+                //     $('#appointmentModal').modal('show');
+                // },
                 // select: function(info) {
                 //     // ✅ Works for week/day view
 

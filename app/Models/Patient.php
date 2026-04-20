@@ -29,6 +29,12 @@ class Patient extends Model
         'reminder',
         'email',
         'other_disease_comments',
-        'referred_name'
+        'referred_name',
+
+        'middle_name',
+        'last_name',
+        'blood_group',
+        'Occupation',
+        'company_name'
     ];
 }

@@ -189,7 +189,6 @@
     </div>
 
 
-
     <!-- Delete Modal Start -->
     <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

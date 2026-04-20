@@ -2,7 +2,7 @@
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('ReasonForVisitToday.index', 'ReasonForVisitToday.index')) active @endif"
             href="{{ route('ReasonForVisitToday.index', $id) }}" role="tab">
-            Patient Treatments
+            Case Paper
         </a>
     </li>
 
@@ -21,32 +21,11 @@
     </li> --}}
 
     <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('orders.index', 'orders.create')) active @endif" href="{{ route('orders.index', $id) }}"
-            role="tab">
-            Invoice
-        </a>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('payments.index', 'payments.edit')) active @endif" href="{{ route('payments.index', $id) }}"
-            role="tab">
-            Payments
-        </a>
-    </li>
-
-    <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('notes.index', 'notes.edit')) active @endif" href="{{ route('notes.index', $id) }}"
             role="tab">
-            Notes
+            Treatments
         </a>
     </li>
-
-    {{-- <li class="nav-item">
-        <a class="nav-link @if (request()->routeIs('patientconcernform.index')) active @endif"
-            href="{{ route('patientconcernform.index', $id) }}" role="tab">
-            Consent Form
-        </a>
-    </li> --}}
 
     <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('document.index')) active @endif" href="{{ route('document.index', $id) }}"
@@ -63,18 +42,42 @@
     </li>
 
     <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('orders.index', 'orders.create')) active @endif" href="{{ route('orders.index', $id) }}"
+            role="tab">
+            Invoice
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('payments.index', 'payments.edit')) active @endif" href="{{ route('payments.index', $id) }}"
+            role="tab">
+            Payments
+        </a>
+    </li>
+
+
+    {{-- <li class="nav-item">
+        <a class="nav-link @if (request()->routeIs('patientconcernform.index')) active @endif"
+            href="{{ route('patientconcernform.index', $id) }}" role="tab">
+            Consent Form
+        </a>
+    </li> --}}
+
+
+
+    <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('prescriptions.index', 'prescriptions.create', 'prescriptions.edit')) active @endif"
             href="{{ route('prescriptions.index', $id) }}" role="tab">
             Prescription
         </a>
     </li>
 
-    <li class="nav-item">
+    {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('patient_appointment.index', 'patient_appointment.create', 'patient_appointment.edit')) active @endif"
             href="{{ route('patient_appointment.index', $id) }}" role="tab">
             Appointments
         </a>
-    </li>
+    </li> --}}
     {{-- <li class="nav-item">
         <a class="nav-link @if (request()->routeIs('pay_to_dr.index')) active @endif || @if (request()->routeIs('pay_to_dr.create')) active @endif || @if (request()->routeIs('pay_to_dr.edit')) active @endif"
             href="{{ route('pay_to_dr.index', $id) }}" role="tab">
