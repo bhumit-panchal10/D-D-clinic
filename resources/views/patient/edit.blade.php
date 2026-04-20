@@ -27,18 +27,67 @@
                                     @method('PUT')
 
                                     <div class="row">
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
                                             <label>Case No <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" placeholder="Enter Case No"
                                                 maxlength="30" name="case_no" value="{{ $patient->case_no }}" required>
                                         </div>
-                                        <div class="mb-3 col-lg-4">
-                                            <label>Patient Name <span class="text-danger">*</span></label>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>First Name<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" placeholder="Enter Name"
                                                 maxlength="30" name="name" value="{{ $patient->name }}" required>
                                         </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Middle Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" placeholder="Enter Middle Name"
+                                                maxlength="30" name="middle_name" value="{{ $patient->middle_name }}"
+                                                required>
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Last Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" placeholder="Enter Name"
+                                                maxlength="30" name="last_name" value="{{ $patient->last_name }}" required>
+                                        </div>
 
-                                        <div class="mb-3 col-lg-4">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Blood Group</label>
+                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
+                                                <option value="A+"{{ $patient->blood_group == 'A+' ? 'selected' : '' }}>
+                                                    A+</option>
+                                                <option value="A−"{{ $patient->blood_group == 'A−' ? 'selected' : '' }}>
+                                                    A−</option>
+                                                <option value="B+"{{ $patient->blood_group == 'B+' ? 'selected' : '' }}>
+                                                    B+</option>
+                                                <option value="B−"{{ $patient->blood_group == 'B−' ? 'selected' : '' }}>
+                                                    B−</option>
+                                                <option
+                                                    value="AB+"{{ $patient->blood_group == 'AB+' ? 'selected' : '' }}>
+                                                    AB+</option>
+                                                <option
+                                                    value="AB−"{{ $patient->blood_group == 'AB−' ? 'selected' : '' }}>
+                                                    AB−</option>
+                                                <option
+                                                    value="O+"{{ $patient->blood_group == 'O+' ? 'selected' : '' }}>O+
+                                                </option>
+                                                <option
+                                                    value="O−"{{ $patient->blood_group == 'O−' ? 'selected' : '' }}>O−
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Occupation</label>
+                                            <input type="text" class="form-control" placeholder="Enter Occupation"
+                                                maxlength="50" name="Occupation" value="{{ $patient->Occupation }}">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Company Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter Company Name"
+                                                maxlength="30" name="company_name" value="{{ $patient->company_name }}">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
                                             <label>Mobile 1 <span class="text-danger">*</span></label>
                                             <input type="text"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
@@ -48,11 +97,6 @@
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
-
-
-                                    </div>
-
-                                    <div class="row">
                                         <div class="mb-3 col-lg-3">
                                             <label>Mobile 2 <span class="text-danger">*</span></label>
                                             <input type="text"
@@ -99,11 +143,11 @@
                                                 minlength="6" maxlength="6" name="pincode"
                                                 value="{{ $patient->pincode }}">
                                         </div>
-                                        <div class="mb-3 col-lg-3">
+                                        {{-- <div class="mb-3 col-lg-3">
                                             <label>Reference By</label>
                                             <input type="text" class="form-control" placeholder="Enter Reference By"
                                                 maxlength="30" name="reference_by" value="{{ $patient->reference_by }}">
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     @php
@@ -147,6 +191,10 @@
                                                 </label>
                                             </div>
                                         @endforeach
+                                        <div class="col-lg-9">
+                                            <label>Other Disease Comments</label>
+                                            <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments">{{ $patient->other_disease_comments }}</textarea>
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="mb-3 col-lg-4">
@@ -163,16 +211,16 @@
                                         </div>
 
                                         <div class="mb-3 col-lg-4">
-                                            <label>Allergy</label>
+                                            <label>Drug / Dental Material Allergy</label>
                                             <textarea class="form-control" placeholder="Enter Allergy" maxlength="255" name="allergy">{{ $patient->allergy }}</textarea>
 
                                         </div>
 
-                                        <div class="mb-3 col-lg-8">
+                                        {{-- <div class="mb-3 col-lg-8">
                                             <label>Other Disease Comments</label>
                                             <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments">{{ $patient->other_disease_comments }}</textarea>
 
-                                        </div>
+                                        </div> --}}
                                         <div class="mb-3 col-lg-4">
                                             <label>Referred To Us By Name</label>
                                             <input class="form-control" placeholder="Enter Referred Name" maxlength="255"
@@ -211,6 +259,20 @@
                                     <hr>
 
                                     <h5>Referred To Us By</h5>
+                                    <div class="row mb-2">
+                                        <div class="col-lg-2">
+                                            <label>
+                                                <input type="checkbox" name="referred_by[]" value="self"
+                                                    {{ in_array('self', $referred) ? 'checked' : '' }}> Self
+                                            </label>
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <input type="text" class="form-control" name="relative_name"
+                                                placeholder="Enter Friend / Relative's name"
+                                                value="{{ $patient->referred_name }}">
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         @foreach (['google', 'facebook', 'instagram', 'twitter', 'justdial'] as $ref)
                                             <div class="col-lg-2">

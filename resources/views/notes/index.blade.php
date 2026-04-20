@@ -63,19 +63,17 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="amount" class="form-label">Amount<span
-                                                class="text-danger">*</span></label>
+                                        <label for="amount" class="form-label">Amount</label>
                                         <input type="text" name="amount" id="amount" class="form-control"
                                             oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="" required>
+                                            value="">
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="tooth_no" class="form-label">Tooth No<span
-                                                class="text-danger">*</span></label>
+                                        <label for="tooth_no" class="form-label">Tooth No</label>
                                         <input type="text" name="tooth_no" id="tooth_no" class="form-control"
                                             oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="" required>
+                                            value="">
                                     </div>
 
                                     <div class="text-end">

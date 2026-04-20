@@ -26,12 +26,55 @@
                                     @csrf
 
                                     <div class="row">
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
                                             <label>Case No <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" placeholder="Enter Case No"
                                                 maxlength="30" name="case_no" value="{{ $caseno }}" required>
                                         </div>
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-3 col-lg-3">
+                                            <label>First</label>
+                                            <input type="text" class="form-control" placeholder="Enter Name"
+                                                maxlength="30" name="name">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Middle</label>
+                                            <input type="text" class="form-control" placeholder="Enter Name"
+                                                maxlength="30" name="middle_name">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Last</label>
+                                            <input type="text" class="form-control" placeholder="Enter Name"
+                                                maxlength="30" name="last_name">
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Blood Group</label>
+                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
+                                                <option value="A+">A+</option>
+                                                <option value="A−">A−</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B−">B−</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="AB−">AB−</option>
+                                                <option value="O+">O+</option>
+                                                <option value="O−">O−</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Occupation</label>
+                                            <input type="text" class="form-control" placeholder="Enter Occupation"
+                                                maxlength="50" name="Occupation">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Company Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter Company Name"
+                                                maxlength="30" name="company_name">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
                                             <label>Mobile 1</label>
                                             <input type="text"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
@@ -41,14 +84,11 @@
                                                 <span class="text-danger text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                        <div class="mb-3 col-lg-4">
-                                            <label>Patient Name</label>
-                                            <input type="text" class="form-control" placeholder="Enter Name"
-                                                maxlength="30" name="name">
-                                        </div>
+
                                     </div>
 
                                     <div class="row">
+
                                         <div class="mb-3 col-lg-3">
                                             <label>Mobile 2</label>
                                             <input type="text"
@@ -83,20 +123,20 @@
 
                                     <div class="row">
 
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-4 col-lg-6">
                                             <label>Address</label>
                                             <textarea class="form-control" placeholder="Enter Address" maxlength="255" name="address"></textarea>
                                         </div>
-                                        <div class="mb-3 col-lg-4">
+                                        <div class="mb-4 col-lg-3">
                                             <label>Pincode</label>
                                             <input type="text" class="form-control" placeholder="Enter Pincode"
                                                 minlength="6" maxlength="6" name="pincode">
                                         </div>
-                                        <div class="mb-3 col-lg-4">
+                                        {{-- <div class="mb-4 col-lg-3">
                                             <label>Reference By</label>
                                             <input type="text" class="form-control" placeholder="Enter Reference By"
                                                 maxlength="30" name="reference_by">
-                                        </div>
+                                        </div> --}}
 
                                         <hr>
                                         <h5>Medical History</h5>
@@ -131,6 +171,10 @@
                                                     </label>
                                                 </div>
                                             @endforeach
+                                            <div class="col-lg-9">
+                                                <label>Other Disease Comments</label>
+                                                <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments"></textarea>
+                                            </div>
                                         </div>
 
                                         <div class="row">
@@ -154,11 +198,6 @@
 
                                             </div>
 
-                                            <div class="mb-3 col-lg-8">
-                                                <label>Other Disease Comments</label>
-                                                <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments"></textarea>
-
-                                            </div>
                                             <div class="mb-3 col-lg-4">
                                                 <label>Referred To Us By Name</label>
                                                 <input class="form-control" placeholder="Enter Referred Name"
@@ -188,6 +227,18 @@
                                         <hr>
 
                                         <h5>Referred To Us By</h5>
+                                        <div class="row mb-2">
+                                            <div class="col-lg-2">
+                                                <label>
+                                                    <input type="checkbox" name="referred_by[]" value="self"> Self
+                                                </label>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <input type="text" class="form-control" name="relative_name"
+                                                    placeholder="Enter Friend / Relative's name ">
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
                                                         value="google"> Google</label></div>
@@ -220,7 +271,7 @@
                                             <button type="submit" class="btn btn-primary">Save</button>
                                             <button type="reset" class="btn btn-primary">Clear</button>
                                         </div>
-
+                                    </div>
                                 </form>
                             </div> <!-- card-body -->
                         </div> <!-- card -->

@@ -115,10 +115,16 @@ class PatientController extends Controller
     // Store patient data
     public function store(Request $request)
     {
+
         $clinicId = auth()->user()->clinic_id;
         $request->validate([
             'case_no' => 'required',
             'name' => 'nullable|string|max:30',
+            'middle_name' => 'nullable',
+            'last_name' => 'nullable',
+            'blood_group' => 'nullable',
+            'Occupation' => 'nullable',
+            'company_name' => 'nullable',
             'mobile1' => 'required',
             'email' => 'nullable',
             'referred_name' => 'nullable',
@@ -169,10 +175,14 @@ class PatientController extends Controller
     // Update patient data
     public function update(Request $request, Patient $patient)
     {
-
         $request->validate([
             'case_no' => 'required',
             'name' => 'required|string|max:30',
+            'middle_name' => 'nullable',
+            'last_name' => 'nullable',
+            'blood_group' => 'nullable',
+            'Occupation' => 'nullable',
+            'company_name' => 'nullable',
             'mobile1' => 'required',
             'mobile2' => 'nullable',
             'email' => 'nullable',
