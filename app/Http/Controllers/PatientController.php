@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
-
 class PatientController extends Controller
 {
     // Display patients list
@@ -117,6 +116,7 @@ class PatientController extends Controller
     {
 
         $clinicId = auth()->user()->clinic_id;
+
         $request->validate([
             'case_no' => 'required',
             'name' => 'nullable|string|max:30',
@@ -128,10 +128,12 @@ class PatientController extends Controller
             'mobile1' => 'required',
             'email' => 'nullable',
             'referred_name' => 'nullable',
+            'relative_name' => 'nullable',
             'other_disease_comments' => 'nullable',
             //'mobile2' => 'required',
             'dob' => 'nullable|date',
             'gender' => 'nullable',
+            'Age' => 'nullable',
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
@@ -187,9 +189,11 @@ class PatientController extends Controller
             'mobile2' => 'nullable',
             'email' => 'nullable',
             'referred_name' => 'nullable',
+            'relative_name' => 'nullable',
             'other_disease_comments' => 'nullable',
             'dob' => 'nullable|date',
             'gender' => 'required',
+            'Age' => 'nullable',
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',

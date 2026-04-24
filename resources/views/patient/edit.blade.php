@@ -75,6 +75,10 @@
                                                 <option
                                                     value="O−"{{ $patient->blood_group == 'O−' ? 'selected' : '' }}>O−
                                                 </option>
+                                                <option
+                                                    value="N/A"{{ $patient->blood_group == 'N/A' ? 'selected' : '' }}>
+                                                    N/A
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="mb-3 col-lg-3">
@@ -111,6 +115,13 @@
                                             <label>DOB</label>
                                             <input type="date" class="form-control" name="dob"
                                                 value="{{ $patient->dob }}">
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Age</label>
+                                            <input type="text" class="form-control" name="Age"
+                                                value="{{ $patient->Age }}"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                         </div>
                                         <div class="mb-3 col-lg-3">
                                             <label>Gender <span class="text-danger">*</span></label>
@@ -267,11 +278,22 @@
                                             </label>
                                         </div>
 
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-2">
+                                            <input type="checkbox" name="referred_by[]" value="friend/relative"
+                                                {{ in_array('friend/relative', $referred) ? 'checked' : '' }}>
+                                            Friend/Relative
+
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <input type="text" class="form-control" name="relative_name"
+                                                value="{{ $patient->relative_name }}">
+                                        </div>
+
+                                        {{-- <div class="col-lg-4">
                                             <input type="text" class="form-control" name="relative_name"
                                                 placeholder="Enter Friend / Relative's name"
-                                                value="{{ $patient->referred_name }}">
-                                        </div>
+                                                value="{{ $patient->relative_name }}">
+                                        </div> --}}
                                     </div>
                                     <div class="row">
                                         @foreach (['google', 'facebook', 'instagram', 'twitter', 'justdial'] as $ref)

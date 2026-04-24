@@ -35,6 +35,8 @@ class Patient extends Model
         'last_name',
         'blood_group',
         'Occupation',
-        'company_name'
+        'company_name',
+        'relative_name',
+        'Age'
     ];
 }

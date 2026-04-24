@@ -62,6 +62,7 @@
                                                 <option value="AB−">AB−</option>
                                                 <option value="O+">O+</option>
                                                 <option value="O−">O−</option>
+                                                <option value="N/A">N/A</option>
                                             </select>
                                         </div>
                                         <div class="mb-3 col-lg-3">
@@ -103,6 +104,12 @@
                                         <div class="mb-3 col-lg-3">
                                             <label>DOB</label>
                                             <input type="date" class="form-control" name="dob" id="dob">
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Age</label>
+                                            <input type="text" class="form-control" placeholder="Enter Age"
+                                                name="Age" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                         </div>
 
                                         <div class="mb-3 col-lg-3">
@@ -227,16 +234,20 @@
                                         <hr>
 
                                         <h5>Referred To Us By</h5>
-                                        <div class="row mb-2">
+                                        <div class="row mb-2 align-items-center">
                                             <div class="col-lg-2">
                                                 <label>
                                                     <input type="checkbox" name="referred_by[]" value="self"> Self
                                                 </label>
                                             </div>
 
-                                            <div class="col-lg-4">
-                                                <input type="text" class="form-control" name="relative_name"
-                                                    placeholder="Enter Friend / Relative's name ">
+                                            <div class="col-lg-2">
+                                                <input type="checkbox" name="referred_by[]" value="friend/relative">
+                                                Friend/Relative
+
+                                            </div>
+                                            <div class="col-lg-2">
+                                                <input type="text" class="form-control" name="relative_name">
                                             </div>
                                         </div>
                                         <div class="row">
