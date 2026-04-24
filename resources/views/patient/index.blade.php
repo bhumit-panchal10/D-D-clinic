@@ -46,14 +46,10 @@
                                             <th>Case No</th>
                                             <th>Patient Name</th>
                                             <th>Mobile</th>
-                                            {{-- <th>Mobile - 2</th> --}}
-                                            <th>DOB</th>
-                                            <th>Gender</th>
-                                            {{-- <th>Entry Date</th> --}}
+                                            <th>Age</th>
                                             <th>Medical</th>
-                                            <th>Habit</th>
+                                            {{-- <th>Habit</th> --}}
                                             <th>Referred</th>
-                                            {{-- <th>Reminder</th> --}}
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -69,21 +65,23 @@
                                                 <td>
                                                     <a href="{{ route('ReasonForVisitToday.index', $patient->id) }}"
                                                         class="text-primary">
-                                                        {{ $patient->name }}
+                                                        {{ $patient->name . ' ' . $patient->middle_name . ' ' . $patient->last_name }}
                                                     </a>
                                                 </td>
                                                 <td>{{ $patient->mobile1 }}</td>
-                                                {{-- <td>{{ $patient->mobile2 ?? '-' }}</td> --}}
-
                                                 <td>
-                                                    {{ $patient->dob && $patient->dob !== '0000-00-00' ? date('d-m-Y', strtotime($patient->dob)) : '-' }}
+                                                    @php
+                                                        $age = $patient->Age ?? null;
+                                                        $dob = $patient->dob ?? null;
+
+                                                        if (!$age && $dob && $dob !== '0000-00-00') {
+                                                            $age = \Carbon\Carbon::parse($dob)->age;
+                                                        }
+                                                    @endphp
+
+                                                    {{ $age ? $age : '-' }}
                                                 </td>
 
-                                                <td>
-
-                                                    {{ $patient->gender ?? '-' }}
-
-                                                </td>
                                                 {{-- <td>
                                                     {{ $patient->created_at && strtotime($patient->created_at)
                                                         ? date('d-m-Y', strtotime($patient->created_at))
@@ -93,12 +91,25 @@
                                                     {{ implode(', ', json_decode($patient->medical_history ?? '[]', true) ?? []) }}
                                                 </td>
 
-                                                <td>
+                                                {{-- <td>
                                                     {{ implode(', ', json_decode($patient->habit ?? '[]', true) ?? []) }}
-                                                </td>
+                                                </td> --}}
 
                                                 <td>
-                                                    {{ implode(', ', json_decode($patient->referred_by ?? '[]', true) ?? []) }}
+                                                    {{-- {{ implode(', ', json_decode($patient->referred_by ?? '[]', true) ?? []) }} --}}
+                                                    @php
+                                                        $referrals =
+                                                            json_decode($patient->referred_by ?? '[]', true) ?? [];
+
+                                                        $display = array_map(function ($item) use ($patient) {
+                                                            if (strtolower($item) === 'friend/relative') {
+                                                                return $patient->relative_name ?? 'Friend/Relative';
+                                                            }
+                                                            return ucfirst($item);
+                                                        }, $referrals);
+                                                    @endphp
+
+                                                    {{ !empty($display) ? implode(', ', $display) : '-' }}
                                                 </td>
 
                                                 {{-- <td>

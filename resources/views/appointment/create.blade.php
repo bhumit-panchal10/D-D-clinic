@@ -27,6 +27,10 @@
             min-height: 18px !important;
         }
 
+        .fc-non-business {
+            background-color: #d3d3d3 !important;
+        }
+
         .fc-daygrid-event {
             padding: 2px 4px !important;
             /* ✅ Add this */
@@ -46,8 +50,8 @@
 
     <style>
         /* =========================
-               FULLCALENDAR CUSTOM UI
-            ========================== */
+                                                               FULLCALENDAR CUSTOM UI
+                                                            ========================== */
 
         /* Remove all-day row */
         .fc .fc-timegrid-allday,
@@ -247,7 +251,6 @@
 
     <script>
         $(document).ready(function() {
-            // ✅ Autocomplete for Patient
             $('#patient_search').autocomplete({
                 source: '{{ route('appointment.patients.search') }}',
                 minLength: 2,
@@ -256,7 +259,6 @@
                     $('#patient_search').val(ui.item.value);
                     $('#patient_id').val(ui.item.id);
 
-                    // Fetch additional patient details
                     $.ajax({
                         url: '/dental_clinic/admin/get-patient-details/' + ui.item.id,
                         method: 'GET',
@@ -270,7 +272,6 @@
                 }
             });
 
-            // ✅ FullCalendar Setup
             var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'timeGridWeek',
                 selectable: true,
@@ -280,35 +281,33 @@
                 selectMirror: true,
                 slotMinTime: "09:00:00",
                 slotMaxTime: "22:00:00",
+                // eventSources: [{
+                //     events: [{
+                //         startTime: '13:00',
+                //         endTime: '16:00',
+                //         daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                //         display: 'background',
+                //         color: '#e0e0e0'
+                //     }]
+                // }],
+                allDaySlot: false,
                 firstDay: 1,
+                businessHours: [{
+                        daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                        startTime: '09:00',
+                        endTime: '13:00'
+                    },
+                    {
+                        daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                        startTime: '16:00',
+                        endTime: '22:00'
+                    }
+                ],
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                // events: function(info, successCallback, failureCallback) {
-                //     $.ajax({
-                //         url: '{{ route('patient_appointment.getAppointments') }}',
-                //         method: 'GET',
-                //         dataType: 'json',
-                //         success: function(data) {
-                //             const events = data.map(item => ({
-                //                 title: item.title,
-                //                 start: item.start,
-                //                 allDay: false,
-                //                 // backgroundColor: '#4caf50',
-                //                 color: item.color
-                //                 // color: '#4caf50'
-                //             }));
-                //             successCallback(events);
-                //         },
-                //         error: function() {
-                //             failureCallback();
-                //             alert('Failed to fetch appointments.');
-                //         }
-                //     });
-                // },
-
                 select: function(info) {
 
                     let start = new Date(info.start);
@@ -318,7 +317,6 @@
                     let hours = start.getHours().toString().padStart(2, '0');
                     let minutes = start.getMinutes().toString().padStart(2, '0');
 
-                    // ✅ Convert to 12-hour format
                     let ampm = hours >= 12 ? 'PM' : 'AM';
                     hours = hours % 12;
                     hours = hours ? hours : 12; // 0 => 12
@@ -330,23 +328,9 @@
 
                     $('#appointmentModal').modal('show');
                 },
-                // dateClick: function(info) {
-
-                //     $('#schedule_date').val(info.dateStr);
-                //     $('#appointmentModal').modal('show');
-                // },
-                // select: function(info) {
-                //     // ✅ Works for week/day view
-
-                //     const selectedDate = info.startStr.split('T')[0];
-                //     console.log(selectedDate);
-                //     $('#schedule_date').val(selectedDate);
-                //     $('#appointmentModal').modal('show');
-                // },
                 eventDidMount: function(info) {
                     const titleElement = info.el.querySelector('.fc-event-title');
                     if (titleElement) {
-                        // Wrap with <div> for safety and line break
                         const lines = info.event.title.split(' at ');
                         titleElement.innerHTML = `
                 <div style="white-space: normal; text-align: center;">
@@ -360,7 +344,7 @@
             });
 
             calendar.render();
-            // Function to fetch appointments
+
             function fetchAppointments() {
                 var doctorId = $('#doctor_id_filter').val();
 
@@ -371,9 +355,9 @@
                     data: {
                         doctor_id: doctorId
                     },
-                    dataType: 'json', // Ensure correct data format
+                    dataType: 'json',
                     success: function(data) {
-                        console.log("Fetched Appointments:", data); // Debugging - Check data in console
+                        console.log("Fetched Appointments:", data);
 
                         if (!Array.isArray(data)) {
                             alert("Invalid data received from server.");
@@ -383,11 +367,18 @@
                         var events = data.map(function(appointment) {
                             return {
                                 title: appointment
-                                    .title, // Using the formatted title from the controller
+                                    .title,
                                 start: appointment.start,
                                 allDay: false,
                                 color: appointment.color
                             };
+                        });
+                        events.push({
+                            startTime: '13:00:00',
+                            endTime: '16:00:00',
+                            daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                            display: 'background',
+                            backgroundColor: '#d3d3d3'
                         });
 
                         calendar.removeAllEvents(); // Clear previous events
@@ -417,6 +408,7 @@
 
         });
     </script>
+
     <script>
         flatpickr("#followup_datetime", {
             enableTime: true,

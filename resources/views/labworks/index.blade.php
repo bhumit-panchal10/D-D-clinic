@@ -9,13 +9,22 @@
             <div class="container-fluid">
 
                 <div class="d-flex justify-content-between align-items-center m-3">
-                  <h5 class="mb-0">
-                        Name: {{ $patient->name }} | Mobile No 1: {{ $patient->mobile1 }}
-                        @if($patient->mobile2 != '')
-                        | Mobile No 2: {{ $patient->mobile2 }}
+                    <h5 class="mb-0">
+                        Name: {{ $patient->name }} | Mobile No 1: {{ $patient->mobile1 }} |
+                        Age: @php
+                            $age = $patient->Age ?? null;
+                            $dob = $patient->dob ?? null;
+
+                            if (!$age && $dob && $dob !== '0000-00-00') {
+                                $age = \Carbon\Carbon::parse($dob)->age;
+                            }
+                        @endphp
+                        {{ $age ? $age : '-' }}
+                        @if ($patient->mobile2 != '')
+                            | Mobile No 2: {{ $patient->mobile2 }}
                         @endif
                         | Case No: {{ $patient->case_no }}
-                   </h5>                    <a href="{{ route('patient.index') }}" class="btn btn-sm btn-primary shadow-sm">
+                    </h5> <a href="{{ route('patient.index') }}" class="btn btn-sm btn-primary shadow-sm">
                         <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back
                     </a>
                 </div>

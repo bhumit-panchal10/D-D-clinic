@@ -8,7 +8,16 @@
 
                 <div class="d-flex justify-content-between align-items-center m-3">
                     <h5 class="mb-0">
-                        Name: {{ $patient->name }} | Mobile No 1: {{ $patient->mobile1 }}
+                        Name: {{ $patient->name }} | Mobile No 1: {{ $patient->mobile1 }} |
+                        Age: @php
+                            $age = $patient->Age ?? null;
+                            $dob = $patient->dob ?? null;
+
+                            if (!$age && $dob && $dob !== '0000-00-00') {
+                                $age = \Carbon\Carbon::parse($dob)->age;
+                            }
+                        @endphp
+                        {{ $age ? $age : '-' }}
                         @if ($patient->mobile2 != '')
                             | Mobile No 2: {{ $patient->mobile2 }}
                         @endif
@@ -82,7 +91,7 @@
                                 @endforelse
                             </tbody>
                             <tfoot class="table-light">
-                               
+
                             </tfoot>
                         </table>
                         <div class="d-flex justify-content-center mt-3">
