@@ -20,8 +20,11 @@ class PatientController extends Controller
 
         $results = Patient::select('id', 'name', 'mobile1')
             ->where('name', 'like', "%{$search}%")
+            ->orWhere('middle_name', 'LIKE', "%{$search}%")
+            ->orWhere('last_name', 'LIKE', "%{$search}%")
             ->orWhere('mobile1', 'like', "%{$search}%")
             ->orWhere('mobile2', 'like', "%{$search}%")
+            ->orWhere('case_no', 'like', "%{$search}%")
             ->orderBy('name')
             ->limit(10)
             ->get();

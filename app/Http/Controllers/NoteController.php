@@ -17,12 +17,14 @@ class NoteController extends Controller
     public function index($patient_id)
     {
         $Totalamount = Notes::where(['patient_id' => $patient_id])->sum('amount');
+        $discount = Notes::where(['patient_id' => $patient_id])->sum('discount');
+        $NetAmount = $Totalamount - $discount;
         $Paidamount = Payment::where('patient_id', $patient_id)->sum('amount');
         $patient = Patient::findOrFail($patient_id);
         $Treatment = Treatment::get();
         $notes = Notes::with('treatment')->where('patient_id', $patient_id)->orderBy('id', 'desc')->paginate(config('app.per_page'));
         // dd($notes);
-        return view('notes.index', compact('Treatment', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
+        return view('notes.index', compact('NetAmount', 'Treatment', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
     }
 
     public function store(Request $request)
@@ -36,6 +38,7 @@ class NoteController extends Controller
             'comments' => 'nullable|string',
             'tooth_no' => 'nullable'
         ]);
+        $netamount =  $request->amount - $request->discount;
 
         Notes::create([
             'patient_id' => $request->patient_id,
@@ -44,6 +47,8 @@ class NoteController extends Controller
             'treatment_id' => $request->treatment,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
+            'discount' => $request->discount,
+            'Net_amount' => $netamount
         ]);
 
         return redirect()->back()->with('success', 'Notes added successfully.');
@@ -67,12 +72,16 @@ class NoteController extends Controller
             'amount' => 'required|numeric|min:1',
             'tooth_no' => 'nullable',
         ]);
+        $netamount =  $request->amount - $request->discount;
+
         $data = [
             'date' => $request->date,
             'amount' => $request->amount,
+            'discount' => $request->discount,
             'treatment_id' => $request->treatment,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
+            'Net_amount' => $netamount,
             'updated_at' => now(),
 
         ];

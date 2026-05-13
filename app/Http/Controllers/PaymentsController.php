@@ -14,7 +14,7 @@ class PaymentsController extends Controller
 {
     public function index($patient_id)
     {
-        $Totalamount = Notes::where(['patient_id' => $patient_id])->sum('amount');
+        $Totalamount = Notes::where(['patient_id' => $patient_id])->sum('Net_amount');
         $Paidamount = Payment::where('patient_id', $patient_id)->sum('amount');
         $discount = Payment::where('patient_id', $patient_id)->sum('discount');
         $patient = Patient::findOrFail($patient_id);

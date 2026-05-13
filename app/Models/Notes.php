@@ -9,8 +9,7 @@ class Notes extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['patient_id', 'date', 'treatment_id', 'comments', 'amount', 'tooth_no', 'created_at', 'updated_at'];
-
+    protected $fillable = ['patient_id', 'date', 'treatment_id', 'comments', 'amount', 'tooth_no', 'discount', 'created_at', 'updated_at', 'Net_amount'];
 
     public function patient()
     {

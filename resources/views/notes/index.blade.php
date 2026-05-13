@@ -10,7 +10,8 @@
 
                 <div class="d-flex justify-content-between align-items-center m-3">
                     <h5 class="mb-0">
-                        Name: {{ $patient->name }} | Mobile No 1: {{ $patient->mobile1 }} |
+                        Name: {{ $patient->name }} {{ $patient->middle_name }} {{ $patient->last_name }} | Mobile No 1:
+                        {{ $patient->mobile1 }} |
                         Age: @php
                             $age = $patient->Age ?? null;
                             $dob = $patient->dob ?? null;
@@ -20,9 +21,9 @@
                             }
                         @endphp
                         {{ $age ? $age : '-' }}
-                        @if ($patient->mobile2 != '')
+                        {{-- @if ($patient->mobile2 != '')
                             | Mobile No 2: {{ $patient->mobile2 }}
-                        @endif
+                        @endif --}}
                         | Case No: {{ $patient->case_no }}
                     </h5>
                     <a href="{{ route('patient.index') }}" class="btn btn-sm btn-primary shadow-sm">
@@ -38,7 +39,7 @@
                     <div class="col-lg-5">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
-                                <h5 class="card-title mb-0">Add Notes</h5>
+                                <h5 class="card-title mb-0">Add Treatment</h5>
                             </div>
 
                             <div class="card-body">
@@ -79,6 +80,13 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label for="discount" class="form-label">Discount</label>
+                                        <input type="text" name="discount" id="discount" class="form-control"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
+                                            value="">
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label for="tooth_no" class="form-label">Tooth No</label>
                                         <input type="text" name="tooth_no" id="tooth_no" class="form-control"
                                             oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
@@ -98,10 +106,10 @@
                     <div class="col-lg-7">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Notes List</h5>
+                                <h5 class="card-title mb-0">Treatment List</h5>
                                 <div class="d-flex justify-content-between align-items-center m-3">
                                     <h5 class="mb-0">
-                                        Total Amount: {{ $Totalamount }}
+                                        Total Amount: {{ $NetAmount }}
                                     </h5>
                                 </div>
                             </div>
@@ -113,6 +121,7 @@
                                             <th>Payment Date</th>
                                             <th>Treatment</th>
                                             <th>Amount</th>
+                                            <th>Discount</th>
                                             <th>Tooth No</th>
                                             <th>Actions</th>
                                         </tr>
@@ -124,6 +133,7 @@
                                                 <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
                                                 <td>{{ $note->treatment->treatment_name ?? '' }}</td>
                                                 <td>{{ $note->amount }}</td>
+                                                <td>{{ $note->discount ?? '' }}</td>
                                                 <td>{{ $note->tooth_no }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-primary edit-btn"
@@ -203,6 +213,13 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="discount" class="form-label">Discount<span class="text-danger">*</span></label>
+                            <input type="text" name="discount" id="edit_discount" class="form-control"
+                                value="{{ old('discount') }}" oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                                maxlength="10" required>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="tooth_no" class="form-label">Tooth No<span class="text-danger">*</span></label>
                             <input type="text" name="tooth_no" id="edit_tooth_no" class="form-control"
                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10" value=""
@@ -275,6 +292,7 @@
                     success: function(obj) {
                         $("#edit_date").val(obj.date);
                         $("#edit_amount").val(obj.amount);
+                        $("#edit_discount").val(obj.discount);
                         $("#edit_treatment").val(obj.treatment_id);
                         $("#edit_comments").val(obj.comments);
                         $("#edit_tooth_no").val(obj.tooth_no); // missing field
