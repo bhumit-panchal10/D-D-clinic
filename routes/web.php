@@ -26,9 +26,12 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CasenoController;
 use App\Http\Controllers\PayToDrController;
 use App\Http\Controllers\PatientTreatmentItemController;
+use App\Http\Controllers\TotalPaymentController;
+
 
 use App\Http\Controllers\SubTreatmentController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\OutLabworkController;
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PaymentsController;
@@ -175,7 +178,6 @@ Route::prefix('employee/patient_appointment')->name('employee.')->group(function
     Route::post('/reschedule/{appointment}', [EmployeePatientAppointmentController::class, 'reschedule'])->name('patient_appointment.reschedule');
 });
 
-
 // Document Routes
 Route::prefix('admin/document')->name('document.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/index/{patient_id}', [DocumentController::class, 'index'])->name('index');
@@ -205,6 +207,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/notes/pdf/{id}/', [NoteController::class, 'generateInvoice'])->name('notes.invoice');
 });
 
+// Payment Routes
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('TotalPayment/{patient_id?}', [TotalPaymentController::class, 'index'])->name('TotalPayment.index');
+    Route::post('TotalPayment/store', [TotalPaymentController::class, 'store'])->name('TotalPayment.store');
+    Route::get('TotalPayment/{payment}/edit', [TotalPaymentController::class, 'edit'])->name('TotalPayment.edit');
+    Route::post('TotalPayment/update', [TotalPaymentController::class, 'update'])->name('TotalPayment.update');
+    Route::delete('TotalPayment/{id}', [TotalPaymentController::class, 'destroy'])->name('TotalPayment.destroy');
+});
+
 // Reports Routes
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/reports/payments', [ReportController::class, 'report'])->name('payments.report');
@@ -213,8 +224,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::any('/reports/pay_to_dr', [ReportController::class, 'pay_to_dr_Report'])->name('reports.pay_to_dr');
     Route::any('/reports/lab_work', [ReportController::class, 'lab_work_Report'])->name('reports.lab_work_Report');
 });
-
-
 // Report Export To Excel Routes
 
 Route::get('/payments/export', function (Request $request) {
@@ -275,10 +284,24 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 Route::prefix('admin/labworks')->name('labworks.')->group(function () {
     Route::get('/index/{patient_id}', [LabworkController::class, 'index'])->name('index');
     Route::post('/store', [LabworkController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [LabworkController::class, 'edit'])->name('edit');
+    Route::post('/update', [LabworkController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [LabworkController::class, 'destroy'])->name('destroy');
     Route::post('/collected/{id}', [LabworkController::class, 'markCollected'])->name('collected');
     Route::post('/received/{id}', [LabworkController::class, 'markReceived'])->name('received');
-    Route::get('/full-list', [LabworkController::class, 'fullList'])->name('full_list'); // ✅ Added Route
+    Route::get('/full-list', [LabworkController::class, 'fullList'])->name('full_list');
+    Route::post('/received', [LabworkController::class, 'received'])->name('received');
+});
+
+Route::prefix('admin/Outlabworks')->name('Outlabworks.')->group(function () {
+    Route::get('/index/{patient_id?}', [OutLabworkController::class, 'index'])->name('index');
+    Route::post('/store', [OutLabworkController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [OutLabworkController::class, 'edit'])->name('edit');
+    Route::post('/update', [OutLabworkController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [OutLabworkController::class, 'destroy'])->name('destroy');
+    Route::post('/collected/{id}', [OutLabworkController::class, 'markCollected'])->name('collected');
+    Route::post('/received/{id}', [OutLabworkController::class, 'markReceived'])->name('received');
+    Route::post('/received', [OutLabworkController::class, 'received'])->name('received');
 });
 
 // Employee Labwork Routes

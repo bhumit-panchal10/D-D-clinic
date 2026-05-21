@@ -37,7 +37,6 @@
                                 </div>
                             </div>
 
-
                             <div class="card-body">
                                 <table class="table table-striped">
                                     <thead>
@@ -196,7 +195,6 @@
     </div>
     <!-- Delete Modal End -->
 
-
 @endsection
 
 @section('scripts')
@@ -205,8 +203,11 @@
         $(document).ready(function() {
             // Autocomplete for Patient search
             $('#patient-search').on('keyup', function() {
-                let query = $(this).val();
-                if (query.length >= 3) {
+
+                let query = $(this).val().trim();
+
+                if (query.length >= 2) {
+
                     $.ajax({
                         url: "{{ route('patient.autocomplete') }}",
                         type: "GET",
@@ -214,22 +215,49 @@
                             search: query
                         },
                         success: function(response) {
+
                             let suggestions = $('#search-suggestions');
+
                             suggestions.empty().show();
+
                             if (response.length > 0) {
+
                                 response.forEach(patient => {
-                                    suggestions.append(
-                                        `<li class="list-group-item suggestion-item" style="cursor:pointer;" data-value="${patient.name}">${patient.name} (${patient.mobile1})</li>`
-                                    );
+
+                                    let fullName = [
+                                        patient.name,
+                                        patient.middle_name,
+                                        patient.last_name
+                                    ].filter(Boolean).join(' ');
+
+                                    if (fullName === '') {
+                                        fullName = 'No Name';
+                                    }
+
+                                    let mobile = patient.mobile1 ?? '';
+
+                                    suggestions.append(`
+                                        <li class="list-group-item suggestion-item"
+                                            style="cursor:pointer;"
+                                            data-value="${patient.case_no}">
+                                            ${patient.case_no} - ${fullName} ${mobile ? '(' + mobile + ')' : ''}
+                                        </li>
+                                    `);
                                 });
+
                             } else {
-                                suggestions.append(
-                                    `<li class="list-group-item disabled">No results found</li>`
-                                );
+
+                                suggestions.append(`
+                        <li class="list-group-item disabled">
+                            No results found
+                        </li>
+                    `);
                             }
                         }
                     });
+
                 } else {
+
                     $('#search-suggestions').hide().empty();
                 }
             });
@@ -239,6 +267,8 @@
                 let value = $(this).data('value');
                 $('#patient-search').val(value);
                 $('#search-suggestions').hide();
+                $('#patient-search').closest('form').submit();
+
             });
 
             // Hide suggestion list on blur
@@ -266,57 +296,3 @@
         });
     </script>
 @endsection
-
-
-<!--@section('scripts')-->
-    <!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-    <!--    <script>
-        -- >
-        <
-        !--$(document).ready(function() {
-            -- >
-            <
-            !--$(".delete-patient").on("click", function() {
-                -- >
-                <
-                !--
-                let id = $(this).data("id");
-                -- >
-                <
-                !--$("#deleteid").val(id);
-                -- >
-                <
-                !--
-            });
-            -- >
-
-            // Confirm Delete Button Click
-            <
-            !--$("#confirmDelete").on("click", function() {
-                -- >
-                <
-                !--
-                let id = $("#deleteid").val();
-                -- >
-                <
-                !--
-                let actionUrl = "{{ route('patient.destroy', ':id') }}".replace(':id', id);
-                -- >
-                <
-                !--$("#deleteForm").attr("action", actionUrl);
-                -- >
-                <
-                !--$("#deleteForm").submit();
-                -- >
-                <
-                !--
-            });
-            -- >
-            <
-            !--
-        });
-        -- >
-        <
-        !--
-    </script>-->
-<!--@endsection-->

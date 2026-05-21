@@ -9,23 +9,23 @@ use App\Models\Treatment;
 use App\Models\PatientTreatment;
 use Illuminate\Http\Request;
 
-class LabworkController extends Controller
+class OutLabworkController extends Controller
 {
     public function index(Request $request)
     {
         $patient_id = $request->patient_id;
-        $patient = $patient_id ? Patient::findOrFail($patient_id) : null;
+        $patient =  Patient::all();
         $labs = Lab::all();
         $treatments = Treatment::all();
         $patientTreatments = PatientTreatment::all();
-        $labworks = Labwork::with('lab')->where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        $labworks = Labwork::with('lab', 'patient')->where('type', 'out')->paginate(config('app.per_page'));
 
-        return view('labworks.index', compact('patient', 'labs', 'treatments', 'patientTreatments', 'labworks'));
+        return view('labworks.OutLabworklist', compact('patient', 'labs', 'treatments', 'patientTreatments', 'labworks'));
     }
 
     public function edit($id)
     {
-        $labworks = Labwork::with('lab')->where('id', $id)->first();
+        $labworks = Labwork::with('lab', 'patient')->where('id', $id)->first();
         return response()->json($labworks);
     }
 
@@ -35,6 +35,7 @@ class LabworkController extends Controller
             'patient_id' => 'required|exists:patients,id',
             'lab' => 'required|exists:labs,id',
             'given_date' => 'required|date',
+            'entry_date' => 'required|date',
             'given_by' => 'nullable|string',
             'work_code' => 'nullable|string',
         ]);
@@ -46,11 +47,10 @@ class LabworkController extends Controller
             'entry_date' => $request->entry_date,
             'given_by' => $request->given_by,
             'work_code' => $request->work_code,
+            'type' => 'out',
             'created_at' => now()
         ]);
-
-        // Redirect back to the labwork index with success message
-        return redirect()->route('labworks.index', ['patient_id' => $request->patient_id])
+        return redirect()->route('Outlabworks.index')
             ->with('success', 'Labwork added successfully.');
     }
 
@@ -66,6 +66,7 @@ class LabworkController extends Controller
         ]);
 
         $data = [
+            'patient_id' => $request->patient_id,
             'lab_id' => $request->lab,
             'collection_date' => $request->date,
             'entry_date' => $request->entrydate,
@@ -77,13 +78,12 @@ class LabworkController extends Controller
 
         Labwork::where("id", $request->id)->update($data);
 
-        return redirect()->route('labworks.index', $request->patient_id)->with('success', 'Labwork updated successfully.');
+        return redirect()->route('Outlabworks.index', $request->patient_id)->with('success', 'Labwork updated successfully.');
     }
 
     public function received(Request $request)
     {
         $request->validate([
-            'patient_id' => 'required|exists:patients,id',
             'id' => 'required|exists:labworks,id',
             'received_date' => 'required|date',
             'received_by' => 'nullable|string',
@@ -98,7 +98,7 @@ class LabworkController extends Controller
         ];
         Labwork::where("id", $request->id)->update($data);
 
-        return redirect()->route('labworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        return redirect()->route('Outlabworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
     }
 
 

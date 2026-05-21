@@ -3,36 +3,36 @@
 @section('title', 'Labwork')
 
 @section('content')
+    <style>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /><link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    </style>
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
 
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            padding: 5px 10px;
+            border: 1px solid #ced4da;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 26px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+
+        .select2-dropdown {
+            z-index: 9999;
+        }
+    </style>
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
-
-                <div class="d-flex justify-content-between align-items-center m-3">
-                    <h5 class="mb-0">
-                        Name: {{ $patient->name }} {{ $patient->middle_name }} {{ $patient->last_name }} | Mobile No 1:
-                        {{ $patient->mobile1 }} |
-                        Age: @php
-                            $age = $patient->Age ?? null;
-                            $dob = $patient->dob ?? null;
-
-                            if (!$age && $dob && $dob !== '0000-00-00') {
-                                $age = \Carbon\Carbon::parse($dob)->age;
-                            }
-                        @endphp
-                        {{ $age ? $age : '-' }}
-                        {{-- @if ($patient->mobile2 != '')
-                            | Mobile No 2: {{ $patient->mobile2 }}
-                        @endif --}}
-                        | Case No: {{ $patient->case_no }}
-                    </h5>
-                    <a href="{{ route('patient.index') }}" class="btn btn-sm btn-primary shadow-sm">
-                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back
-                    </a>
-                </div>
-
                 @include('common.alert')
-                @include('patient.show', ['id' => $patient->id])
 
                 <div class="row">
                     <!-- Add Note Section -->
@@ -44,9 +44,27 @@
 
                             <div class="card-body">
 
-                                <form action="{{ route('labworks.store', $patient->id) }}" method="POST">
+                                <form action="{{ route('Outlabworks.store') }}" method="POST">
                                     @csrf
-                                    <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+
+                                    <div class="mb-3">
+                                        <label for="patient_id" class="form-label">
+                                            Patient <span class="text-danger">*</span>
+                                        </label>
+
+                                        <select name="patient_id" id="patient_id" class="form-select" required>
+                                            <option value="">--Please Select--</option>
+
+                                            @foreach ($patient as $pat)
+                                                <option value="{{ $pat->id }}">
+                                                    {{ $pat->name }} {{ $pat->middle_name }} {{ $pat->last_name }}
+                                                    ({{ $pat->mobile1 }})
+                                                    ({{ $pat->case_no }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                     <div class="mb-3">
                                         <label for="mode" class="form-label">Lab<span
                                                 class="text-danger">*</span></label>
@@ -104,6 +122,8 @@
                                         <tr>
                                             <th>Sr. No</th>
                                             <th>Date</th>
+                                            <th>Patient Name</th>
+                                            <th>Case No</th>
                                             <th>Lab</th>
                                             <th>Work Type</th>
                                             <th>Collection Date</th>
@@ -116,11 +136,12 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($labworks as $key => $lab)
-                                            <tr class="
-    @if (\Carbon\Carbon::parse($lab->entry_date)->addDays(4)->lt(now())) table-danger @endif
-">
+                                            <tr
+                                                class="{{ !empty($lab->received_date) && \Carbon\Carbon::parse($lab->entry_date)->diffInDays($lab->received_date) >= 4 ? 'table-danger' : '' }}">
                                                 <td class="text-center">{{ $labworks->firstItem() + $key }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($lab->entry_date)) }}</td>
+                                                <td>{{ $lab->patient->name ?? '' }}</td>
+                                                <td>{{ $lab->patient->case_no ?? '' }}</td>
                                                 <td>{{ $lab->lab->lab_name ?? '' }}</td>
                                                 <td>{{ $lab->work_code ?? '' }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($lab->entry_date)) }}</td>
@@ -143,7 +164,7 @@
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-primary delete-btn"
                                                         data-id="{{ $lab->id }}"
-                                                        data-patient-id="{{ $patient->id }}" data-toggle="modal"
+                                                        data-patient-id="{{ $lab->patient_id }}" data-toggle="modal"
                                                         data-target="#deleteRecordModal">
                                                         Delete
                                                     </button>
@@ -174,15 +195,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="{{ route('labworks.update') }}">
+                    <form id="editForm" method="POST" action="{{ route('Outlabworks.update') }}">
                         @csrf
-                        <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                        <input type="hidden" name="id" id="edit_labwork_id" value="">
 
+                        <input type="hidden" name="id" id="edit_labwork_id" value="">
                         <div class="mb-3">
-                            <label for="entry_date" class="form-label">Date<span class="text-danger">*</span></label>
-                            <input type="date" name="entrydate" id="entrydate" class="form-control"
-                                value="{{ old('entry_date') }}" required>
+                            <label for="edit_patient_id" class="form-label">
+                                Patient <span class="text-danger">*</span>
+                            </label>
+
+                            <select name="patient_id" id="edit_patient_id" class="form-control" required>
+                                <option value="">--Please Select--</option>
+
+                                @foreach ($patient as $pat)
+                                    <option value="{{ $pat->id }}">
+                                        {{ $pat->name }}
+                                        {{ $pat->middle_name }}
+                                        {{ $pat->last_name }}
+                                        ({{ $pat->mobile1 }})
+                                        ({{ $pat->case_no }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="mb-3">
@@ -194,6 +228,12 @@
                                 @endforeach
 
                             </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="entry_date" class="form-label">Date<span class="text-danger">*</span></label>
+                            <input type="date" name="entrydate" id="entrydate" class="form-control"
+                                value="{{ old('entry_date') }}" required>
                         </div>
 
                         <div class="mb-3">
@@ -232,11 +272,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="{{ route('labworks.received') }}">
+                    <form id="editForm" method="POST" action="{{ route('Outlabworks.received') }}">
                         @csrf
-                        <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                        <input type="hidden" name="id" id="received_labwork_id" value="{{ $lab->id }}">
 
+                        <input type="hidden" name="id" id="received_labwork_id">
                         <div class="mb-3">
                             <label for="work_code" class="form-label">Job Work Code</label>
                             <input type="text" name="job_work_code" id="job_work_code"
@@ -305,12 +344,34 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         function getreceivedData(id) {
 
             $('#received_labwork_id').val(id);
 
         }
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#patient_id').select2({
+                placeholder: '--Please Select--',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+
+            $('#edit_patient_id').select2({
+                dropdownParent: $('#editlabModal'),
+                placeholder: '--Please Select--',
+                allowClear: true,
+                width: '100%'
+            });
+
+        });
     </script>
     <script>
         function getEditData(id) {
@@ -330,6 +391,7 @@
                         $("#edit_work_code").val(obj.work_code);
                         $("#edit_lab").val(obj.lab_id);
                         $("#entrydate").val(obj.entry_date);
+                        $("#edit_patient_id").val(obj.patient_id).trigger('change');
                         $('#edit_labwork_id').val(id);
                     },
                     error: function(xhr) {

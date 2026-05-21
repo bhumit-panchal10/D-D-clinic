@@ -30,7 +30,8 @@
                                         <div class="mb-3 col-lg-3">
                                             <label>Case No <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" placeholder="Enter Case No"
-                                                maxlength="30" name="case_no" value="{{ $patient->case_no }}" required>
+                                                maxlength="30" name="case_no" value="{{ $patient->case_no }}" required
+                                                readonly>
                                         </div>
                                         <div class="mb-3 col-lg-3">
                                             <label>First Name<span class="text-danger">*</span></label>

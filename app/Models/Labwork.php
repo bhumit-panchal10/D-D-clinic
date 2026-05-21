@@ -18,6 +18,11 @@ class Labwork extends Model
         'collection_date',
         'received_date',
         'comment',
+        'given_by',
+        'work_code',
+        'job_work_no',
+        'received_by',
+        'type'
     ];
 
     public function patient()

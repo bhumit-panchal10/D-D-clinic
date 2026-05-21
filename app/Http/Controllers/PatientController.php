@@ -16,46 +16,138 @@ class PatientController extends Controller
     // Display patients list
     public function autocomplete(Request $request)
     {
-        $search = $request->search;
+        $search = trim($request->search);
 
-        $results = Patient::select('id', 'name', 'mobile1')
-            ->where('name', 'like', "%{$search}%")
-            ->orWhere('middle_name', 'LIKE', "%{$search}%")
-            ->orWhere('last_name', 'LIKE', "%{$search}%")
-            ->orWhere('mobile1', 'like', "%{$search}%")
-            ->orWhere('mobile2', 'like', "%{$search}%")
-            ->orWhere('case_no', 'like', "%{$search}%")
-            ->orderBy('name')
+        $results = Patient::select(
+            'id',
+            'name',
+            'middle_name',
+            'last_name',
+            'mobile1',
+            'case_no'
+        )
+            ->where(function ($query) use ($search) {
+
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('mobile1', 'LIKE', "%{$search}%")
+                    ->orWhere('mobile2', 'LIKE', "%{$search}%")
+                    ->orWhere('case_no', 'LIKE', "%{$search}%");
+
+                $query->orWhereRaw("
+            CONCAT(
+                COALESCE(name, ''),
+                ' ',
+                COALESCE(middle_name, ''),
+                ' ',
+                COALESCE(last_name, '')
+            ) LIKE ?
+        ", ["%{$search}%"]);
+            })
+
+            // Exact match first
+            ->orderByRaw("CASE WHEN case_no = ? THEN 0 ELSE 1 END", [$search])
+
+            ->orderBy('case_no')
+
             ->limit(10)
             ->get();
 
         return response()->json($results);
     }
 
+    // public function index(Request $request)
+    // {
+    //     $query = Patient::query();
+    //     if ($request->items) {
+    //         $items = $request->items ?? 100;
+    //         $minutes = 30 * 24 * 60 * 60;
+    //         Cookie::forget('Pagination');
+    //         Cookie::queue('Pagination', $items, $minutes);
+    //         $get_all_cookies = $items;
+    //     } else {
+    //         $get_all_cookies = Cookie::get('Pagination');
+    //     }
+
+    //     // Search logic (by name or mobile)
+    //     if ($request->filled('search')) {
+    //         $searchTerm = $request->search;
+    //         $query->where('name', 'like', "%{$searchTerm}%")
+    //             ->orWhere('mobile2', 'like', "%{$searchTerm}%")
+    //             ->orWhere('mobile1', 'like', "%{$searchTerm}%");
+    //     }
+
+    //     // Maintain search term in pagination links
+    //     $items = $get_all_cookies;
+    //     $patients = $query->orderBy('id', 'desc')->paginate($get_all_cookies)->appends(['search' => $request->search]);
+
+    //     return view('patient.index', compact('patients', 'items'));
+    // }
+
     public function index(Request $request)
     {
         $query = Patient::query();
+
+        // Pagination Cookie
         if ($request->items) {
+
             $items = $request->items ?? 100;
+
             $minutes = 30 * 24 * 60 * 60;
+
             Cookie::forget('Pagination');
+
             Cookie::queue('Pagination', $items, $minutes);
+
             $get_all_cookies = $items;
         } else {
-            $get_all_cookies = Cookie::get('Pagination');
+
+            $get_all_cookies = Cookie::get('Pagination', 10);
         }
 
-        // Search logic (by name or mobile)
+        // Search Logic
         if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $query->where('name', 'like', "%{$searchTerm}%")
-                ->orWhere('mobile2', 'like', "%{$searchTerm}%")
-                ->orWhere('mobile1', 'like', "%{$searchTerm}%");
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+
+                // Single Field Search
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('mobile1', 'LIKE', "%{$search}%")
+                    ->orWhere('mobile2', 'LIKE', "%{$search}%")
+                    ->orWhere('case_no', 'LIKE', "%{$search}%");
+
+                // Full Name Search
+                $q->orWhereRaw("
+                CONCAT(
+                    COALESCE(name, ''),
+                    ' ',
+                    COALESCE(middle_name, ''),
+                    ' ',
+                    COALESCE(last_name, '')
+                ) LIKE ?
+            ", ["%{$search}%"]);
+            });
+
+            // Exact case_no first
+            $query->orderByRaw(
+                "CASE WHEN case_no = ? THEN 0 ELSE 1 END",
+                [$search]
+            );
         }
 
-        // Maintain search term in pagination links
         $items = $get_all_cookies;
-        $patients = $query->orderBy('id', 'desc')->paginate($get_all_cookies)->appends(['search' => $request->search]);
+
+        $patients = $query
+            ->orderBy('id', 'desc')
+            ->paginate($items)
+            ->appends([
+                'search' => $request->search
+            ]);
 
         return view('patient.index', compact('patients', 'items'));
     }
@@ -70,7 +162,6 @@ class PatientController extends Controller
     {
 
         $patient = Patient::find($id);
-        //dd($patient);
         if (!$patient) {
             return response()->json(['error' => 'Patient not found'], 404);
         }
@@ -141,8 +232,6 @@ class PatientController extends Controller
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
         ]);
-
-
         $caseMaster = ClinicCaseCounters::first();
         if (!$caseMaster) {
             return redirect()->back()->withErrors(['error' => 'Case master not found.']);
