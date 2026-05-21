@@ -145,6 +145,22 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link menu-link @if (request()->routeIs('Outlabworks.index')) {{ 'active' }} @endif"
+                            href="{{ route('Outlabworks.index') }}">
+                            <i class="fas fa-flask"></i>
+                            <span data-key="t-dashboards">Labwork</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link @if (request()->routeIs('TotalPayment.index')) {{ 'active' }} @endif"
+                            href="{{ route('TotalPayment.index') }}">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span data-key="t-dashboards">Payment</span>
+                        </a>
+                    </li>
+
                     <hr class="menu-divider">
 
                     <li class="nav-item">
