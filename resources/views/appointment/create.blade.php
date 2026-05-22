@@ -50,8 +50,8 @@
 
     <style>
         /* =========================
-                                                               FULLCALENDAR CUSTOM UI
-                                                            ========================== */
+                                                                   FULLCALENDAR CUSTOM UI
+                                                                ========================== */
 
         /* Remove all-day row */
         .fc .fc-timegrid-allday,
@@ -118,7 +118,7 @@
 
                 <!-- FullCalendar for Appointment Display -->
 
-                <div class="card">
+                {{-- <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Search Appointments</h5>
                     </div>
@@ -148,7 +148,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </div> --}}
                 <div class="card">
                     <div class="card-body">
                         @if ($errors->any())
