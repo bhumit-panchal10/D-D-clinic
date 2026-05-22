@@ -22,7 +22,8 @@ class Labwork extends Model
         'work_code',
         'job_work_no',
         'received_by',
-        'type'
+        'type',
+        'consult_name'
     ];
 
     public function patient()

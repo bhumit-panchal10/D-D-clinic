@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Labwork')
+@section('title', 'Other Labwork')
 
 @section('content')
     <style>
@@ -39,30 +39,17 @@
                     <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
-                                <h5 class="card-title mb-0">Add Labwork</h5>
+                                <h5 class="card-title mb-0">Other Labwork</h5>
                             </div>
 
                             <div class="card-body">
 
-                                <form action="{{ route('Outlabworks.store') }}" method="POST">
+                                <form action="{{ route('Otherlabworks.store') }}" method="POST">
                                     @csrf
-
                                     <div class="mb-3">
-                                        <label for="patient_id" class="form-label">
-                                            Patient <span class="text-danger">*</span>
-                                        </label>
-
-                                        <select name="patient_id" id="patient_id" class="form-select" required>
-                                            <option value="">--Please Select--</option>
-
-                                            @foreach ($patient as $pat)
-                                                <option value="{{ $pat->id }}">
-                                                    {{ $pat->name }} {{ $pat->middle_name }} {{ $pat->last_name }}
-                                                    ({{ $pat->mobile1 }})
-                                                    ({{ $pat->case_no }})
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <label for="consult_name" class="form-label">Consult Name</label>
+                                        <input type="text" name="consult_name" id="consult_name" class="form-control"
+                                            value="">
                                     </div>
 
                                     <div class="mb-3">
@@ -112,7 +99,7 @@
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Labwork List</h5>
+                                <h5 class="card-title mb-0">Other Labwork List</h5>
                                 <div class="d-flex justify-content-between align-items-center m-3">
                                 </div>
                             </div>
@@ -122,8 +109,7 @@
                                         <tr>
                                             <th>Sr. No</th>
                                             <th>Date</th>
-                                            <th>Patient Name</th>
-                                            <th>Case No</th>
+                                            <th>Consult Name</th>
                                             <th>Lab</th>
                                             <th>Work Type</th>
                                             <th>Collection Date</th>
@@ -140,8 +126,7 @@
                                                 class="{{ !empty($lab->received_date) && \Carbon\Carbon::parse($lab->entry_date)->diffInDays($lab->received_date) >= 4 ? 'table-danger' : '' }}">
                                                 <td class="text-center">{{ $labworks->firstItem() + $key }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($lab->entry_date)) }}</td>
-                                                <td>{{ $lab->patient->name ?? '' }}</td>
-                                                <td>{{ $lab->patient->case_no ?? '' }}</td>
+                                                <td>{{ $lab->consult_name ?? '' }}</td>
                                                 <td>{{ $lab->lab->lab_name ?? '' }}</td>
                                                 <td>{{ $lab->work_code ?? '' }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($lab->entry_date)) }}</td>
@@ -227,32 +212,20 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Labwork</h5>
+                    <h5 class="modal-title">Edit Other Labwork</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="{{ route('Outlabworks.update') }}">
+                    <form id="editForm" method="POST" action="{{ route('Otherlabworks.update') }}">
                         @csrf
 
                         <input type="hidden" name="id" id="edit_labwork_id" value="">
+
                         <div class="mb-3">
-                            <label for="edit_patient_id" class="form-label">
-                                Patient <span class="text-danger">*</span>
-                            </label>
-
-                            <select name="patient_id" id="edit_patient_id" class="form-control" required>
-                                <option value="">--Please Select--</option>
-
-                                @foreach ($patient as $pat)
-                                    <option value="{{ $pat->id }}">
-                                        {{ $pat->name }}
-                                        {{ $pat->middle_name }}
-                                        {{ $pat->last_name }}
-                                        ({{ $pat->mobile1 }})
-                                        ({{ $pat->case_no }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label for="given_by" class="form-label">Consult Name<span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="consult_name" id="edit_consult_name" class="form-control"
+                                value="{{ old('consult_name') }}">
                         </div>
 
                         <div class="mb-3">
@@ -308,12 +281,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="{{ route('Outlabworks.received') }}">
+                    <form id="editForm" method="POST" action="{{ route('Otherlabworks.received') }}">
                         @csrf
 
                         <input type="hidden" name="id" id="received_labwork_id">
                         <div class="mb-3">
-                            <label for="work_code" class="form-label">Job No</label>
+                            <label for="work_code" class="form-label">Job Work Code</label>
                             <input type="text" name="job_work_code" id="job_work_code"
                                 class="form-control">{{ old('job_work_code') }}</textarea>
                         </div>
@@ -372,7 +345,6 @@
             </div>
         </div>
     </div>
-
     <!-- Delete Modal End -->
 
 
@@ -384,7 +356,7 @@
     <script>
         function getreceivedData(id) {
 
-            var url = "{{ route('labworks.edit', ':id') }}";
+            var url = "{{ route('Otherlabworks.edit', ':id') }}";
             url = url.replace(":id", id);
 
             $.ajax({
@@ -434,7 +406,7 @@
     <script>
         function getEditData(id) {
 
-            var url = "{{ route('labworks.edit', ':id') }}";
+            var url = "{{ route('Otherlabworks.edit', ':id') }}";
             url = url.replace(":id", id);
             if (id) {
                 $.ajax({
@@ -449,7 +421,7 @@
                         $("#edit_work_code").val(obj.work_code);
                         $("#edit_lab").val(obj.lab_id);
                         $("#entrydate").val(obj.entry_date);
-                        $("#edit_patient_id").val(obj.patient_id).trigger('change');
+                        $("#edit_consult_name").val(obj.consult_name);
                         $('#edit_labwork_id').val(id);
                     },
                     error: function(xhr) {
@@ -467,7 +439,7 @@
                 let patientId = $(this).data("patient-id");
 
                 // Set the delete form action to the payments.destroy route
-                let actionUrl = "{{ route('labworks.destroy', ':id') }}".replace(':id', id);
+                let actionUrl = "{{ route('Otherlabworks.destroy', ':id') }}".replace(':id', id);
 
                 // Set the form action dynamically
                 $("#deleteForm").attr("action", actionUrl);

@@ -131,22 +131,36 @@
                                                 <td>{{ $lab->received_by ?? '' }}</td>
                                                 <td>{{ $lab->job_work_no ?? '' }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-sm btn-primary edit-btn"
-                                                        onclick="getEditData(<?= $lab->id ?>)" data-bs-toggle="modal"
-                                                        data-bs-target="#editlabModal">
-                                                        Edit
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-primary edit-btn"
-                                                        onclick="getreceivedData(<?= $lab->id ?>)" data-bs-toggle="modal"
-                                                        data-bs-target="#receivedlabModal">
-                                                        Received
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-primary delete-btn"
-                                                        data-id="{{ $lab->id }}"
-                                                        data-patient-id="{{ $patient->id }}" data-toggle="modal"
-                                                        data-target="#deleteRecordModal">
-                                                        Delete
-                                                    </button>
+                                                    <div class="d-flex gap-1">
+
+                                                        <!-- Edit -->
+                                                        <button type="button" class="btn btn-sm btn-primary"
+                                                            onclick="getEditData({{ $lab->id }})"
+                                                            data-bs-toggle="modal" data-bs-target="#editlabModal"
+                                                            title="Edit">
+
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+
+                                                        <!-- Received -->
+                                                        <button type="button" class="btn btn-sm btn-success"
+                                                            onclick="getreceivedData({{ $lab->id }})"
+                                                            data-bs-toggle="modal" data-bs-target="#receivedlabModal"
+                                                            title="Received">
+
+                                                            <i class="fas fa-check-circle"></i>
+                                                        </button>
+
+                                                        <!-- Delete -->
+                                                        <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                                            data-id="{{ $lab->id }}"
+                                                            data-patient-id="{{ $patient->id }}" data-toggle="modal"
+                                                            data-target="#deleteRecordModal" title="Delete">
+
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -308,10 +322,36 @@
     <script>
         function getreceivedData(id) {
 
+            var url = "{{ route('labworks.edit', ':id') }}";
+            url = url.replace(":id", id);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+
+                success: function(obj) {
+                    console.log(obj);
+                    $('#received_labwork_id').val(obj.id);
+
+                    $('#job_work_code').val(obj.job_work_no);
+
+                    $('#edit_received_date').val(obj.received_date.split(' ')[0]);
+                    $('#edit_received_by').val(obj.received_by);
+                },
+
+                error: function(xhr) {
+                    alert('Failed to load data');
+                }
+            });
+        }
+    </script>
+    {{-- <script>
+        function getreceivedData(id) {
+
             $('#received_labwork_id').val(id);
 
         }
-    </script>
+    </script> --}}
     <script>
         function getEditData(id) {
 

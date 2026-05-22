@@ -27,11 +27,11 @@ use App\Http\Controllers\CasenoController;
 use App\Http\Controllers\PayToDrController;
 use App\Http\Controllers\PatientTreatmentItemController;
 use App\Http\Controllers\TotalPaymentController;
-
-
+use App\Http\Controllers\PaymentsReceivedController;
 use App\Http\Controllers\SubTreatmentController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\OutLabworkController;
+use App\Http\Controllers\OtherLabworkController;
 
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PaymentsController;
@@ -197,6 +197,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('payments/{id}', [PaymentsController::class, 'destroy'])->name('payments.destroy');
     Route::get('/payments/pdf/{id}/', [PaymentsController::class, 'generateInvoice'])->name('payments.invoice');
 });
+//Payment Received
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('PaymentsReceived/{patient_id?}', [PaymentsReceivedController::class, 'index'])->name('paymentsreceived.index');
+    Route::post('PaymentsReceived/store', [PaymentsReceivedController::class, 'store'])->name('paymentsreceived.store');
+    Route::get('PaymentsReceived/{payment}/edit', [PaymentsReceivedController::class, 'edit'])->name('paymentsreceived.edit');
+    Route::post('PaymentsReceived/update', [PaymentsReceivedController::class, 'update'])->name('paymentsreceived.update');
+    Route::delete('PaymentsReceived/{id}', [PaymentsReceivedController::class, 'destroy'])->name('paymentsreceived.destroy');
+});
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('notes/{patient_id}', [NoteController::class, 'index'])->name('notes.index');
@@ -304,6 +312,16 @@ Route::prefix('admin/Outlabworks')->name('Outlabworks.')->group(function () {
     Route::post('/received', [OutLabworkController::class, 'received'])->name('received');
 });
 
+Route::prefix('admin/Otherlabworks')->name('Otherlabworks.')->group(function () {
+    Route::get('/index/{patient_id?}', [OtherLabworkController::class, 'index'])->name('index');
+    Route::post('/store', [OtherLabworkController::class, 'store'])->name('store');
+    Route::get('/edit/{id}', [OtherLabworkController::class, 'edit'])->name('edit');
+    Route::post('/update', [OtherLabworkController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [OtherLabworkController::class, 'destroy'])->name('destroy');
+    Route::post('/collected/{id}', [OtherLabworkController::class, 'markCollected'])->name('collected');
+    Route::post('/received/{id}', [OtherLabworkController::class, 'markReceived'])->name('received');
+    Route::post('/received', [OtherLabworkController::class, 'received'])->name('received');
+});
 // Employee Labwork Routes
 Route::prefix('employee/labworks')->name('employee.')->group(function () {
     Route::get('/index', [EmployeeLabworkController::class, 'index'])->name('labworks.index');

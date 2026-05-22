@@ -154,10 +154,26 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link menu-link @if (request()->routeIs('Otherlabworks.index')) {{ 'active' }} @endif"
+                            href="{{ route('Otherlabworks.index') }}">
+                            <i class="fas fa-vials"></i>
+                            <span data-key="t-dashboards">Other Labwork</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link menu-link @if (request()->routeIs('TotalPayment.index')) {{ 'active' }} @endif"
                             href="{{ route('TotalPayment.index') }}">
                             <i class="fas fa-money-bill-wave"></i>
                             <span data-key="t-dashboards">Payment</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link @if (request()->routeIs('paymentsreceived.index')) {{ 'active' }} @endif"
+                            href="{{ route('paymentsreceived.index') }}">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span data-key="t-dashboards">Payment Recieved</span>
                         </a>
                     </li>
 
