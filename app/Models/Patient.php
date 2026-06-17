@@ -39,4 +39,8 @@ class Patient extends Model
         'relative_name',
         'Age'
     ];
+    public function notes()
+    {
+        return $this->hasMany(Notes::class);
+    }
 }

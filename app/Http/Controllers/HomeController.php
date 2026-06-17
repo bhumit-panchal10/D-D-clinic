@@ -11,6 +11,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\PatientAppointment;
 use App\Models\Labwork;
+use App\Models\Patient;
+use App\Models\Notes;
 use App\Models\MaintenanceRegister;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -47,7 +49,30 @@ class HomeController extends Controller
 
         $MarkAsReceivedPending = MaintenanceRegister::where(['repair_received_date' => null, 'received_comment' => null])->count();
 
-        return view('home', compact('todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending'));
+        $todayPatients = Patient::with([
+            'notes.treatment'
+        ])
+            ->whereDate('created_at', today())
+            ->get();
+        //dd($todayPatients);
+
+        $todayAppointments = PatientAppointment::with(['patient', 'doctor'])
+            ->where('is_disrupted', 0)
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('rescheduled_date')
+                        ->whereDate('appointment_date', today());
+                })->orWhereDate('rescheduled_date', today());
+            })
+            ->orderBy('appointment_time', 'ASC')
+            ->get();
+
+        $todayDuePatients = Notes::with('patient')
+            ->selectRaw('patient_id, SUM(Net_amount) as total_due')
+            ->whereDate('date', today())
+            ->groupBy('patient_id')
+            ->get();
+        return view('home', compact('todayPatients', 'todayAppointments', 'todayDuePatients', 'todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending'));
     }
 
 

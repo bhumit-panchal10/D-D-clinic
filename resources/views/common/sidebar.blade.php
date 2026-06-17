@@ -161,13 +161,13 @@
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link menu-link @if (request()->routeIs('TotalPayment.index')) {{ 'active' }} @endif"
                             href="{{ route('TotalPayment.index') }}">
                             <i class="fas fa-money-bill-wave"></i>
                             <span data-key="t-dashboards">Payment</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li class="nav-item">
                         <a class="nav-link menu-link @if (request()->routeIs('paymentsreceived.index')) {{ 'active' }} @endif"

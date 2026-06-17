@@ -86,6 +86,157 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5>Due Patient List</h5>
+                                                </div>
+
+                                                <div class="card-body table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Case No</th>
+                                                                <th>Patient Name</th>
+                                                                <th>Due Amount</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            @forelse($todayDuePatients as $due)
+                                                                <tr>
+                                                                    <td>{{ $due['case_no'] }}</td>
+
+                                                                    <td>{{ $due['patient_name'] }}</td>
+
+                                                                    <td>
+                                                                        ₹ {{ number_format($due['due_amount'], 2) }}
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center">
+                                                                        No Due Found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5>Today's Appointment List</h5>
+                                                </div>
+
+                                                <div class="card-body table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sr No</th>
+                                                                <th>Patient Name</th>
+                                                                <th>Mobile</th>
+                                                                <th>Doctor</th>
+                                                                <th>Time</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            @forelse($todayAppointments as $key => $appointment)
+                                                                <tr>
+                                                                    <td>{{ $key + 1 }}</td>
+
+                                                                    <td>
+                                                                        {{ $appointment->patient->name ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $appointment->mobile_no ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $appointment->doctor->name ?? '-' }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $appointment->rescheduled_time
+                                                                            ? date('h:i A', strtotime($appointment->rescheduled_time))
+                                                                            : date('h:i A', strtotime($appointment->appointment_time)) }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ ucfirst($appointment->status ?? '-') }}
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center">
+                                                                        No Appointment Found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5>Today's Patient List</h5>
+                                                </div>
+
+                                                <div class="card-body table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sr No</th>
+                                                                <th>Case No</th>
+                                                                <th>Patient Name</th>
+                                                                <th>Treatment</th>
+                                                                <th>Amount</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            @forelse($todayPatients as $key => $patient)
+                                                                <tr>
+                                                                    <td>{{ $key + 1 }}</td>
+
+                                                                    <td>{{ $patient->case_no }}</td>
+
+                                                                    <td>{{ $patient->name }}</td>
+
+                                                                    <td>
+                                                                        @foreach ($patient->notes as $note)
+                                                                            {{ $note->treatment->treatment_name ?? '-' }}<br>
+                                                                        @endforeach
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="5" class="text-center">
+                                                                        No Record Found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @else
                                 <div class="row">

@@ -212,6 +212,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('notes/{payment}/edit', [NoteController::class, 'edit'])->name('notes.edit');
     Route::post('notes/update', [NoteController::class, 'update'])->name('notes.update');
     Route::delete('notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
+    Route::get('notes/{id}/images', [NoteController::class, 'images'])->name('notes.images');
+    Route::delete('notes/images/{id}', [NoteController::class, 'deleteImage'])->name('notes.images.delete');
     Route::get('/notes/pdf/{id}/', [NoteController::class, 'generateInvoice'])->name('notes.invoice');
 });
 
