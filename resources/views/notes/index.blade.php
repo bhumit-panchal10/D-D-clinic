@@ -44,7 +44,8 @@
 
                             <div class="card-body">
 
-                                <form action="{{ route('notes.store', $patient->id) }}" method="POST">
+                                <form action="{{ route('notes.store', $patient->id) }}" method="POST"
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                                     <div class="mb-3">
@@ -64,12 +65,25 @@
 
                                         </select>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="tooth_no" class="form-label">Tooth No</label>
+                                        <input type="text" name="tooth_no" id="tooth_no" class="form-control"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
+                                            value="">
+                                    </div>
 
                                     <div class="row mt-3">
                                         <div class="mb-3">
                                             <label for="comments" class="form-label">Comments</label>
                                             <textarea name="comments" id="comments" class="form-control"></textarea>
                                         </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="images" class="form-label">Upload Images</label>
+                                        <input type="file" name="images[]" id="images" class="form-control" multiple
+                                            accept="image/jpeg,image/jpg,image/png">
+                                        <small class="text-muted">You can select multiple JPG/PNG images.</small>
                                     </div>
 
                                     <div class="mb-3">
@@ -86,12 +100,7 @@
                                             value="">
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="tooth_no" class="form-label">Tooth No</label>
-                                        <input type="text" name="tooth_no" id="tooth_no" class="form-control"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="">
-                                    </div>
+
 
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary">Save</button>
@@ -120,9 +129,10 @@
                                             <th>Sr. No</th>
                                             <th>Payment Date</th>
                                             <th>Treatment</th>
+                                            <th>Tooth No</th>
                                             <th>Amount</th>
                                             <th>Discount</th>
-                                            <th>Tooth No</th>
+                                            <th>Images</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -132,16 +142,24 @@
                                                 <td class="text-center">{{ $notes->firstItem() + $key }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
                                                 <td>{{ $note->treatment->treatment_name ?? '' }}</td>
+                                                <td>{{ $note->tooth_no }}</td>
                                                 <td>{{ $note->amount }}</td>
                                                 <td>{{ $note->discount ?? '' }}</td>
-                                                <td>{{ $note->tooth_no }}</td>
+                                                <td>{{ $note->images->count() }}</td>
                                                 <td>
+                                                    @if ($note->images->count() > 0)
+                                                        <a href="{{ route('notes.images', $note->id) }}"
+                                                            class="btn btn-sm btn-secondary">
+                                                            View Images
+                                                        </a>
+                                                    @endif
+
                                                     <button type="button" class="btn btn-sm btn-primary edit-btn"
                                                         onclick="getEditData(<?= $note->id ?>)" data-bs-toggle="modal"
                                                         data-bs-target="#editNoteModal">
                                                         Edit
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-primary delete-btn"
+                                                    <button type="button" class="btn btn-sm btn-danger delete-btn"
                                                         data-id="{{ $note->id }}"
                                                         data-patient-id="{{ $patient->id }}" data-toggle="modal"
                                                         data-target="#deleteRecordModal">
@@ -201,6 +219,13 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="tooth_no" class="form-label">Tooth No<span class="text-danger">*</span></label>
+                            <input type="text" name="tooth_no" id="edit_tooth_no" class="form-control"
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10" value=""
+                                required>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="comments" class="form-label">Comments</label>
                             <textarea name="comments" id="edit_comments" class="form-control">{{ old('comments') }}</textarea>
                         </div>
@@ -219,13 +244,6 @@
                                 maxlength="10" required>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="tooth_no" class="form-label">Tooth No<span class="text-danger">*</span></label>
-                            <input type="text" name="tooth_no" id="edit_tooth_no" class="form-control"
-                                oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10" value=""
-                                required>
-                        </div>
-
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary">Update</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -235,8 +253,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- Delete Modal Start -->
     <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
@@ -271,8 +287,6 @@
     </div>
 
     <!-- Delete Modal End -->
-
-
 @endsection
 
 @section('scripts')
