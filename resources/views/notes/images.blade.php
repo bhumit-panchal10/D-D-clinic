@@ -32,7 +32,7 @@
                                             <img src="{{ asset($image->file_path) }}" class="card-img-top" alt="Note Image">
                                             <div class="card-body p-3">
                                                 <p class="mb-2 text-truncate">{{ $image->filename }}</p>
-                                                <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <a href="{{ asset($image->file_path) }}" target="_blank"
                                                         class="btn btn-sm btn-secondary">View</a>
                                                     <form action="{{ route('notes.images.delete', $image->id) }}"
@@ -42,6 +42,9 @@
                                                         <button type="submit" class="btn btn-sm btn-danger"
                                                             onclick="return confirm('Delete this image?')">Delete</button>
                                                     </form>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <strong>Tooth No:</strong> {{ $note->tooth_no ?? '-' }}
                                                 </div>
                                             </div>
                                         </div>
