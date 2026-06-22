@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Patient;
 use App\Models\PatientTreatmentItem;
+use App\Models\SubTreatment;
 use App\Models\Treatment;
 use App\Models\Notes;
 use App\Models\NoteImage;
@@ -15,7 +16,7 @@ use PDF;
 
 class NoteController extends Controller
 {
-    public function index($patient_id)
+    public function index(Request $request, $patient_id)
     {
         $Totalamount = Notes::where(['patient_id' => $patient_id])->sum('amount');
         $discount = Notes::where(['patient_id' => $patient_id])->sum('discount');
@@ -23,9 +24,23 @@ class NoteController extends Controller
         $Paidamount = Payment::where('patient_id', $patient_id)->sum('amount');
         $patient = Patient::findOrFail($patient_id);
         $Treatment = Treatment::get();
-        $notes = Notes::with(['treatment', 'images'])->where('patient_id', $patient_id)->orderBy('id', 'asc')->paginate(config('app.per_page'));
+        $SubTreatments = SubTreatment::get();
+
+        $notes = Notes::with(['treatment', 'subTreatment', 'images'])
+            ->where('patient_id', $patient_id);
+
+        if ($request->filled('tooth_no')) {
+            $toothValues = array_filter(array_map('trim', explode(',', $request->tooth_no)));
+            $notes->where(function ($query) use ($toothValues) {
+                foreach ($toothValues as $tooth) {
+                    $query->orWhere('tooth_no', 'like', '%' . $tooth . '%');
+                }
+            });
+        }
+
+        $notes = $notes->orderBy('id', 'asc')->paginate(config('app.per_page'));
         // dd($notes);
-        return view('notes.index', compact('NetAmount', 'Treatment', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
+        return view('notes.index', compact('NetAmount', 'Treatment', 'SubTreatments', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
     }
 
     public function store(Request $request)
@@ -36,6 +51,8 @@ class NoteController extends Controller
             'date' => 'required|date',
             'amount' => 'required|numeric|min:1',
             'treatment' => 'required',
+            'sub_treatment' => 'nullable|exists:sub_treatment,sub_treatment_id',
+            'next_appointment_date' => 'nullable',
             'comments' => 'nullable|string',
             'tooth_no' => 'nullable',
             'images' => 'nullable|array',
@@ -48,6 +65,8 @@ class NoteController extends Controller
             'date' => $request->date,
             'amount' => $request->amount,
             'treatment_id' => $request->treatment,
+            'sub_treatment_id' => $request->sub_treatment,
+            'next_appointment_date' => $request->next_appointment,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
             'discount' => $request->discount,
@@ -94,6 +113,8 @@ class NoteController extends Controller
         $request->validate([
             'date' => 'required|date',
             'treatment' => 'nullable',
+            'sub_treatment' => 'nullable|exists:sub_treatment,sub_treatment_id',
+            'next_appointment_date' => 'nullable',
             'comments' => 'nullable|string',
             'amount' => 'required|numeric|min:1',
             'tooth_no' => 'nullable',
@@ -105,6 +126,8 @@ class NoteController extends Controller
             'amount' => $request->amount,
             'discount' => $request->discount,
             'treatment_id' => $request->treatment,
+            'sub_treatment_id' => $request->sub_treatment,
+            'next_appointment_date' => $request->next_appointment_date,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
             'Net_amount' => $netamount,

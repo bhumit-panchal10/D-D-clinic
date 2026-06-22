@@ -36,7 +36,7 @@
 
                 <div class="row">
                     <!-- Add Note Section -->
-                    <div class="col-lg-5">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between">
                                 <h5 class="card-title mb-0">Add Treatment</h5>
@@ -48,60 +48,65 @@
                                     enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="patient_id" value="{{ $patient->id }}">
-                                    <div class="mb-3">
-                                        <label>Date <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="payment_date" name="date"
-                                            rows="3" required>
-                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 col-md-3">
+                                            <label>Date <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="payment_date" name="date"
+                                                rows="3" required>
+                                        </div>
+                                        <div class="mb-3 col-md-3">
+                                            <label for="mode" class="form-label">Treatment<span
+                                                    class="text-danger">*</span></label>
+                                            <select name="treatment" id="treatment" class="form-select" required>
+                                                <option value="">--Please Select--</option>
+                                                @foreach ($Treatment as $treat)
+                                                    <option value="{{ $treat->id }}">{{ $treat->treatment_name }}
+                                                    </option>
+                                                @endforeach
 
-                                    <div class="mb-3">
-                                        <label for="mode" class="form-label">Treatment<span
-                                                class="text-danger">*</span></label>
-                                        <select name="treatment" id="treatment" class="form-select" required>
-                                            <option value="">--Please Select--</option>
-                                            @foreach ($Treatment as $treat)
-                                                <option value="{{ $treat->id }}">{{ $treat->treatment_name }}</option>
-                                            @endforeach
-
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="tooth_no" class="form-label">Tooth No</label>
-                                        <input type="text" name="tooth_no" id="tooth_no" class="form-control"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="">
-                                    </div>
-
-                                    <div class="row mt-3">
-                                        <div class="mb-3">
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-md-3">
+                                            <label for="mode" class="form-label">Sub Treatment</label>
+                                            <select name="sub_treatment" id="sub_treatment" class="form-select">
+                                                <option value="">--Please Select--</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-md-3">
+                                            <label for="tooth_no" class="form-label">Tooth No</label>
+                                            <input type="text" name="tooth_no" id="tooth_no" class="form-control"
+                                                oninput="this.value = this.value.replace(/[^0-9,]/g, '')" maxlength="50"
+                                                value="">
+                                        </div>
+                                        <div class="mb-3 col-md-3">
+                                            <label for="next_appointment_date" class="form-label">Next Appointment</label>
+                                            <input type="text" name="next_appointment_date" id="next_appointment_date"
+                                                class="form-control" value="">
+                                        </div>
+                                        <div class="mb-3 col-md-3">
+                                            <label for="images" class="form-label">Upload Images</label>
+                                            <input type="file" name="images[]" id="images" class="form-control"
+                                                multiple accept="image/jpeg,image/jpg,image/png">
+                                            <small class="text-muted">You can select multiple JPG/PNG images.</small>
+                                        </div>
+                                        <div class="mb-3 col-md-5">
                                             <label for="comments" class="form-label">Comments</label>
                                             <textarea name="comments" id="comments" class="form-control"></textarea>
                                         </div>
+                                        <div class="mb-3 col-md-2">
+                                            <label for="amount" class="form-label">Amount</label>
+                                            <input type="text" name="amount" id="amount" class="form-control"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
+                                                value="">
+                                        </div>
+
+                                        <div class="mb-3 col-md-2">
+                                            <label for="discount" class="form-label">Discount</label>
+                                            <input type="text" name="discount" id="discount" class="form-control"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
+                                                value="">
+                                        </div>
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label for="images" class="form-label">Upload Images</label>
-                                        <input type="file" name="images[]" id="images" class="form-control" multiple
-                                            accept="image/jpeg,image/jpg,image/png">
-                                        <small class="text-muted">You can select multiple JPG/PNG images.</small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="amount" class="form-label">Amount</label>
-                                        <input type="text" name="amount" id="amount" class="form-control"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="discount" class="form-label">Discount</label>
-                                        <input type="text" name="discount" id="discount" class="form-control"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="">
-                                    </div>
-
-
-
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary">Save</button>
                                         <button type="reset" class="btn btn-primary">Clear</button>
@@ -112,17 +117,31 @@
                     </div>
 
                     <!-- Notes List Section -->
-                    <div class="col-lg-7">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Treatment List</h5>
-                                <div class="d-flex justify-content-between align-items-center m-3">
+                                <h5 class="card-title mb-0">Treatment List | Total Amount: {{ $NetAmount }}</h5>
+                                {{-- <div class="d-flex justify-content-between align-items-center m-3">
                                     <h5 class="mb-0">
-                                        Total Amount: {{ $NetAmount }}
+
                                     </h5>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="card-body">
+                                <form action="{{ route('notes.index', $patient->id) }}" method="GET"
+                                    class="row g-2 mb-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label for="search_tooth" class="form-label">Search Tooth No</label>
+                                        <input type="text" name="tooth_no" id="search_tooth" class="form-control"
+                                            placeholder="Search by tooth number or comma-separated list"
+                                            value="{{ request('tooth_no') }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary">Search</button>
+                                        <a href="{{ route('notes.index', $patient->id) }}"
+                                            class="btn btn-secondary">Reset</a>
+                                    </div>
+                                </form>
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
@@ -130,9 +149,11 @@
                                             <th>Payment Date</th>
                                             <th>Treatment</th>
                                             <th>Tooth No</th>
+                                            <th>Next Appt.</th>
                                             <th>Amount</th>
                                             <th>Discount</th>
-                                            <th>Images</th>
+                                            <th>Comment</th>
+                                            {{-- <th>Images</th> --}}
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -141,11 +162,33 @@
                                             <tr>
                                                 <td class="text-center">{{ $notes->firstItem() + $key }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
-                                                <td>{{ $note->treatment->treatment_name ?? '' }}</td>
+                                                <td>
+                                                    {{ $note->treatment->treatment_name ?? '' }}
+                                                    @if ($note->subTreatment)
+                                                        , {{ $note->subTreatment->name }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $note->tooth_no }}</td>
+                                                <td>{{ $note->next_appointment_date ? date('d-m-Y', strtotime($note->next_appointment_date)) : '-' }}
+                                                </td>
                                                 <td>{{ $note->amount }}</td>
                                                 <td>{{ $note->discount ?? '' }}</td>
-                                                <td>{{ $note->images->count() }}</td>
+                                                <td>
+                                                    @php
+                                                        $comment = $note->comments ?? '';
+                                                    @endphp
+                                                    @if (strlen($comment) > 80)
+                                                        <span
+                                                            class="comment-preview">{{ Illuminate\Support\Str::limit($comment, 80) }}</span>
+                                                        <span class="comment-full d-none">{{ $comment }}</span>
+                                                        <button type="button"
+                                                            class="btn btn-link p-0 small toggle-comment">Show
+                                                            more</button>
+                                                    @else
+                                                        {{ $comment }}
+                                                    @endif
+                                                </td>
+                                                {{-- <td>{{ $note->images->count() }}</td> --}}
                                                 <td>
                                                     @if ($note->images->count() > 0)
                                                         <a href="{{ route('notes.images', $note->id) }}"
@@ -219,29 +262,41 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="edit_sub_treatment" class="form-label">Sub Treatment</label>
+                            <select name="sub_treatment" id="edit_sub_treatment" class="form-select">
+                                <option value="">--Please Select--</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="tooth_no" class="form-label">Tooth No<span class="text-danger">*</span></label>
                             <input type="text" name="tooth_no" id="edit_tooth_no" class="form-control"
+                                oninput="this.value = this.value.replace(/[^0-9,]/g, '')" maxlength="50" value=""
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_next_appointment_date" class="form-label">Next Appointment</label>
+                            <input type="date" name="next_appointment_date" id="edit_next_appointment_date"
+                                class="form-control" value="">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_comments" class="form-label">Comments</label>
+                            <textarea name="comments" id="edit_comments" class="form-control"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_amount" class="form-label">Amount<span class="text-danger">*</span></label>
+                            <input type="text" name="amount" id="edit_amount" class="form-control"
                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10" value=""
                                 required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="comments" class="form-label">Comments</label>
-                            <textarea name="comments" id="edit_comments" class="form-control">{{ old('comments') }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="amount" class="form-label">Amount<span class="text-danger">*</span></label>
-                            <input type="text" name="amount" id="edit_amount" class="form-control"
-                                value="{{ old('amount') }}" oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                                maxlength="10" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="discount" class="form-label">Discount<span class="text-danger">*</span></label>
+                            <label for="edit_discount" class="form-label">Discount</label>
                             <input type="text" name="discount" id="edit_discount" class="form-control"
-                                value="{{ old('discount') }}" oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                                maxlength="10" required>
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10" value="">
                         </div>
 
                         <div class="text-end">
@@ -308,9 +363,11 @@
                         $("#edit_amount").val(obj.amount);
                         $("#edit_discount").val(obj.discount);
                         $("#edit_treatment").val(obj.treatment_id);
+                        $("#edit_next_appointment_date").val(obj.next_appointment_date);
                         $("#edit_comments").val(obj.comments);
                         $("#edit_tooth_no").val(obj.tooth_no); // missing field
 
+                        loadSubTreatments(obj.treatment_id, '#edit_sub_treatment', obj.sub_treatment_id);
                         $('#edit_note_id').val(id);
                     },
                     error: function(xhr) {
@@ -321,12 +378,57 @@
         }
     </script>
     <script>
+        function loadSubTreatments(treatmentId, dropdownSelector, selectedValue = null) {
+            const dropdown = $(dropdownSelector);
+            dropdown.empty().append('<option value="">--Please Select--</option>');
+
+            if (!treatmentId) {
+                return;
+            }
+
+            const routeUrl = "{{ route('subtreatment.getByTreatment', ['treatment_id' => 'TREATMENT_ID']) }}";
+            const url = routeUrl.replace('TREATMENT_ID', treatmentId);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(response) {
+                    if (response && response.length) {
+                        response.forEach(function(item) {
+                            const option = $('<option></option>')
+                                .attr('value', item.sub_treatment_id)
+                                .text(item.name);
+
+                            if (selectedValue && selectedValue == item.sub_treatment_id) {
+                                option.prop('selected', true);
+                            }
+
+                            dropdown.append(option);
+                        });
+                    }
+                },
+                error: function() {
+                    dropdown.empty().append('<option value="">Unable to load sub treatments</option>');
+                }
+            });
+        }
+
         $(document).ready(function() {
+            $("#treatment").on('change', function() {
+                const treatmentId = $(this).val();
+                loadSubTreatments(treatmentId, '#sub_treatment');
+            });
+
+            $("#edit_treatment").on('change', function() {
+                const treatmentId = $(this).val();
+                loadSubTreatments(treatmentId, '#edit_sub_treatment');
+            });
+
             $(".delete-btn").on("click", function() {
                 let id = $(this).data("id");
                 let patientId = $(this).data("patient-id");
 
-                // Set the delete form action to the payments.destroy route
+                // Set the delete form action to the notes.destroy route
                 let actionUrl = "{{ route('notes.destroy', ':id') }}".replace(':id', id);
 
                 // Set the form action dynamically
@@ -336,9 +438,17 @@
                 $("#deleteRecordModal").modal("show");
             });
 
-            // Confirm Delete Button Click (optional if you want a separate confirm button, otherwise remove this part)
-            $("#confirmDelete").on("click", function() {
-                $("#deleteForm").submit();
+            $(document).on('click', '.toggle-comment', function() {
+                let $btn = $(this);
+                let $cell = $btn.closest('td');
+
+                $cell.find('.comment-preview, .comment-full').toggleClass('d-none');
+
+                if ($btn.hasClass('expanded')) {
+                    $btn.removeClass('expanded').text('Show more');
+                } else {
+                    $btn.addClass('expanded').text('Show less');
+                }
             });
         });
     </script>
