@@ -304,8 +304,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-
                                         <hr>
 
                                         <h5>Reminder</h5>
