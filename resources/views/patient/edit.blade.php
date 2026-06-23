@@ -1,6 +1,30 @@
 @extends('layouts.app')
 @section('title', 'Edit Patient')
 @section('content')
+    <style>
+        .referred-wrapper {
+            padding-left: 12px;
+            padding-right: 12px;
+            overflow: hidden;
+        }
+
+        .referred-row {
+            flex-wrap: nowrap;
+        }
+
+        .referred-row .col-auto {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .referred-item {
+            white-space: nowrap;
+        }
+
+        .referred-input input {
+            width: 200px;
+        }
+    </style>
 
     <div class="main-content">
         <div class="page-content">
@@ -25,7 +49,8 @@
                                 <form id="patientForm" action="{{ route('patient.update', $patient->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
-
+                                    <h5>Patient Information</h5>
+                                    <hr>
                                     <div class="row">
                                         <div class="mb-3 col-lg-3">
                                             <label>Case No <span class="text-danger">*</span></label>
@@ -54,65 +79,6 @@
 
                                     <div class="row">
                                         <div class="mb-3 col-lg-3">
-                                            <label>Blood Group</label>
-                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
-                                                <option value="A+"{{ $patient->blood_group == 'A+' ? 'selected' : '' }}>
-                                                    A+</option>
-                                                <option value="A−"{{ $patient->blood_group == 'A−' ? 'selected' : '' }}>
-                                                    A−</option>
-                                                <option value="B+"{{ $patient->blood_group == 'B+' ? 'selected' : '' }}>
-                                                    B+</option>
-                                                <option value="B−"{{ $patient->blood_group == 'B−' ? 'selected' : '' }}>
-                                                    B−</option>
-                                                <option
-                                                    value="AB+"{{ $patient->blood_group == 'AB+' ? 'selected' : '' }}>
-                                                    AB+</option>
-                                                <option
-                                                    value="AB−"{{ $patient->blood_group == 'AB−' ? 'selected' : '' }}>
-                                                    AB−</option>
-                                                <option
-                                                    value="O+"{{ $patient->blood_group == 'O+' ? 'selected' : '' }}>O+
-                                                </option>
-                                                <option
-                                                    value="O−"{{ $patient->blood_group == 'O−' ? 'selected' : '' }}>O−
-                                                </option>
-                                                <option
-                                                    value="N/A"{{ $patient->blood_group == 'N/A' ? 'selected' : '' }}>
-                                                    N/A
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Occupation</label>
-                                            <input type="text" class="form-control" placeholder="Enter Occupation"
-                                                maxlength="50" name="Occupation" value="{{ $patient->Occupation }}">
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Company Name</label>
-                                            <input type="text" class="form-control" placeholder="Enter Company Name"
-                                                maxlength="30" name="company_name" value="{{ $patient->company_name }}">
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Mobile 1 <span class="text-danger">*</span></label>
-                                            <input type="text"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                                class="form-control" name="mobile1" placeholder="Enter Mobile Number"
-                                                value="{{ $patient->mobile1 }}" maxlength="10" minlength="10" required>
-                                            @error('mobile1')
-                                                <span class="text-red-500 text-sm">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Mobile 2 <span class="text-danger">*</span></label>
-                                            <input type="text"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                                class="form-control" name="mobile2" placeholder="Enter Mobile Number"
-                                                value="{{ $patient->mobile2 }}" maxlength="10" minlength="10" required>
-                                            @error('mobile2')
-                                                <span class="text-red-500 text-sm">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
                                             <label>DOB</label>
                                             <input type="date" class="form-control" name="dob"
                                                 value="{{ $patient->dob }}">
@@ -135,6 +101,82 @@
 
                                             </select>
                                         </div>
+
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Blood Group</label>
+                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
+                                                <option value="A+"{{ $patient->blood_group == 'A+' ? 'selected' : '' }}>
+                                                    A+</option>
+                                                <option value="A−"{{ $patient->blood_group == 'A−' ? 'selected' : '' }}>
+                                                    A−</option>
+                                                <option
+                                                    value="B+"{{ $patient->blood_group == 'B+' ? 'selected' : '' }}>
+                                                    B+</option>
+                                                <option
+                                                    value="B−"{{ $patient->blood_group == 'B−' ? 'selected' : '' }}>
+                                                    B−</option>
+                                                <option
+                                                    value="AB+"{{ $patient->blood_group == 'AB+' ? 'selected' : '' }}>
+                                                    AB+</option>
+                                                <option
+                                                    value="AB−"{{ $patient->blood_group == 'AB−' ? 'selected' : '' }}>
+                                                    AB−</option>
+                                                <option
+                                                    value="O+"{{ $patient->blood_group == 'O+' ? 'selected' : '' }}>O+
+                                                </option>
+                                                <option
+                                                    value="O−"{{ $patient->blood_group == 'O−' ? 'selected' : '' }}>O−
+                                                </option>
+                                                <option
+                                                    value="N/A"{{ $patient->blood_group == 'N/A' ? 'selected' : '' }}>
+                                                    N/A
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3 col-lg-4">
+                                            <label>Address</label>
+                                            <textarea class="form-control" placeholder="Enter Address" maxlength="255" name="address">{{ $patient->address }}</textarea>
+                                        </div>
+
+                                        <div class="mb-3 col-lg-2">
+                                            <label>Pincode</label>
+                                            <input type="text" class="form-control" placeholder="Enter Pincode"
+                                                minlength="6" maxlength="6" name="pincode"
+                                                value="{{ $patient->pincode }}">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Occupation</label>
+                                            <input type="text" class="form-control" placeholder="Enter Occupation"
+                                                maxlength="50" name="Occupation" value="{{ $patient->Occupation }}">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Company Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter Company Name"
+                                                maxlength="30" name="company_name" value="{{ $patient->company_name }}">
+                                        </div>
+                                        <hr>
+                                        <h5>Contact Details</h5>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Mobile<span class="text-danger">*</span></label>
+                                            <input type="text"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                                class="form-control" name="mobile1" placeholder="Enter Mobile Number"
+                                                value="{{ $patient->mobile1 }}" maxlength="10" minlength="10" required>
+                                            @error('mobile1')
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Contact Number <span class="text-danger">*</span></label>
+                                            <input type="text"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                                class="form-control" name="mobile2" placeholder="Enter Contact Number"
+                                                value="{{ $patient->mobile2 }}" maxlength="10" minlength="10" required>
+                                            @error('mobile2')
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
                                         <div class="mb-3 col-lg-3">
                                             <label>Email</label>
                                             <input type="text" class="form-control" name="email"
@@ -144,17 +186,7 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="mb-3 col-lg-6">
-                                            <label>Address</label>
-                                            <textarea class="form-control" placeholder="Enter Address" maxlength="255" name="address">{{ $patient->address }}</textarea>
-                                        </div>
 
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Pincode</label>
-                                            <input type="text" class="form-control" placeholder="Enter Pincode"
-                                                minlength="6" maxlength="6" name="pincode"
-                                                value="{{ $patient->pincode }}">
-                                        </div>
                                         {{-- <div class="mb-3 col-lg-3">
                                             <label>Reference By</label>
                                             <input type="text" class="form-control" placeholder="Enter Reference By"
@@ -194,7 +226,7 @@
                                         @endphp
 
                                         @foreach ($medicalList as $key => $label)
-                                            <div class="col-lg-3">
+                                            <div class="col-lg-2">
                                                 <label>
                                                     <input type="checkbox" name="medical_history[]"
                                                         value="{{ $key }}"
@@ -233,12 +265,12 @@
                                             <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments">{{ $patient->other_disease_comments }}</textarea>
 
                                         </div> --}}
-                                        <div class="mb-3 col-lg-4">
+                                        {{-- <div class="mb-3 col-lg-4">
                                             <label>Referred To Us By Name</label>
                                             <input class="form-control" placeholder="Enter Referred Name" maxlength="255"
                                                 name="referred_name" value="{{ $patient->referred_name }}">
 
-                                        </div>
+                                        </div> --}}
                                     </div>
 
                                     <hr>
@@ -271,7 +303,7 @@
                                     <hr>
 
                                     <h5>Referred To Us By</h5>
-                                    <div class="row mb-2">
+                                    {{-- <div class="row mb-2">
                                         <div class="col-lg-2">
                                             <label>
                                                 <input type="checkbox" name="referred_by[]" value="self"
@@ -289,12 +321,6 @@
                                             <input type="text" class="form-control" name="relative_name"
                                                 value="{{ $patient->relative_name }}">
                                         </div>
-
-                                        {{-- <div class="col-lg-4">
-                                            <input type="text" class="form-control" name="relative_name"
-                                                placeholder="Enter Friend / Relative's name"
-                                                value="{{ $patient->relative_name }}">
-                                        </div> --}}
                                     </div>
                                     <div class="row">
                                         @foreach (['google', 'facebook', 'instagram', 'twitter', 'justdial'] as $ref)
@@ -307,6 +333,45 @@
                                                 </label>
                                             </div>
                                         @endforeach
+                                    </div> --}}
+
+                                    <div class="referred-wrapper">
+                                        <div class="row mb-2 align-items-center flex-nowrap referred-row">
+
+                                            <div class="col-auto referred-item">
+                                                <label class="mb-0">
+                                                    <input type="checkbox" name="referred_by[]" value="self"
+                                                        {{ in_array('self', $referred) ? 'checked' : '' }}>
+                                                    Self
+                                                </label>
+                                            </div>
+
+                                            <div class="col-auto referred-item">
+                                                <label class="mb-0">
+                                                    <input type="checkbox" name="referred_by[]" value="friend/relative"
+                                                        {{ in_array('friend/relative', $referred) ? 'checked' : '' }}>
+                                                    Friend/Relative
+                                                </label>
+                                            </div>
+
+                                            <div class="col-auto referred-input">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    name="relative_name" value="{{ $patient->relative_name }}"
+                                                    placeholder="Enter Friend/Relative Name">
+                                            </div>
+
+                                            @foreach (['google', 'facebook', 'instagram', 'twitter', 'justdial'] as $ref)
+                                                <div class="col-auto referred-item">
+                                                    <label class="mb-0">
+                                                        <input type="checkbox" name="referred_by[]"
+                                                            value="{{ $ref }}"
+                                                            {{ in_array($ref, $referred) ? 'checked' : '' }}>
+                                                        {{ $ref == 'justdial' ? 'Just Dial' : ucfirst($ref) }}
+                                                    </label>
+                                                </div>
+                                            @endforeach
+
+                                        </div>
                                     </div>
 
                                     <hr>

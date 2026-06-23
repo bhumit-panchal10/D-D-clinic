@@ -24,7 +24,8 @@
                             <div class="card-body">
                                 <form id="patientForm" action="{{ route('patient.store') }}" method="POST">
                                     @csrf
-
+                                    <h5>Patient Information</h5>
+                                    <hr>
                                     <div class="row">
                                         <div class="mb-3 col-lg-3">
                                             <label>Case No <span class="text-danger">*</span></label>
@@ -46,61 +47,9 @@
                                             <input type="text" class="form-control" placeholder="Enter Name"
                                                 maxlength="30" name="last_name">
                                         </div>
-
-
                                     </div>
 
                                     <div class="row">
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Blood Group</label>
-                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
-                                                <option value="A+">A+</option>
-                                                <option value="A−">A−</option>
-                                                <option value="B+">B+</option>
-                                                <option value="B−">B−</option>
-                                                <option value="AB+">AB+</option>
-                                                <option value="AB−">AB−</option>
-                                                <option value="O+">O+</option>
-                                                <option value="O−">O−</option>
-                                                <option value="N/A">N/A</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Occupation</label>
-                                            <input type="text" class="form-control" placeholder="Enter Occupation"
-                                                maxlength="50" name="Occupation">
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Company Name</label>
-                                            <input type="text" class="form-control" placeholder="Enter Company Name"
-                                                maxlength="30" name="company_name">
-                                        </div>
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Mobile 1</label>
-                                            <input type="text"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                                class="form-control" name="mobile1" placeholder="Enter Mobile 1"
-                                                maxlength="10" minlength="10" autocomplete="off">
-                                            @error('mobile1')
-                                                <span class="text-danger text-sm">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Mobile 2</label>
-                                            <input type="text"
-                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
-                                                class="form-control" name="mobile2" placeholder="Enter Mobile 2"
-                                                maxlength="10" minlength="10">
-                                            @error('mobile2')
-                                                <span class="text-danger text-sm">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
                                         <div class="mb-3 col-lg-3">
                                             <label>DOB</label>
                                             <input type="date" class="form-control" name="dob" id="dob">
@@ -122,6 +71,67 @@
                                             </select>
                                         </div>
                                         <div class="mb-3 col-lg-3">
+                                            <label>Blood Group</label>
+                                            <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
+                                                <option value="A+">A+</option>
+                                                <option value="A−">A−</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B−">B−</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="AB−">AB−</option>
+                                                <option value="O+">O+</option>
+                                                <option value="O−">O−</option>
+                                                <option value="N/A">N/A</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-4 col-lg-4">
+                                            <label>Address</label>
+                                            <textarea class="form-control" placeholder="Enter Address" maxlength="255" name="address"></textarea>
+                                        </div>
+                                        <div class="mb-4 col-lg-2">
+                                            <label>Pincode</label>
+                                            <input type="text" class="form-control" placeholder="Enter Pincode"
+                                                minlength="6" maxlength="6" name="pincode">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Occupation</label>
+                                            <input type="text" class="form-control" placeholder="Enter Occupation"
+                                                maxlength="50" name="Occupation">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Company Name</label>
+                                            <input type="text" class="form-control" placeholder="Enter Company Name"
+                                                maxlength="30" name="company_name">
+                                        </div>
+
+                                    </div>
+                                    <hr>
+                                    <h5>Contact Details</h5>
+
+                                    <div class="row">
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Mobile</label>
+                                            <input type="text"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                                class="form-control" name="mobile1" placeholder="Enter Mobile"
+                                                maxlength="10" minlength="10" autocomplete="off">
+                                            @error('mobile1')
+                                                <span class="text-danger text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
+                                            <label>Contact Number</label>
+                                            <input type="text"
+                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                                                class="form-control" name="mobile2" placeholder="Enter Contact Number"
+                                                maxlength="10" minlength="10">
+                                            @error('mobile2')
+                                                <span class="text-danger text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
                                             <label>Email</label>
                                             <input type="email" class="form-control" name="email" id="email">
                                         </div>
@@ -129,16 +139,6 @@
                                     </div>
 
                                     <div class="row">
-
-                                        <div class="mb-4 col-lg-6">
-                                            <label>Address</label>
-                                            <textarea class="form-control" placeholder="Enter Address" maxlength="255" name="address"></textarea>
-                                        </div>
-                                        <div class="mb-4 col-lg-3">
-                                            <label>Pincode</label>
-                                            <input type="text" class="form-control" placeholder="Enter Pincode"
-                                                minlength="6" maxlength="6" name="pincode">
-                                        </div>
                                         {{-- <div class="mb-4 col-lg-3">
                                             <label>Reference By</label>
                                             <input type="text" class="form-control" placeholder="Enter Reference By"
@@ -170,7 +170,7 @@
                                             @endphp
 
                                             @foreach ($medicalHistory as $key => $label)
-                                                <div class="col-lg-3">
+                                                <div class="col-lg-2">
                                                     <label>
                                                         <input type="checkbox" name="medical_history[]"
                                                             value="{{ $key }}">
@@ -205,12 +205,12 @@
 
                                             </div>
 
-                                            <div class="mb-3 col-lg-4">
+                                            {{-- <div class="mb-3 col-lg-4">
                                                 <label>Referred To Us By Name</label>
                                                 <input class="form-control" placeholder="Enter Referred Name"
                                                     maxlength="255" name="referred_name">
 
-                                            </div>
+                                            </div> --}}
                                         </div>
 
                                         <hr>
@@ -232,9 +232,8 @@
                                         </div>
 
                                         <hr>
-
                                         <h5>Referred To Us By</h5>
-                                        <div class="row mb-2 align-items-center">
+                                        {{-- <div class="row mb-2 align-items-center">
                                             <div class="col-lg-2">
                                                 <label>
                                                     <input type="checkbox" name="referred_by[]" value="self"> Self
@@ -247,10 +246,9 @@
 
                                             </div>
                                             <div class="col-lg-2">
-                                                <input type="text" class="form-control" name="relative_name">
+                                                <input type="text" class="form-control" name="relative_name"
+                                                    placeholder="Enter Friend/Relative Name">
                                             </div>
-                                        </div>
-                                        <div class="row">
                                             <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
                                                         value="google"> Google</label></div>
                                             <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
@@ -261,7 +259,52 @@
                                                         value="twitter"> Twitter</label></div>
                                             <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
                                                         value="justdial"> Just Dial</label></div>
+                                        </div> --}}
+                                        <div style="overflow-x:auto;">
+                                            <div class="row mb-2 align-items-center flex-nowrap">
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="self">
+                                                        Self</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]"
+                                                            value="friend/relative"> Friend/Relative</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        name="relative_name" placeholder="Enter Friend/Relative Name"
+                                                        style="width: 190px;">
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="google">
+                                                        Google</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="facebook">
+                                                        Facebook</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="instagram">
+                                                        Instagram</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="twitter">
+                                                        Twitter</label>
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    <label><input type="checkbox" name="referred_by[]" value="justdial">
+                                                        Just Dial</label>
+                                                </div>
+                                            </div>
                                         </div>
+
 
                                         <hr>
 
