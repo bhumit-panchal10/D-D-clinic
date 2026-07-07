@@ -137,7 +137,7 @@
                                     <tbody>
                                         @foreach ($labworks as $key => $lab)
                                             <tr
-                                                class="{{ !empty($lab->received_date) && \Carbon\Carbon::parse($lab->entry_date)->diffInDays($lab->received_date) >= 4 ? 'table-danger' : '' }}">
+                                                class="{{ empty($lab->received_date) && \Carbon\Carbon::parse($lab->entry_date)->diffInDays($lab->received_date) >= 4 ? 'table-danger' : '' }}">
                                                 <td class="text-center">{{ $labworks->firstItem() + $key }}</td>
                                                 <td>{{ date('d-m-Y', strtotime($lab->entry_date)) }}</td>
                                                 <td>{{ $lab->patient->name ?? '' }}</td>

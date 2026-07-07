@@ -235,7 +235,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Note</h5>
+                    <h5 class="modal-title">Edit Treatment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -269,10 +269,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="tooth_no" class="form-label">Tooth No<span class="text-danger">*</span></label>
+                            <label for="tooth_no" class="form-label">Tooth No</label>
                             <input type="text" name="tooth_no" id="edit_tooth_no" class="form-control"
-                                oninput="this.value = this.value.replace(/[^0-9,]/g, '')" maxlength="50" value=""
-                                required>
+                                oninput="this.value = this.value.replace(/[^0-9,]/g, '')" maxlength="50" value="">
                         </div>
 
                         <div class="mb-3">

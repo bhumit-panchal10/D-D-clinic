@@ -38,7 +38,7 @@ class NoteController extends Controller
             });
         }
 
-        $notes = $notes->orderBy('id', 'asc')->paginate(config('app.per_page'));
+        $notes = $notes->orderBy('date', 'desc')->paginate(config('app.per_page'));
         // dd($notes);
         return view('notes.index', compact('NetAmount', 'Treatment', 'SubTreatments', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
     }

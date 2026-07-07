@@ -18,8 +18,7 @@ class OutLabworkController extends Controller
         $labs = Lab::all();
         $treatments = Treatment::all();
         $patientTreatments = PatientTreatment::all();
-        $labworks = Labwork::with('lab', 'patient')->where('type', 'out')->paginate(config('app.per_page'));
-
+        $labworks = Labwork::with('lab', 'patient')->where('type', 'out')->orderByDesc('id')->paginate(10);
         return view('labworks.OutLabworklist', compact('patient', 'labs', 'treatments', 'patientTreatments', 'labworks'));
     }
 
