@@ -8,6 +8,21 @@
     {{-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet"> --}}
 
     <style>
+        /* Break time 1 PM to 4 PM full background */
+        .fc .fc-bg-event.break-time-block {
+            background-color: #d3d3d3 !important;
+            opacity: 1 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Remove rounded box effect from background event */
+        .fc .fc-timegrid-bg-harness .fc-bg-event {
+            inset: 0 !important;
+            border-radius: 0 !important;
+        }
+
         .fc-timeGridWeek-view .fc-timegrid-event {
             min-width: 100px !important;
             min-height: 20px !important;
@@ -31,6 +46,12 @@
             background-color: #d3d3d3 !important;
         }
 
+        .fc .fc-timegrid-col:hover,
+        .fc .fc-timegrid-slot:hover,
+        .fc .fc-highlight {
+            background: transparent !important;
+        }
+
         .fc-daygrid-event {
             padding: 2px 4px !important;
             /* ✅ Add this */
@@ -49,10 +70,6 @@
     </style>
 
     <style>
-        /* =========================
-                                                                   FULLCALENDAR CUSTOM UI
-                                                                ========================== */
-
         /* Remove all-day row */
         .fc .fc-timegrid-allday,
         .fc .fc-timegrid-divider {
@@ -82,7 +99,11 @@
 
         /* Keep background visible */
         .fc .fc-bg-event {
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             opacity: 1 !important;
+            border: none !important;
         }
 
         /* Gray background 1 PM to 4 PM */
@@ -274,24 +295,20 @@
 
             var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'timeGridWeek',
-                selectable: true,
+                selectable: false,
                 eventDisplay: 'block',
                 slotEventOverlap: false,
-                selectable: true,
-                selectMirror: true,
+                selectMirror: false,
+
                 slotMinTime: "09:00:00",
                 slotMaxTime: "22:00:00",
-                // eventSources: [{
-                //     events: [{
-                //         startTime: '13:00',
-                //         endTime: '16:00',
-                //         daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-                //         display: 'background',
-                //         color: '#e0e0e0'
-                //     }]
-                // }],
+                height: 'auto',
+                contentHeight: 'auto',
+                expandRows: false,
+
                 allDaySlot: false,
                 firstDay: 1,
+
                 businessHours: [{
                         daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
                         startTime: '09:00',
@@ -300,16 +317,17 @@
                     {
                         daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
                         startTime: '16:00',
-                        endTime: '22:00'
+                        endTime: '21:00'
                     }
                 ],
+
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                select: function(info) {
 
+                select: function(info) {
                     let start = new Date(info.start);
 
                     let date = start.toISOString().split('T')[0];
@@ -319,7 +337,7 @@
 
                     let ampm = hours >= 12 ? 'PM' : 'AM';
                     hours = hours % 12;
-                    hours = hours ? hours : 12; // 0 => 12
+                    hours = hours ? hours : 12;
 
                     let formattedTime = hours + ':' + minutes + ' ' + ampm;
 
@@ -328,6 +346,7 @@
 
                     $('#appointmentModal').modal('show');
                 },
+
                 eventDidMount: function(info) {
                     const titleElement = info.el.querySelector('.fc-event-title');
                     if (titleElement) {
@@ -373,13 +392,13 @@
                                 color: appointment.color
                             };
                         });
-                        events.push({
-                            startTime: '13:00:00',
-                            endTime: '16:00:00',
-                            daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-                            display: 'background',
-                            backgroundColor: '#d3d3d3'
-                        });
+                        // events.push({
+                        //     startTime: '13:00:00',
+                        //     endTime: '16:00:00',
+                        //     daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                        //     display: 'background',
+                        //     backgroundColor: '#d3d3d3'
+                        // });
 
                         calendar.removeAllEvents(); // Clear previous events
                         calendar.addEventSource(events); // Add new events
