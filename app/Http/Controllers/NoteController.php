@@ -10,6 +10,7 @@ use App\Models\SubTreatment;
 use App\Models\Treatment;
 use App\Models\Notes;
 use App\Models\NoteImage;
+use App\Models\TreatmentPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use PDF;
@@ -25,6 +26,10 @@ class NoteController extends Controller
         $patient = Patient::findOrFail($patient_id);
         $Treatment = Treatment::get();
         $SubTreatments = SubTreatment::get();
+        $treatmentPlans = TreatmentPlan::with('details')->where('patient_id', $patient_id)
+            ->orderBy('date', 'desc')
+            ->get();
+        //dd($treatmentPlans);
 
         $notes = Notes::with(['treatment', 'subTreatment', 'images'])
             ->where('patient_id', $patient_id);
@@ -37,10 +42,9 @@ class NoteController extends Controller
                 }
             });
         }
-
         $notes = $notes->orderBy('date', 'desc')->paginate(config('app.per_page'));
         // dd($notes);
-        return view('notes.index', compact('NetAmount', 'Treatment', 'SubTreatments', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id'));
+        return view('notes.index', compact('NetAmount', 'Treatment', 'patient', 'notes', 'Totalamount', 'Paidamount', 'patient_id', 'treatmentPlans'));
     }
 
     public function store(Request $request)
@@ -49,9 +53,10 @@ class NoteController extends Controller
         $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'date' => 'required|date',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric',
             'treatment' => 'required',
-            'sub_treatment' => 'nullable|exists:sub_treatment,sub_treatment_id',
+            'sub_treatment' => 'nullable|array',
+            'sub_treatment.*' => 'nullable|exists:sub_treatment,sub_treatment_id',
             'next_appointment_date' => 'nullable',
             'comments' => 'nullable|string',
             'tooth_no' => 'nullable',
@@ -65,8 +70,8 @@ class NoteController extends Controller
             'date' => $request->date,
             'amount' => $request->amount,
             'treatment_id' => $request->treatment,
-            'sub_treatment_id' => $request->sub_treatment,
-            'next_appointment_date' => $request->next_appointment,
+            'sub_treatment_id' => $request->has('sub_treatment') ? implode(',', $request->sub_treatment) : null,
+            'next_appointment_date' => $request->next_appointment_date,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
             'discount' => $request->discount,
@@ -88,7 +93,7 @@ class NoteController extends Controller
         return view('notes.images', compact('note'));
     }
 
-    public function deleteImage($id)
+    public function deleteImage(Request $request, $id)
     {
         $image = NoteImage::findOrFail($id);
         $noteId = $image->note_id;
@@ -96,14 +101,18 @@ class NoteController extends Controller
         $this->deleteNoteImageFile($image);
         $image->delete();
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
         return redirect()->route('notes.images', $noteId)->with('success', 'Image deleted successfully.');
     }
 
     public function edit($id)
     {
-
-        // $patient = Patient::findOrFail($Notes->patient_id);
-        $Notes = Notes::findOrFail($id);
+        $Notes = Notes::with('images')->findOrFail($id);
+        // convert comma-separated sub_treatment_id into array for the frontend
+        $Notes->sub_treatment_id = $Notes->sub_treatment_id ? explode(',', $Notes->sub_treatment_id) : [];
         return response()->json($Notes);
     }
 
@@ -113,20 +122,24 @@ class NoteController extends Controller
         $request->validate([
             'date' => 'required|date',
             'treatment' => 'nullable',
-            'sub_treatment' => 'nullable|exists:sub_treatment,sub_treatment_id',
+            'sub_treatment' => 'nullable|array',
+            'sub_treatment.*' => 'nullable|exists:sub_treatment,sub_treatment_id',
             'next_appointment_date' => 'nullable',
             'comments' => 'nullable|string',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric',
+            'discount' => 'nullable|numeric',
             'tooth_no' => 'nullable',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,jpg,png|max:5120',
         ]);
-        $netamount =  $request->amount - $request->discount;
+        $netamount =  $request->amount - ($request->discount ?? 0);
 
         $data = [
             'date' => $request->date,
             'amount' => $request->amount,
             'discount' => $request->discount,
             'treatment_id' => $request->treatment,
-            'sub_treatment_id' => $request->sub_treatment,
+            'sub_treatment_id' => $request->has('sub_treatment') ? implode(',', $request->sub_treatment) : null,
             'next_appointment_date' => $request->next_appointment_date,
             'comments' => $request->comments,
             'tooth_no' => $request->tooth_no,
@@ -135,7 +148,14 @@ class NoteController extends Controller
 
         ];
 
-        Notes::where("id", $request->id)->update($data);
+        $note = Notes::findOrFail($request->id);
+        $note->update($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $this->saveNoteImage($note, $image);
+            }
+        }
 
         return redirect()->route('notes.index', $request->patient_id)->with('success', 'Notes updated successfully.');
     }
@@ -156,7 +176,7 @@ class NoteController extends Controller
 
     private function galleryUploadPath($noteId)
     {
-        return $_SERVER['DOCUMENT_ROOT'] . '/uploads/notes/' . $noteId;
+        return $_SERVER['DOCUMENT_ROOT'] . '/dental_clinic/uploads/notes/' . $noteId;
     }
 
     private function saveNoteImage(Notes $note, $image)
@@ -173,7 +193,7 @@ class NoteController extends Controller
         return NoteImage::create([
             'note_id' => $note->id,
             'filename' => $filename,
-            'file_path' => 'uploads/notes/' . $note->id . '/' . $filename,
+            'file_path' => '/uploads/notes/' . $note->id . '/' . $filename,
         ]);
     }
 
