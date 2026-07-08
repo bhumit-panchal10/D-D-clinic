@@ -49,11 +49,28 @@ class HomeController extends Controller
 
         $MarkAsReceivedPending = MaintenanceRegister::where(['repair_received_date' => null, 'received_comment' => null])->count();
 
-        $todayPatients = Patient::with([
-            'notes.treatment'
-        ])
+        $todayPatients = Patient::with(['notes.treatment', 'payments'])
+            ->where('is_completed', 0)
             ->whereDate('created_at', today())
-            ->get();
+            ->get()
+            ->map(function ($patient) {
+                $patient->total_amount = $patient->notes->sum('Net_amount');
+                $patient->paid_amount = $patient->payments->sum('amount');
+                $patient->due_amount = $patient->total_amount - $patient->paid_amount;
+
+                return $patient;
+            });
+
+        $completedPatients = Patient::with(['notes.treatment', 'payments'])
+            ->where('is_completed', 1)
+            ->get()
+            ->map(function ($patient) {
+                $patient->total_amount = $patient->notes->sum('Net_amount');
+                $patient->paid_amount = $patient->payments->sum('amount');
+                $patient->due_amount = $patient->total_amount - $patient->paid_amount;
+
+                return $patient;
+            });
         //dd($todayPatients);
 
         $todayAppointments = PatientAppointment::with(['patient', 'doctor'])
@@ -72,7 +89,7 @@ class HomeController extends Controller
             ->whereDate('date', today())
             ->groupBy('patient_id')
             ->get();
-        return view('home', compact('todayPatients', 'todayAppointments', 'todayDuePatients', 'todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending'));
+        return view('home', compact('todayPatients', 'todayAppointments', 'todayDuePatients', 'todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending', 'completedPatients'));
     }
 
 
@@ -86,7 +103,6 @@ class HomeController extends Controller
 
         return view('profile', compact('users'));
     }
-
 
     public function EditProfile()
     {
