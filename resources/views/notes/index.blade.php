@@ -38,8 +38,12 @@
                     <!-- Add Note Section -->
                     <div class="col-lg-12">
                         <div class="card">
-                            <div class="card-header d-flex justify-content-between">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">Add Treatment</h5>
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#treatmentPlanModal">
+                                    Treatment Plan
+                                </button>
                             </div>
 
                             <div class="card-body">
@@ -68,7 +72,7 @@
                                         </div>
                                         <div class="mb-3 col-md-3">
                                             <label for="mode" class="form-label">Sub Treatment</label>
-                                            <select name="sub_treatment" id="sub_treatment" class="form-select">
+                                            <select name="sub_treatment[]" id="sub_treatment" class="form-select" multiple>
                                                 <option value="">--Please Select--</option>
                                             </select>
                                         </div>
@@ -97,14 +101,14 @@
                                             <label for="amount" class="form-label">Amount</label>
                                             <input type="text" name="amount" id="amount" class="form-control"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                                value="">
+                                                value="0">
                                         </div>
 
                                         <div class="mb-3 col-md-2">
                                             <label for="discount" class="form-label">Discount</label>
                                             <input type="text" name="discount" id="discount" class="form-control"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                                value="">
+                                                value="0">
                                         </div>
                                     </div>
                                     <div class="text-end">
@@ -120,12 +124,10 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title mb-0">Treatment List | Total Amount: {{ $NetAmount }}</h5>
-                                {{-- <div class="d-flex justify-content-between align-items-center m-3">
-                                    <h5 class="mb-0">
-
-                                    </h5>
-                                </div> --}}
+                                <button type="button" class="btn btn-sm btn-info" id="toggleAmountBtn">
+                                    Treatment List | Total Amount: <span id="amountDisplay"
+                                        class="d-none">{{ $NetAmount }}</span>
+                                </button>
                             </div>
                             <div class="card-body">
                                 <form action="{{ route('notes.index', $patient->id) }}" method="GET"
@@ -145,9 +147,11 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Sr. No</th>
+                                            <!--<th>Sr. No</th>-->
                                             <th>Payment Date</th>
+                                            {{-- <th>Time</th> --}}
                                             <th>Treatment</th>
+                                            <th>Sub Treatment</th>
                                             <th>Tooth No</th>
                                             <th>Next Appt.</th>
                                             <th>Amount</th>
@@ -160,16 +164,17 @@
                                     <tbody>
                                         @foreach ($notes as $key => $note)
                                             <tr>
-                                                <td class="text-center">{{ $notes->firstItem() + $key }}</td>
+                                                <!--<td class="text-center">{{ $notes->firstItem() + $key }}</td>-->
                                                 <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
+                                                {{-- <td>{{ $note->time ?? '' }}</td> --}}
+                                                <td>{{ $note->treatment->treatment_name ?? '' }}</td>
                                                 <td>
-                                                    {{ $note->treatment->treatment_name ?? '' }}
-                                                    @if ($note->subTreatment)
-                                                        , {{ $note->subTreatment->name }}
+                                                    @if (!empty($note->sub_treatment_id))
+                                                        {{ \App\Models\SubTreatment::whereIn('sub_treatment_id', array_filter(explode(',', $note->sub_treatment_id)))->pluck('name')->implode(', ') }}
                                                     @endif
                                                 </td>
                                                 <td>{{ $note->tooth_no }}</td>
-                                                <td>{{ $note->next_appointment_date ? date('d-m-Y', strtotime($note->next_appointment_date)) : '-' }}
+                                                <td>{{ $note->next_appointment_date ?? '' }}
                                                 </td>
                                                 <td>{{ $note->amount }}</td>
                                                 <td>{{ $note->discount ?? '' }}</td>
@@ -239,7 +244,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="{{ route('notes.update') }}">
+                    <form id="editForm" method="POST" action="{{ route('notes.update') }}"
+                        enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                         <input type="hidden" name="id" id="edit_note_id" value="">
@@ -249,7 +255,6 @@
                             <input type="date" name="date" id="edit_date" class="form-control"
                                 value="{{ old('date') }}" required>
                         </div>
-
                         <div class="mb-3">
                             <label for="mode" class="form-label">Treatment<span class="text-danger">*</span></label>
                             <select name="treatment" id="edit_treatment" class="form-select" required>
@@ -263,7 +268,7 @@
 
                         <div class="mb-3">
                             <label for="edit_sub_treatment" class="form-label">Sub Treatment</label>
-                            <select name="sub_treatment" id="edit_sub_treatment" class="form-select">
+                            <select name="sub_treatment[]" id="edit_sub_treatment" class="form-select" multiple>
                                 <option value="">--Please Select--</option>
                             </select>
                         </div>
@@ -276,13 +281,26 @@
 
                         <div class="mb-3">
                             <label for="edit_next_appointment_date" class="form-label">Next Appointment</label>
-                            <input type="date" name="next_appointment_date" id="edit_next_appointment_date"
+                            <input type="text" name="next_appointment_date" id="edit_next_appointment_date"
                                 class="form-control" value="">
                         </div>
 
                         <div class="mb-3">
                             <label for="edit_comments" class="form-label">Comments</label>
                             <textarea name="comments" id="edit_comments" class="form-control"></textarea>
+                        </div>
+
+                        <div class="mb-3" id="edit_images_preview_container">
+                            <label class="form-label">Existing Images</label>
+                            <div id="edit_images_preview" class="row gy-2"></div>
+                            <small class="text-muted">You can delete existing images or upload new ones below.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_images" class="form-label">Upload Images</label>
+                            <input type="file" name="images[]" id="edit_images" class="form-control" multiple
+                                accept="image/jpeg,image/jpg,image/png">
+                            <small class="text-muted">You can select multiple JPG/PNG images to add to this note.</small>
                         </div>
 
                         <div class="mb-3">
@@ -341,10 +359,158 @@
     </div>
 
     <!-- Delete Modal End -->
+
+    <!-- Treatment Plan Modal -->
+    <div class="modal fade" id="treatmentPlanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Treatment Plan List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if ($treatmentPlans->isNotEmpty())
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>RCT</th>
+                                    <th>Extraction</th>
+                                    <th>Restoration</th>
+                                    <th>Prosthesis</th>
+                                    <th>Other Treatments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($treatmentPlans as $plan)
+                                    @php
+                                        // Get tooth-wise comments for each treatment type
+                                        $rctDetails = $plan->details
+                                            ->where('type_id', 1)
+                                            ->filter(fn($d) => !empty($d->comment));
+                                        $extractionDetails = $plan->details
+                                            ->where('type_id', 2)
+                                            ->filter(fn($d) => !empty($d->comment));
+                                        $restorationDetails = $plan->details
+                                            ->where('type_id', 3)
+                                            ->filter(fn($d) => !empty($d->comment));
+                                        $prosthesisDetails = $plan->details
+                                            ->where('type_id', 4)
+                                            ->filter(fn($d) => !empty($d->comment));
+
+                                        // Format tooth-wise comments
+                                        $formatToothComments = fn($details) => $details
+                                            ->map(fn($d) => 'Tooth ' . $d->tooth_no . ': ' . $d->comment)
+                                            ->implode('<br>');
+                                    @endphp
+
+                                    <tr>
+                                        <td>{{ \Carbon\Carbon::parse($plan->date)->format('d M Y') }}</td>
+
+                                        <td>
+                                            {{ $plan->RCT_IPC ?? '-' }}
+                                            @if ($rctDetails->isNotEmpty())
+                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
+                                                    {!! $formatToothComments($rctDetails) !!}
+                                                </div>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            {{ $plan->Extraction ?? '-' }}
+                                            @if ($extractionDetails->isNotEmpty())
+                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
+                                                    {!! $formatToothComments($extractionDetails) !!}
+                                                </div>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            {{ $plan->Restoration ?? '-' }}
+                                            @if ($restorationDetails->isNotEmpty())
+                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
+                                                    {!! $formatToothComments($restorationDetails) !!}
+                                                </div>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            {{ $plan->Prosthesis ?? '-' }}
+                                            @if ($prosthesisDetails->isNotEmpty())
+                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
+                                                    {!! $formatToothComments($prosthesisDetails) !!}
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($plan->Scaling)
+                                                <div><strong>Scaling:</strong> {{ $plan->Scaling_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->polishing)
+                                                <div><strong>Polishing:</strong> {{ $plan->polishing_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->Grinding)
+                                                <div><strong>Grinding:</strong> {{ $plan->Grinding_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->Bleaching)
+                                                <div><strong>Bleaching:</strong> {{ $plan->Bleaching_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->smile_design)
+                                                <div><strong>Smile Design:</strong> {{ $plan->smile_design_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->orthodontics)
+                                                <div><strong>Orthodontics:</strong> {{ $plan->orthodontics_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->surgery)
+                                                <div><strong>Surgery:</strong> {{ $plan->surgery_desc }}</div>
+                                            @endif
+
+                                            @if ($plan->biopsy)
+                                                <div><strong>Biopsy:</strong> {{ $plan->biopsy_desc }}</div>
+                                            @endif
+
+                                            @if (!empty($plan->Dentures))
+                                                <div><strong>Dentures:</strong> {{ $plan->Dentures }}</div>
+                                            @endif
+
+                                            @if (!empty($plan->implants))
+                                                <div><strong>Implants:</strong> {{ $plan->implants }}</div>
+                                            @endif
+
+                                            @if (!empty($plan->other_treatment))
+                                                <div><strong>Other Treatment:</strong> {{ $plan->other_treatment }}</div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <div class="text-muted">No treatment plan data found for this patient.</div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Toggle Total Amount Display
+        $(document).ready(function() {
+            $('#toggleAmountBtn').on('click', function() {
+                $('#amountDisplay').toggleClass('d-none');
+            });
+        });
+    </script>
     <script>
         function getEditData(id) {
 
@@ -359,6 +525,7 @@
                     },
                     success: function(obj) {
                         $("#edit_date").val(obj.date);
+                        $("#edit_time").val(obj.time ?? '');
                         $("#edit_amount").val(obj.amount);
                         $("#edit_discount").val(obj.discount);
                         $("#edit_treatment").val(obj.treatment_id);
@@ -367,6 +534,7 @@
                         $("#edit_tooth_no").val(obj.tooth_no); // missing field
 
                         loadSubTreatments(obj.treatment_id, '#edit_sub_treatment', obj.sub_treatment_id);
+                        renderEditImages(obj.images || []);
                         $('#edit_note_id').val(id);
                     },
                     error: function(xhr) {
@@ -374,6 +542,41 @@
                     }
                 });
             }
+        }
+
+        function renderEditImages(images) {
+            const container = $('#edit_images_preview');
+            container.empty();
+
+            if (!images || images.length === 0) {
+                container.append(
+                    '<div id="edit_images_preview_empty" class="col-12 text-muted">No images uploaded for this note.</div>'
+                );
+                return;
+            }
+
+            const baseUrl = "{{ asset('/') }}";
+
+            images.forEach(function(image) {
+                const imgSrc = image.file_path ?
+                    (image.file_path.startsWith('http') ? image.file_path : baseUrl + image.file_path.replace(
+                        /^\/+/, '')) :
+                    '';
+
+                const card = $(
+                    '<div class="col-6 col-md-4">' +
+                    '<div class="card">' +
+                    '<img src="' + imgSrc +
+                    '" class="card-img-top" alt="Note Image">' +
+                    '<div class="card-body p-2 text-center">' +
+                    '<button type="button" class="btn btn-sm btn-danger delete-edit-image" data-image-id="' +
+                    image.id + '">Delete</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+                container.append(card);
+            });
         }
     </script>
     <script>
@@ -393,17 +596,33 @@
                 type: 'GET',
                 success: function(response) {
                     if (response && response.length) {
+                        // Normalize selectedValue into array of strings for reliable comparison
+                        let selectedArr = [];
+                        if (selectedValue) {
+                            if (Array.isArray(selectedValue)) {
+                                selectedArr = selectedValue.map(String);
+                            } else {
+                                selectedArr = [String(selectedValue)];
+                            }
+                        }
+
                         response.forEach(function(item) {
+                            const valStr = String(item.sub_treatment_id);
                             const option = $('<option></option>')
                                 .attr('value', item.sub_treatment_id)
                                 .text(item.name);
 
-                            if (selectedValue && selectedValue == item.sub_treatment_id) {
+                            if (selectedArr.length && selectedArr.indexOf(valStr) !== -1) {
                                 option.prop('selected', true);
                             }
 
                             dropdown.append(option);
                         });
+
+                        // If dropdown is a multi-select, ensure browser reflects selection
+                        if (selectedArr.length) {
+                            dropdown.val(selectedArr);
+                        }
                     }
                 },
                 error: function() {
@@ -448,6 +667,38 @@
                 } else {
                     $btn.addClass('expanded').text('Show less');
                 }
+            });
+
+            $(document).on('click', '.delete-edit-image', function() {
+                const imageId = $(this).data('image-id');
+                const noteId = $('#edit_note_id').val();
+                if (!imageId || !noteId) {
+                    return;
+                }
+
+                if (!confirm('Delete this image?')) {
+                    return;
+                }
+
+                const deleteUrl = "{{ route('notes.images.delete', ':id') }}".replace(':id', imageId);
+
+                $.ajax({
+                    url: deleteUrl,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            getEditData(noteId);
+                        } else {
+                            alert('Unable to delete image.');
+                        }
+                    },
+                    error: function() {
+                        alert('Unable to delete image.');
+                    }
+                });
             });
         });
     </script>
