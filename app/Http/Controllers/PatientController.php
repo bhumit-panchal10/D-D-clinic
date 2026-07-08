@@ -158,6 +158,15 @@ class PatientController extends Controller
         return view('patient.show', compact('patient'));
     }
 
+    public function complete(Patient $patient)
+    {
+        $patient->update([
+            'is_completed' => true,
+        ]);
+
+        return redirect()->back()->with('success', 'Patient marked as complete.');
+    }
+
     public function getPatientDetails($id)
     {
 
@@ -165,10 +174,9 @@ class PatientController extends Controller
         if (!$patient) {
             return response()->json(['error' => 'Patient not found'], 404);
         }
-
         return response()->json([
             'contact_no' => $patient->mobile1,
-            //'email' => $patient->email,
+            'email' => $patient->email,
         ]);
     }
 

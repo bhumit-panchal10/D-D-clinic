@@ -281,10 +281,10 @@
                     $('#patient_id').val(ui.item.id);
 
                     $.ajax({
-                        url: '/dental_clinic/admin/get-patient-details/' + ui.item.id,
+                        url: '/admin/get-patient-details/' + ui.item.id,
                         method: 'GET',
                         success: function(data) {
-
+                            console.log(data);
                             $('#contact_no').val(data.contact_no || '');
                             $('#email').val(data.email || '');
                         }
@@ -295,7 +295,7 @@
 
             var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialView: 'timeGridWeek',
-                selectable: false,
+                selectable: true,
                 eventDisplay: 'block',
                 slotEventOverlap: false,
                 selectMirror: false,

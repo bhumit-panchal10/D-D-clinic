@@ -18,6 +18,7 @@ class Patient extends Model
         'pincode',
         'reference_by',
         'case_no',
+        'is_completed',
         'gender',
 
         'medical_history',
@@ -37,10 +38,15 @@ class Patient extends Model
         'Occupation',
         'company_name',
         'relative_name',
-        'Age'
+        'Age',
+        'is_completed'
     ];
     public function notes()
     {
         return $this->hasMany(Notes::class);
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'patient_id');
     }
 }

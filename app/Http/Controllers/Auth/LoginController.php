@@ -49,10 +49,10 @@ class LoginController extends Controller
     }
 
     protected function attemptLogin(Request $request)
-{
-    return Auth::attempt(
-        $this->credentials($request) + ['status' => 1], 
-        $request->filled('remember')
-    );
-}
+    {
+        return Auth::attempt(
+            $this->credentials($request) + ['status' => 1],
+            $request->filled('remember')
+        );
+    }
 }

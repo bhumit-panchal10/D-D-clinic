@@ -73,7 +73,7 @@
                                     </div>
 
                                     <!-- Mark As Received Pending -->
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <div class="card text-white wrapper">
                                             <div class="card-body">
                                                 <h5 class="card-title text-white">Mark As Received Pending</h5>
@@ -85,9 +85,9 @@
                                                 </a>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="row mt-4">
+                                    {{-- <div class="row mt-4">
                                         <div class="col-md-12">
                                             <div class="card">
                                                 <div class="card-header">
@@ -188,7 +188,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="row mt-4">
                                         <div class="col-md-12">
@@ -206,6 +206,10 @@
                                                                 <th>Patient Name</th>
                                                                 <th>Treatment</th>
                                                                 <th>Amount</th>
+                                                                <th>Paid Amount</th>
+                                                                <th>Due Amount</th>
+                                                                <th>Next Appointment Date</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
 
@@ -216,17 +220,111 @@
 
                                                                     <td>{{ $patient->case_no }}</td>
 
-                                                                    <td>{{ $patient->name }}</td>
+                                                                    <td><a
+                                                                            href="{{ route('ReasonForVisitToday.index', $patient->id) }}">{{ $patient->name }}</a>
+                                                                    </td>
 
                                                                     <td>
                                                                         @foreach ($patient->notes as $note)
                                                                             {{ $note->treatment->treatment_name ?? '-' }}<br>
                                                                         @endforeach
                                                                     </td>
+                                                                    <td>{{ number_format($patient->total_amount, 0) }}</td>
+                                                                    <td>{{ number_format($patient->paid_amount, 0) }}</td>
+                                                                    <td><a
+                                                                            href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ route('appointment.create') }}">
+                                                                            @foreach ($patient->notes as $note)
+                                                                                {{ $note->next_appointment_date ?? '-' }}<br>
+                                                                            @endforeach
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (empty($patient->is_completed))
+                                                                            <form
+                                                                                action="{{ route('patient.complete', $patient->id) }}"
+                                                                                method="POST" class="d-inline">
+                                                                                @csrf
+                                                                                <button type="submit"
+                                                                                    class="btn btn-sm btn-success">
+                                                                                    Complete
+                                                                                </button>
+                                                                            </form>
+                                                                        @else
+                                                                            <span class="badge bg-success">Completed</span>
+                                                                        @endif
+                                                                    </td>
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="5" class="text-center">
+                                                                    <td colspan="7" class="text-center">
+                                                                        No Record Found
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h5>Completed Patients List</h5>
+                                                </div>
+
+                                                <div class="card-body table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sr No</th>
+                                                                <th>Case No</th>
+                                                                <th>Patient Name</th>
+                                                                <th>Treatment</th>
+                                                                <th>Amount</th>
+                                                                <th>Paid Amount</th>
+                                                                <th>Due Amount</th>
+                                                                <th>Next Appointment Date</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            @forelse($completedPatients as $key => $patient)
+                                                                <tr>
+                                                                    <td>{{ $key + 1 }}</td>
+
+                                                                    <td>{{ $patient->case_no }}</td>
+
+                                                                    <td><a
+                                                                            href="{{ route('ReasonForVisitToday.index', $patient->id) }}">{{ $patient->name }}</a>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @foreach ($patient->notes as $note)
+                                                                            {{ $note->treatment->treatment_name ?? '-' }}<br>
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>{{ number_format($patient->total_amount, 0) }}</td>
+                                                                    <td>{{ number_format($patient->paid_amount, 0) }}</td>
+                                                                    <td><a
+                                                                            href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ route('appointment.create') }}">
+                                                                            @foreach ($patient->notes as $note)
+                                                                                {{ $note->next_appointment_date ?? '-' }}<br>
+                                                                            @endforeach
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="7" class="text-center">
                                                                         No Record Found
                                                                     </td>
                                                                 </tr>
