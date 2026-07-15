@@ -23,7 +23,14 @@
 
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h5 class="card-title">Create Prescription</h5>
+                        <h5 class="card-title">Create Prescription </h5>
+                        <div class="d-flex gap-5 align-items-center">
+
+                            <span>Drug / Dental Material Allergy :
+                                {{ $patient->allergy ?? 'No known allergies' }}</span>
+                            <span>Weight :
+                                {{ $patient->weight ?? '' }}</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('prescriptions.store') }}" method="POST">

@@ -51,7 +51,12 @@ class HomeController extends Controller
 
         $todayPatients = Patient::with(['notes.treatment', 'payments'])
             ->where('is_completed', 0)
-            ->whereDate('created_at', today())
+            ->where(function ($query) {
+                $query->whereDate('created_at', today())
+                    ->orWhereHas('notes', function ($q) {
+                        $q->whereDate('date', today());
+                    });
+            })
             ->get()
             ->map(function ($patient) {
                 $patient->total_amount = $patient->notes->sum('Net_amount');

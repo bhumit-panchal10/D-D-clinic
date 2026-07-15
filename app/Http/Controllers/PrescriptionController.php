@@ -135,9 +135,6 @@ class PrescriptionController extends Controller
                 $updatedIds[] = $newDetail->id;
             }
         }
-
-
-
         return redirect()->route('prescriptions.index', $prescription->patient_id)
             ->with('success', 'Prescription updated successfully.');
     }
@@ -146,10 +143,8 @@ class PrescriptionController extends Controller
     public function downloadPDF($id)
     {
         $prescription = Prescription::with('patient', 'prescriptionDetails.medicine', 'prescriptionDetails.dosage')->findOrFail($id);
-
         // Load the PDF view
         $pdf = Pdf::loadView('prescriptions.pdf', compact('prescription'));
-
         // Open PDF in a new tab
         return $pdf->stream('Prescription_' . $prescription->id . '.pdf');
     }
@@ -160,10 +155,8 @@ class PrescriptionController extends Controller
         $prescription = Prescription::with('patient', 'prescriptionDetails.medicine', 'prescriptionDetails.dosage')
             ->where('gu_id', $gu_id)
             ->firstOrFail();
-
         // Load the PDF view
         $pdf = Pdf::loadView('prescriptions.pdf', compact('prescription'));
-
         // Stream the PDF
         return $pdf->stream('Prescription_' . $prescription->id . '.pdf');
     }
@@ -176,7 +169,6 @@ class PrescriptionController extends Controller
     {
         $prescription = Prescription::findOrFail($id);
         $patient_id = $prescription->patient_id;
-
         // Delete Prescription Details First
         $prescription->prescriptionDetails()->delete();
         $prescription->delete();
@@ -191,11 +183,8 @@ class PrescriptionController extends Controller
         if (!$medicine) {
             return response()->json([]);
         }
-
         $selectedDosage = Dosage::find($medicine->dosage_id);
-
         $allDosages = Dosage::orderBy('dosage')->get(['id', 'dosage']); // get all
-
         return response()->json([
             'selected_dosage_id' => $selectedDosage->id ?? null,
             'comment' => $medicine->comment ?? '',

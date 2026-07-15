@@ -80,7 +80,7 @@
 <body>
 
     <!-- Header -->
-      <div style="height: 250px; overflow:hidden;">
+    <div style="height: 250px; overflow:hidden;">
         <!--<table width="100%" cellspacing="0" cellpadding="5" style=" displayfont-family: Arial, sans-serif;">-->
         <!--    <tr align="center">-->
 
@@ -135,7 +135,10 @@
     <table class="patient-info">
         <tr>
             <td colspan="2">
-                <strong>{{ $prescription->patient->name }}</strong> &nbsp;&nbsp;{{ $age ? $age . ' yrs' : '' }}
+                <strong>{{ $prescription->patient->name ?? '' }}
+                    {{ $prescription->patient->middle_name ?? '' }}
+                    {{ $prescription->patient->last_name ?? '' }}</strong><br>
+                &nbsp;&nbsp;{{ $age ? $age . ' yrs' : '' }}
                 / {{ $genderInitial }}
             </td>
         </tr>
@@ -174,7 +177,7 @@
                     @endif
                     ___________ {{ $qty }}
                     <br>
-                      {{ $detail->comments ? $detail->comments : '' }}
+                    {{ $detail->comments ? $detail->comments : '' }}
                     <br>
                     <br>
 
