@@ -20,7 +20,7 @@ class Patient extends Model
         'case_no',
         'is_completed',
         'gender',
-
+        'weight',
         'medical_history',
         'medications',
         'previous_surgery',

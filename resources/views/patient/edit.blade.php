@@ -85,6 +85,13 @@
                                         </div>
 
                                         <div class="mb-3 col-lg-3">
+                                            <label>Weight (kg)</label>
+                                            <input type="number" class="form-control" name="weight"
+                                                placeholder="Enter Weight" value="{{ $patient->weight }}" step="0.1"
+                                                min="0">
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
                                             <label>Age</label>
                                             <input type="text" class="form-control" name="Age"
                                                 value="{{ $patient->Age }}"
@@ -107,7 +114,8 @@
                                             <select name="blood_group" class="form-control" placeholder="Enter Blood Group">
                                                 <option value="A+"{{ $patient->blood_group == 'A+' ? 'selected' : '' }}>
                                                     A+</option>
-                                                <option value="A−"{{ $patient->blood_group == 'A−' ? 'selected' : '' }}>
+                                                <option
+                                                    value="A−"{{ $patient->blood_group == 'A−' ? 'selected' : '' }}>
                                                     A−</option>
                                                 <option
                                                     value="B+"{{ $patient->blood_group == 'B+' ? 'selected' : '' }}>
@@ -167,11 +175,11 @@
                                             @enderror
                                         </div>
                                         <div class="mb-3 col-lg-3">
-                                            <label>Contact Number <span class="text-danger">*</span></label>
+                                            <label>Contact Number</label>
                                             <input type="text"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
                                                 class="form-control" name="mobile2" placeholder="Enter Contact Number"
-                                                value="{{ $patient->mobile2 }}" maxlength="10" minlength="10" required>
+                                                value="{{ $patient->mobile2 }}" maxlength="10" minlength="10">
                                             @error('mobile2')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror

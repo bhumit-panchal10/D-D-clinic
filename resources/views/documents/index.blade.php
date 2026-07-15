@@ -154,9 +154,17 @@
                                                 <td>{{ $document->comment }}</td>
                                                 <td>{{ $document->tooth_no ?? '' }}</td>
                                                 <td>
-                                                    <a href="{{ asset('/dental_clinic/D&D_DENTAL_CLINIC/documents/' . $document->document) }}"
+                                                    <a href="{{ asset('/D&D_DENTAL_CLINIC/documents/' . $document->document) }}"
                                                         target="_blank" class="btn btn-sm btn-primary">
                                                         <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="javascript:void(0)"
+                                                        class="btn btn-sm btn-primary editDocumentBtn"
+                                                        data-id="{{ $document->id }}" data-date="{{ $document->date }}"
+                                                        data-comment="{{ $document->comment }}"
+                                                        data-tooth_no="{{ $document->tooth_no }}"
+                                                        data-document="{{ $document->document }}">
+                                                        Edit
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-primary delete-btn"
                                                         data-id="{{ $document->id }}"
@@ -180,6 +188,64 @@
             </div>
         </div>
     </div>
+    <!--EDIT MODEL START-->
+    <div class="modal fade" id="editDocumentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="editDocumentForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Document</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+
+
+                        <div class="mb-3">
+                            <label>Document</label>
+                            <input type="file" name="document" class="form-control"
+                                accept="image/jpeg,image/png,application/pdf">
+
+                            <div class="mt-2" id="currentDocumentDiv">
+                                <!-- Current document will appear here -->
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Date</label>
+                            <input type="date" name="date" id="edit_date" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Tooth No</label>
+                            <input type="text" id="edit_tooth_no" name="tooth_no" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Comment</label>
+                            <textarea name="comment" id="edit_comment" class="form-control"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <!--EDIT MODEL END-->
 
     <!-- Delete Modal Start -->
     <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
@@ -217,6 +283,43 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).on('click', '.editDocumentBtn', function() {
+
+            var id = $(this).data('id');
+
+            var url = "{{ route('document.update', ':id') }}";
+            url = url.replace(':id', id);
+
+            $('#editDocumentForm').attr('action', url);
+
+            $('#edit_date').val($(this).data('date'));
+            $('#edit_comment').val($(this).data('comment'));
+            $('#edit_tooth_no').val($(this).data('tooth_no'));
+
+            var file = $(this).data('document');
+            var ext = file.split('.').pop().toLowerCase();
+            var fileUrl = "{{ asset('/D&D_DENTAL_CLINIC/documents') }}/" + file;
+
+            if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                $('#currentDocumentDiv').html(
+                    '<img src="' + fileUrl +
+                    '" class="img-thumbnail" style="max-width:150px; max-height:150px;">'
+                );
+            } else if (ext == 'pdf') {
+                $('#currentDocumentDiv').html(
+                    '<a href="' + fileUrl +
+                    '" target="_blank" class="btn btn-sm btn-info mt-2">View Current PDF</a>'
+                );
+            } else {
+                $('#currentDocumentDiv').html('');
+            }
+
+
+            $('#editDocumentModal').modal('show');
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $(".delete-btn").on("click", function() {

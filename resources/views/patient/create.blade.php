@@ -56,6 +56,12 @@
                                         </div>
 
                                         <div class="mb-3 col-lg-3">
+                                            <label>Weight (kg)</label>
+                                            <input type="number" class="form-control" name="weight"
+                                                placeholder="Enter Weight" step="0.1" min="0">
+                                        </div>
+
+                                        <div class="mb-3 col-lg-3">
                                             <label>Age</label>
                                             <input type="text" class="form-control" placeholder="Enter Age"
                                                 name="Age" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
@@ -304,6 +310,8 @@
                                                 </div>
                                             </div>
                                         </div>
+
+
                                         <hr>
 
                                         <h5>Reminder</h5>

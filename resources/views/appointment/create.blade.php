@@ -281,7 +281,7 @@
                     $('#patient_id').val(ui.item.id);
 
                     $.ajax({
-                        url: '/admin/get-patient-details/' + ui.item.id,
+                        url: '/dental_clinic/admin/get-patient-details/' + ui.item.id,
                         method: 'GET',
                         success: function(data) {
                             console.log(data);

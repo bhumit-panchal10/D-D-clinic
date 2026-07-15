@@ -34,9 +34,13 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label>Dosage <span class="text-danger">*</span></label>
+                                        <!--<input type="text" class="form-control" name="dosage" minlength="5"-->
+                                        <!--    maxlength="7" pattern="^[0-9]-[0-9]-[0-9]-[0-9]$"-->
+                                        <!--    placeholder="Enter Dosage (e.g., 1-1-1)" required>-->
                                         <input type="text" class="form-control" name="dosage" minlength="5"
-                                            maxlength="7" pattern="^[0-9]-[0-9]-[0-9]-[0-9]$"
-                                            placeholder="Enter Dosage (e.g., 1-1-1)" required>
+                                            maxlength="20"
+                                            pattern="^((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)$"
+                                            placeholder="Examples: 1-1-1, 5ml-0-5ml, 2.5ml-0-2.5ml" required>
                                         <small class="text-danger d-none" id="dosageError">Invalid format! Use 1-1-1
                                             format.</small>
                                     </div>
@@ -111,9 +115,11 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label>Dosage <span class="text-danger">*</span></label>
+                            <!--<input type="text" class="form-control" name="dosage" id="editDosageInput" minlength="5"-->
+                            <!--    maxlength="7" pattern="^[0-9]-[0-9]-[0-9]-[0-9]$" placeholder="Enter Dosage (e.g., 1-1-1)"-->
+                            <!--    required>-->
                             <input type="text" class="form-control" name="dosage" id="editDosageInput" minlength="5"
-                                maxlength="7" pattern="^[0-9]-[0-9]-[0-9]-[0-9]$" placeholder="Enter Dosage (e.g., 1-1-1)"
-                                required>
+                                maxlength="20" placeholder="Examples: 1-1-1, 5ml-0-5ml, 2.5ml-0-2.5ml" required>
                             <small class="text-danger d-none" id="editDosageError">Invalid format! Use 1-1-1 format.</small>
                         </div>
                         <div class="text-end">
@@ -204,18 +210,37 @@
         document.addEventListener("DOMContentLoaded", function() {
             function validateDosage(inputElement, errorElement) {
                 inputElement.addEventListener("input", function() {
-                    // Remove any invalid characters (only allow numbers and hyphens)
-                    this.value = this.value.replace(/[^0-9-]/g, '');
 
-                    // Ensure the format is strictly X-X-X (5 characters)
-                    const regex = /^[0-9]-[0-9]-[0-9]-[0-9]$/;
-                    if (!regex.test(inputElement.value)) {
+                    // Allow only numbers, dot, hyphen, m, l
+                    this.value = this.value.replace(/[^0-9mlML.-]/g, '');
+
+                    // Valid formats:
+                    // 1-1-1
+                    // 5ml-0-5ml
+                    // 2.5ml-0-2.5ml
+                    const regex = /^((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)$/i;
+
+                    if (!regex.test(this.value)) {
                         errorElement.classList.remove("d-none");
                     } else {
                         errorElement.classList.add("d-none");
                     }
                 });
             }
+            // function validateDosage(inputElement, errorElement) {
+            //     inputElement.addEventListener("input", function() {
+            //         // Remove any invalid characters (only allow numbers and hyphens)
+            //         this.value = this.value.replace(/[^0-9-]/g, '');
+
+            //         // Ensure the format is strictly X-X-X (5 characters)
+            //         const regex = /^[0-9]-[0-9]-[0-9]-[0-9]$/;
+            //         if (!regex.test(inputElement.value)) {
+            //             errorElement.classList.remove("d-none");
+            //         } else {
+            //             errorElement.classList.add("d-none");
+            //         }
+            //     });
+            // }
 
             // Apply validation to Add & Edit form fields
             validateDosage(document.querySelector("input[name='dosage']"), document.getElementById("dosageError"));
@@ -225,11 +250,13 @@
             document.querySelectorAll("form").forEach(form => {
                 form.addEventListener("submit", function(e) {
                     const dosageInput = form.querySelector("input[name='dosage']");
-                    const regex = /^[0-9]-[0-9]-[0-9]-[0-9]$/;
+                    const regex =
+                        /^((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)-((\d+(\.\d+)?ml)|\d+)$/i;
 
                     if (!regex.test(dosageInput.value)) {
                         e.preventDefault();
-                        alert("Invalid dosage format! Please enter in '1-1-1' format.");
+                        // alert("Invalid dosage format! Please enter in '1-1-1' format.");
+                        alert("Invalid dosage format!\nExamples:\n1-1-1\n5ml-0-5ml\n2.5ml-0-2.5ml");
                     }
                 });
             });

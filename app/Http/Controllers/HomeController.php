@@ -49,12 +49,21 @@ class HomeController extends Controller
 
         $MarkAsReceivedPending = MaintenanceRegister::where(['repair_received_date' => null, 'received_comment' => null])->count();
 
-        $todayPatients = Patient::with(['notes.treatment', 'payments'])
+        $todayPatients = Patient::with([
+            'notes.treatment',
+            'payments',
+            'appointments' => function ($q) {
+                $q->whereDate('appointment_date', today());
+            }
+        ])
             ->where('is_completed', 0)
             ->where(function ($query) {
                 $query->whereDate('created_at', today())
                     ->orWhereHas('notes', function ($q) {
                         $q->whereDate('date', today());
+                    })
+                    ->orWhereHas('appointments', function ($q) {
+                        $q->whereDate('appointment_date', today());
                     });
             })
             ->get()
@@ -66,8 +75,19 @@ class HomeController extends Controller
                 return $patient;
             });
 
-        $completedPatients = Patient::with(['notes.treatment', 'payments'])
+        $completedPatients = Patient::with(['notes.treatment', 'payments', 'appointments' => function ($q) {
+            $q->whereDate('appointment_date', today());
+        }])
             ->where('is_completed', 1)
+            ->where(function ($query) {
+                $query->whereDate('created_at', today())
+                    ->orWhereHas('notes', function ($q) {
+                        $q->whereDate('date', today());
+                    })
+                    ->orWhereHas('appointments', function ($q) {
+                        $q->whereDate('appointment_date', today());
+                    });
+            })
             ->get()
             ->map(function ($patient) {
                 $patient->total_amount = $patient->notes->sum('Net_amount');
@@ -76,7 +96,7 @@ class HomeController extends Controller
 
                 return $patient;
             });
-        //dd($todayPatients);
+        //dd($completedPatients);
 
         $todayAppointments = PatientAppointment::with(['patient', 'doctor'])
             ->where('is_disrupted', 0)
