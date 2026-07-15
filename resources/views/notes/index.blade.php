@@ -198,20 +198,20 @@
                                                     @if ($note->images->count() > 0)
                                                         <a href="{{ route('notes.images', $note->id) }}"
                                                             class="btn btn-sm btn-secondary">
-                                                            View Images
+                                                            <i class="fas fa-eye"></i>
                                                         </a>
                                                     @endif
 
                                                     <button type="button" class="btn btn-sm btn-primary edit-btn"
                                                         onclick="getEditData(<?= $note->id ?>)" data-bs-toggle="modal"
                                                         data-bs-target="#editNoteModal">
-                                                        Edit
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn"
                                                         data-id="{{ $note->id }}"
                                                         data-patient-id="{{ $patient->id }}" data-toggle="modal"
                                                         data-target="#deleteRecordModal">
-                                                        Delete
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                     {{-- <a href="{{ route('payments.invoice', $note->id) }}" target="_blank"
                                                         class="btn btn-primary btn-sm">

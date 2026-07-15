@@ -206,9 +206,11 @@
                                                                 <th>Patient Name</th>
                                                                 <th>Treatment</th>
                                                                 <!--<th>Amount</th>-->
-                                                                <!--<th>Paid Amount</th>-->
                                                                 <th>Due Amount</th>
-                                                                <th>Next Appointment</th>
+                                                                <th>Payment Received</th>
+                                                                <!--<th>Payment mode</th>-->
+                                                                <th>Instruction</th>
+                                                                <th>Final Appointment</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -226,27 +228,23 @@
 
                                                                     <td>{{ $patient->case_no }}</td>
 
-                                                                    <td><a
-                                                                            href="{{ route('ReasonForVisitToday.index', $patient->id) }}">
+                                                                    <td><a href="{{ route('notes.index', $patient->id) }}">
                                                                             <!--{{ $patient->name }}-->
                                                                             {{ trim($patient->name . ' ' . ($patient->middle_name ?? '') . ' ' . ($patient->last_name ?? '')) }}
                                                                         </a>
                                                                     </td>
 
                                                                     <td>
-                                                                        {{-- {{ optional($latestNote->treatment)->treatment_name ?? '-' }} --}}
                                                                         {{ $latestNote && $latestNote->treatment ? $latestNote->treatment->treatment_name : '-' }}
-                                                                        <!--@foreach ($patient->notes as $note)
-    -->
-                                                                        <!--    {{ $note->treatment->treatment_name ?? '-' }}<br>-->
-                                                                        <!--
-    @endforeach-->
+
+
                                                                     </td>
                                                                     <!--<td>{{ number_format($patient->total_amount, 0) }}</td>-->
-                                                                    <!--<td>{{ number_format($patient->paid_amount, 0) }}</td>-->
                                                                     <td><a
                                                                             href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
                                                                     </td>
+                                                                    <td>{{ number_format($patient->paid_amount, 0) }}</td>
+                                                                    <!--<td>{{ optional($patient->payments->first())->mode ?? '-' }}</td>                                                                    -->
                                                                     <td>
                                                                         <a href="{{ route('appointment.create') }}">
                                                                             {{ $latestNote->next_appointment_date ?? '-' }}
@@ -260,6 +258,18 @@
     @endforeach-->
                                                                         <!--</a>-->
                                                                     </td>
+                                                                    @php
+                                                                        $latestAppointment = $patient->appointments
+                                                                            ->sortByDesc('appointment_date')
+                                                                            ->first();
+                                                                    @endphp
+
+                                                                    <td>
+                                                                        <a href="{{ route('appointment.create') }}">
+                                                                            {{ $latestAppointment->appointment_date ?? '-' }}
+                                                                        </a>
+                                                                    </td>
+
                                                                     <td>
                                                                         @if (empty($patient->is_completed))
                                                                             <form
@@ -306,21 +316,22 @@
                                                                 <th>Patient Name</th>
                                                                 <th>Treatment</th>
                                                                 <!--<th>Amount</th>-->
-                                                                <!--<th>Paid Amount</th>-->
-                                                                <th>Due Amount</th>
-                                                                <th>Next Appointment</th>
+                                                                <th>Balance</th>
+                                                                <th>Payment Received</th>
+                                                                <th>Payment Mode</th>
+                                                                <th>Final Appointment</th>
                                                             </tr>
                                                         </thead>
 
                                                         <tbody>
                                                             @forelse($completedPatients as $key => $patient)
                                                                 <tr>
+
                                                                     <td>{{ $key + 1 }}</td>
 
                                                                     <td>{{ $patient->case_no }}</td>
 
-                                                                    <td><a
-                                                                            href="{{ route('ReasonForVisitToday.index', $patient->id) }}">
+                                                                    <td><a href="{{ route('notes.index', $patient->id) }}">
                                                                             {{ trim($patient->name . ' ' . ($patient->middle_name ?? '') . ' ' . ($patient->last_name ?? '')) }}
                                                                         </a>
                                                                     </td>
@@ -344,14 +355,18 @@
     @endforeach-->
                                                                     <!--</td>-->
                                                                     <!--<td>{{ number_format($patient->total_amount, 0) }}</td>-->
-                                                                    <!--<td>{{ number_format($patient->paid_amount, 0) }}</td>-->
+
                                                                     <td><a
                                                                             href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
                                                                     </td>
+                                                                    <td>{{ number_format($patient->paid_amount, 0) }}</td>
+
+                                                                    <td>{{ optional($patient->payments->first())->mode ?? '-' }}
+                                                                    </td>
                                                                     <td>
-                                                                        <a href="{{ route('appointment.create') }}">
-                                                                            {{ $latestNote->next_appointment_date ?? '-' }}
-                                                                        </a>
+                                                                        {{ $patient->appointments->first()
+                                                                            ? date('d-m-Y', strtotime($patient->appointments->first()->appointment_date))
+                                                                            : '-' }}
                                                                     </td>
                                                                     <!--<td>-->
                                                                     <!--    <a href="{{ route('appointment.create') }}">-->

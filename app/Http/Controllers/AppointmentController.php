@@ -35,6 +35,22 @@ class AppointmentController extends Controller
     }
 
 
+    public function appointmentsUpdate(Request $request, $id)
+    {
+        $appointment = PatientAppointment::findOrFail($id);
+
+        $appointment->update([
+            'doctor_id' => $request->doctor_id,
+            'treatment_id' => $request->treatment_id,
+            'appointment_date' => $request->appointment_date,
+            'appointment_time' => $request->appointment_time,
+            'duration' => $request->duration,
+            'mobile_no' => $request->contact_no,
+            'email' => $request->email,
+        ]);
+
+        return redirect()->back()->with('success', 'Appointment Rescheduled Successfully.');
+    }
 
     public function getAppointments(Request $request)
     {

@@ -154,6 +154,8 @@ Route::prefix('admin/patient_appointment')->name('patient_appointment.')->group(
 
     Route::post('/appointments/store', [AppointmentController::class, 'appointmentsstore'])
         ->name('appointmentsstore');
+    Route::put('/appointment/{id}/reschedule', [AppointmentController::class, 'appointmentsUpdate'])
+        ->name('reschedule');
 });
 
 // Appointment CRUD Routes
@@ -183,6 +185,9 @@ Route::prefix('employee/patient_appointment')->name('employee.')->group(function
 Route::prefix('admin/document')->name('document.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/index/{patient_id}', [DocumentController::class, 'index'])->name('index');
     Route::get('/multidocview/{patient_treatment_id}', [DocumentController::class, 'multidocview'])->name('multidocview');
+
+    Route::put('/document/{id}', [DocumentController::class, 'update'])
+        ->name('update');
 
     Route::post('/store/{patient_id}', [DocumentController::class, 'store'])->name('store');
     Route::post('/multipleDocstore/{patient_id}', [DocumentController::class, 'multipleDocstore'])->name('multipleDocstore');
@@ -243,6 +248,7 @@ Route::get('/payments/export', function (Request $request) {
 
     return Excel::download(new PaymentsExport($fromDate, $toDate), 'payment_report.xlsx');
 })->name('payments.export');
+
 
 Route::get('/pay_to_dr/export', function (Request $request) {
     $fromDate = $request->from_date;
