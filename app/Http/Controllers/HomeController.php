@@ -52,19 +52,19 @@ class HomeController extends Controller
         $todayPatients = Patient::with([
             'notes.treatment',
             'payments',
-            'appointments' => function ($q) {
-                $q->whereDate('appointment_date', today());
-            }
+            // 'appointments' => function ($q) {
+            //     $q->whereDate('appointment_date', today());
+            // }
         ])
             ->where('is_completed', 0)
             ->where(function ($query) {
                 $query->whereDate('created_at', today())
                     ->orWhereHas('notes', function ($q) {
                         $q->whereDate('date', today());
-                    })
-                    ->orWhereHas('appointments', function ($q) {
-                        $q->whereDate('appointment_date', today());
                     });
+                // ->orWhereHas('appointments', function ($q) {
+                //     $q->whereDate('appointment_date', today());
+                // });
             })
             ->get()
             ->map(function ($patient) {
@@ -88,14 +88,15 @@ class HomeController extends Controller
                         $q->whereDate('appointment_date', today());
                     });
             })
-            ->get()
-            ->map(function ($patient) {
-                $patient->total_amount = $patient->notes->sum('Net_amount');
-                $patient->paid_amount = $patient->payments->sum('amount');
-                $patient->due_amount = $patient->total_amount - $patient->paid_amount;
+            ->paginate(10);
+        $completedPatients->getCollection()->transform(function ($patient) {
 
-                return $patient;
-            });
+            $patient->total_amount = $patient->notes->sum('Net_amount');
+            $patient->paid_amount = $patient->payments->sum('amount');
+            $patient->due_amount = $patient->total_amount - $patient->paid_amount;
+
+            return $patient;
+        });
         //dd($completedPatients);
 
         $todayAppointments = PatientAppointment::with(['patient', 'doctor'])

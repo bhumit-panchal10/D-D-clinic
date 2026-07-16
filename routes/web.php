@@ -154,12 +154,15 @@ Route::prefix('admin/patient_appointment')->name('patient_appointment.')->group(
 
     Route::post('/appointments/store', [AppointmentController::class, 'appointmentsstore'])
         ->name('appointmentsstore');
-    Route::put('/appointment/{id}/reschedule', [AppointmentController::class, 'appointmentsUpdate'])
-        ->name('reschedule');
 });
 
 // Appointment CRUD Routes
 Route::prefix('admin/appointment')->name('appointment.')->group(function () {
+    Route::put(
+        '/appointment/update',
+        [AppointmentController::class, 'appointmentsUpdate']
+    )
+        ->name('appointmentsUpdate');
     Route::get('/index', [AppointmentController::class, 'index'])->name('index');
     Route::get('/create', [AppointmentController::class, 'create'])->name('create');
     Route::post('/store', [AppointmentController::class, 'store'])->name('store');
