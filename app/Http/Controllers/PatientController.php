@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Models\ReasonForVisitToday;
+use App\Models\IntraoralExamination;
+use App\Models\TreatmentPlan;
+use App\Models\Notes;
 use App\Models\ClinicCaseCounters;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Http\Request;
@@ -14,6 +18,20 @@ use Carbon\Carbon;
 class PatientController extends Controller
 {
     // Display patients list
+    public function overview(Request $request, $patient_id = null)
+    {
+        $patient = Patient::findOrFail($patient_id); // Fetch patient details
+        $ReasonForVisitToday = ReasonForVisitToday::where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        $examinations = IntraoralExamination::where('patient_id', $patient_id)
+            ->orderBy('exam_date', 'desc')
+            ->paginate(config('app.per_page'));
+        $examinationsplan = TreatmentPlan::where('patient_id', $patient_id)
+            ->orderBy('date', 'desc')
+            ->paginate(config('app.per_page'));
+        $notes = Notes::with(['treatment', 'subTreatment', 'images'])
+            ->where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        return view('patient.overview', compact('patient', 'ReasonForVisitToday', 'examinations', 'examinationsplan', 'notes'));
+    }
     public function autocomplete(Request $request)
     {
         $search = trim($request->search);
@@ -158,15 +176,38 @@ class PatientController extends Controller
         return view('patient.show', compact('patient'));
     }
 
-    public function complete(Patient $patient)
+    public function complete(Request $request, Patient $patient)
     {
-        $patient->update([
-            'is_completed' => true,
-        ]);
+        $noteId = $request->input('note_id');
+        $paymentId = $request->input('payment_id');
+
+        // Debugging: Log the received noteId and paymentId
+        \Log::info('Completing patient with noteId: ' . $noteId . ' and paymentId: ' . $paymentId);
+
+        // Mark the patient as completed
+        $patient->is_completed = true;
+        $patient->save();
+
+        // Mark the note as completed if noteId is provided
+        if ($noteId) {
+            $note = $patient->notes()->find($noteId);
+            if ($note) {
+                $note->is_completed = true;
+                $note->save();
+            }
+        }
+
+        // Mark the payment as completed if paymentId is provided
+        if ($paymentId) {
+            $payment = $patient->payments()->find($paymentId);
+            if ($payment) {
+                $payment->is_completed = true;
+                $payment->save();
+            }
+        }
 
         return redirect()->back()->with('success', 'Patient marked as complete.');
     }
-
     public function getPatientDetails($id)
     {
 

@@ -205,10 +205,8 @@
                                                                 <th>Case No</th>
                                                                 <th>Patient Name</th>
                                                                 <th>Treatment</th>
-                                                                <!--<th>Amount</th>-->
                                                                 <th>Due Amount</th>
                                                                 <th>Payment Received</th>
-                                                                <!--<th>Payment mode</th>-->
                                                                 <th>Instruction</th>
                                                                 <th>Final Appointment</th>
                                                                 <th>Action</th>
@@ -222,6 +220,9 @@
                                                                         $latestNote = $patient->notes
                                                                             ->sortByDesc('date')
                                                                             ->first();
+                                                                        $latestPayment = $patient->payments
+                                                                            ->sortByDesc('payment_date')
+                                                                            ->first();
                                                                     @endphp
 
                                                                     <td>{{ $key + 1 }}</td>
@@ -229,34 +230,23 @@
                                                                     <td>{{ $patient->case_no }}</td>
 
                                                                     <td><a href="{{ route('notes.index', $patient->id) }}">
-                                                                            <!--{{ $patient->name }}-->
                                                                             {{ trim($patient->name . ' ' . ($patient->middle_name ?? '') . ' ' . ($patient->last_name ?? '')) }}
                                                                         </a>
                                                                     </td>
 
                                                                     <td>
                                                                         {{ $latestNote && $latestNote->treatment ? $latestNote->treatment->treatment_name : '-' }}
-
-
                                                                     </td>
-                                                                    <!--<td>{{ number_format($patient->total_amount, 0) }}</td>-->
                                                                     <td><a
                                                                             href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
                                                                     </td>
                                                                     <td>{{ number_format($patient->paid_amount, 0) }}</td>
-                                                                    <!--<td>{{ optional($patient->payments->first())->mode ?? '-' }}</td>                                                                    -->
+
+
                                                                     <td>
                                                                         <a href="{{ route('appointment.create') }}">
                                                                             {{ $latestNote->next_appointment_date ?? '-' }}
                                                                         </a>
-                                                                        <!--<a href="{{ route('appointment.create') }}">-->
-                                                                        <!--    @foreach ($patient->notes as $note)
-    -->
-                                                                        <!--        {{ $note->next_appointment_date ?? '-' }}   -->
-                                                                        <!--        <br>-->
-                                                                        <!--
-    @endforeach-->
-                                                                        <!--</a>-->
                                                                     </td>
                                                                     @php
                                                                         $latestAppointment = $patient->appointments
@@ -271,24 +261,27 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        @if (empty($patient->is_completed))
-                                                                            <form
-                                                                                action="{{ route('patient.complete', $patient->id) }}"
-                                                                                method="POST" class="d-inline">
-                                                                                @csrf
-                                                                                <button type="submit"
-                                                                                    class="btn btn-sm btn-success">
-                                                                                    Complete
-                                                                                </button>
-                                                                            </form>
-                                                                        @else
-                                                                            <span class="badge bg-success">Completed</span>
-                                                                        @endif
+
+                                                                        <form
+                                                                            action="{{ route('patient.complete', $patient->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            <input type="hidden" name="note_id"
+                                                                                value="{{ optional($latestNote)->id }}">
+                                                                            <input type="hidden" name="payment_id"
+                                                                                value="{{ optional($latestPayment)->id }}">
+
+                                                                            <button type="submit"
+                                                                                class="btn btn-success btn-sm">
+                                                                                Complete
+                                                                            </button>
+                                                                        </form>
+
                                                                     </td>
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center">
+                                                                    <td colspan="9" class="text-center">
                                                                         No Record Found
                                                                     </td>
                                                                 </tr>
@@ -343,21 +336,11 @@
                                                                                 ->first();
                                                                         @endphp
 
-                                                                        {{ optional($latestNote->treatment)->treatment_name ?? '-' }}
+                                                                        {{ optional(optional($latestNote)->treatment)->treatment_name ?? '-' }}
                                                                     </td>
-
-                                                                    <!--<td>-->
-                                                                    <!--    @foreach ($patient->notes as $note)
-    -->
-                                                                    <!--        {{ $note->treatment->treatment_name ?? '-' }}-->
-                                                                    <!--        <br>-->
-                                                                    <!--
-    @endforeach-->
-                                                                    <!--</td>-->
-                                                                    <!--<td>{{ number_format($patient->total_amount, 0) }}</td>-->
-
                                                                     <td><a
                                                                             href="{{ route('payments.index', $patient->id) }}">{{ number_format($patient->due_amount, 0) }}</a>
+
                                                                     </td>
                                                                     <td>{{ number_format($patient->paid_amount, 0) }}</td>
 

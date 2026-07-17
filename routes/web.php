@@ -83,8 +83,8 @@ Route::get('/', function () {
 Auth::routes(['register' => false]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::post('/patients/{patient}/complete', [PatientController::class, 'complete'])->name('patient.complete');
-
+Route::post('/patients/{patient}/complete', [PatientController::class, 'complete'])
+    ->name('patient.complete');
 // Profile Routes
 Route::prefix('profile')->name('profile.')->middleware('auth')->group(function () {
     Route::get('/', [HomeController::class, 'getProfile'])->name('detail');
@@ -352,6 +352,7 @@ Route::prefix('admin')->name('patient.')->middleware(['auth', 'admin'])->group(f
     Route::post('/patient/fetch-by-mobile', [PatientController::class, 'fetchByMobile'])->name('fetchByMobile');
     Route::get('/patient/autocomplete', [PatientController::class, 'autocomplete'])->name('autocomplete');
     Route::get('/get-patient-details/{id}', [PatientController::class, 'getPatientDetails'])->name('get.patient.details');
+    Route::get('/patient/overview/{id?}', [PatientController::class, 'overview'])->name('overview');
 });
 
 // Maintenance Register Routes

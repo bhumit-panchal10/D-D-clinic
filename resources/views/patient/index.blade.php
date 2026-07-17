@@ -121,6 +121,10 @@
                                                         data-bs-target="#deleteRecordModal">
                                                         Delete
                                                     </button>
+                                                    <a href="{{ route('patient.overview', $patient->id) }}"
+                                                        class="btn btn-sm btn-primary" title="Overview">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             <?php $i++; ?>

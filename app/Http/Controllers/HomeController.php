@@ -50,53 +50,66 @@ class HomeController extends Controller
         $MarkAsReceivedPending = MaintenanceRegister::where(['repair_received_date' => null, 'received_comment' => null])->count();
 
         $todayPatients = Patient::with([
-            'notes.treatment',
-            'payments',
-            // 'appointments' => function ($q) {
-            //     $q->whereDate('appointment_date', today());
-            // }
+            'notes' => function ($q) {
+                $q->whereDate('date', today())
+                    ->where('is_completed', 0)
+                    ->with('treatment');
+            },
+            'payments' => function ($q) {
+                $q->whereDate('payment_date', today())
+                    ->where('is_completed', 0);
+            }
         ])
-            ->where('is_completed', 0)
             ->where(function ($query) {
-                $query->whereDate('created_at', today())
-                    ->orWhereHas('notes', function ($q) {
-                        $q->whereDate('date', today());
+                $query->whereHas('notes', function ($q) {
+                    $q->whereDate('date', today())
+                        ->where('is_completed', 0);
+                })
+                    ->orWhereHas('payments', function ($q) {
+                        $q->whereDate('payment_date', today())
+                            ->where('is_completed', 0);
                     });
-                // ->orWhereHas('appointments', function ($q) {
-                //     $q->whereDate('appointment_date', today());
-                // });
             })
             ->get()
             ->map(function ($patient) {
+
                 $patient->total_amount = $patient->notes->sum('Net_amount');
-                $patient->paid_amount = $patient->payments->sum('amount');
-                $patient->due_amount = $patient->total_amount - $patient->paid_amount;
+                $patient->paid_amount  = $patient->payments->sum('amount');
+                $patient->due_amount   = $patient->total_amount - $patient->paid_amount;
+                return $patient;
+            });
+        //dd($todayPatients);
+
+        $completedPatients = Patient::with([
+            'notes' => function ($q) {
+                $q->whereDate('date', today())
+                    ->where('is_completed', 1)
+                    ->with('treatment');
+            },
+            'payments' => function ($q) {
+                $q->whereDate('payment_date', today())
+                    ->where('is_completed', 1);
+            },
+            'appointments'
+        ])
+            ->where('is_completed', 1)
+            ->whereHas('notes', function ($q) {
+                $q->whereDate('date', today())
+                    ->where('is_completed', 1);
+            })
+            ->whereHas('payments', function ($q) {
+                $q->whereDate('payment_date', today())
+                    ->where('is_completed', 1);
+            })
+            ->get()
+            ->map(function ($patient) {
+
+                $patient->total_amount = $patient->notes->sum('Net_amount');
+                $patient->paid_amount  = $patient->payments->sum('amount');
+                $patient->due_amount   = $patient->total_amount - $patient->paid_amount;
 
                 return $patient;
             });
-
-        $completedPatients = Patient::with(['notes.treatment', 'payments', 'appointments' => function ($q) {
-            $q->whereDate('appointment_date', today());
-        }])
-            ->where('is_completed', 1)
-            ->where(function ($query) {
-                $query->whereDate('created_at', today())
-                    ->orWhereHas('notes', function ($q) {
-                        $q->whereDate('date', today());
-                    })
-                    ->orWhereHas('appointments', function ($q) {
-                        $q->whereDate('appointment_date', today());
-                    });
-            })
-            ->paginate(10);
-        $completedPatients->getCollection()->transform(function ($patient) {
-
-            $patient->total_amount = $patient->notes->sum('Net_amount');
-            $patient->paid_amount = $patient->payments->sum('amount');
-            $patient->due_amount = $patient->total_amount - $patient->paid_amount;
-
-            return $patient;
-        });
         //dd($completedPatients);
 
         $todayAppointments = PatientAppointment::with(['patient', 'doctor'])
