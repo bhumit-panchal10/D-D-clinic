@@ -216,11 +216,11 @@
                                         @php
                                             $medicalList = [
                                                 'diabetes' => 'Diabetes',
+                                                'bp' => 'Blood Pressure',
                                                 'hepatitis' => 'Hepatitis',
                                                 'bleeding_disorder' => 'Bleeding Disorder',
                                                 'hiv' => 'HIV/AIDS',
                                                 'pregnancy' => 'Pregnancy',
-                                                'bp' => 'Blood Pressure',
                                                 'tb' => 'Tuberculosis (TB)',
                                                 'asthma' => 'Asthma',
                                                 'epilepsy' => 'Epilepsy',
@@ -234,19 +234,33 @@
                                         @endphp
 
                                         @foreach ($medicalList as $key => $label)
-                                            <div class="col-lg-2">
-                                                <label>
-                                                    <input type="checkbox" name="medical_history[]"
-                                                        value="{{ $key }}"
-                                                        {{ in_array($key, $medicalHistory) ? 'checked' : '' }}>
-                                                    {{ $label }}
-                                                </label>
-                                            </div>
+                                            @if ($key == 'other_disease')
+                                                <div class="col-lg-2 d-flex align-items-center">
+                                                    <label class="mb-0">
+                                                        <input type="checkbox" name="medical_history[]"
+                                                            value="{{ $key }}"
+                                                            {{ in_array($key, $medicalHistory) ? 'checked' : '' }}>
+                                                        {{ $label }}
+                                                    </label>
+                                                </div>
+
+                                                <div class="col-lg-4">
+                                                    <input type="text" class="form-control"
+                                                        name="other_disease_comments"
+                                                        placeholder="Enter Other Disease Comments"
+                                                        value="{{ $patient->other_disease_comments }}">
+                                                </div>
+                                            @else
+                                                <div class="col-lg-2">
+                                                    <label>
+                                                        <input type="checkbox" name="medical_history[]"
+                                                            value="{{ $key }}"
+                                                            {{ in_array($key, $medicalHistory) ? 'checked' : '' }}>
+                                                        {{ $label }}
+                                                    </label>
+                                                </div>
+                                            @endif
                                         @endforeach
-                                        <div class="col-lg-9">
-                                            <label>Other Disease Comments</label>
-                                            <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments">{{ $patient->other_disease_comments }}</textarea>
-                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="mb-3 col-lg-4">
