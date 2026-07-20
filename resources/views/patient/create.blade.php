@@ -1,7 +1,12 @@
 @extends('layouts.app')
 @section('title', 'Add Patient')
 @section('content')
-
+    <style>
+        .relative-name::placeholder {
+            color: #6c757d !important;
+            opacity: 1;
+        }
+    </style>
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">
@@ -154,15 +159,16 @@
                                         <hr>
                                         <h5>Medical History</h5>
 
+
                                         <div class="row">
                                             @php
                                                 $medicalHistory = [
                                                     'diabetes' => 'Diabetes',
+                                                    'bp' => 'Blood Pressure',
                                                     'hepatitis' => 'Hepatitis',
                                                     'bleeding_disorder' => 'Bleeding Disorder',
                                                     'hiv' => 'HIV/AIDS',
                                                     'pregnancy' => 'Pregnancy',
-                                                    'bp' => 'Blood Pressure',
                                                     'tb' => 'Tuberculosis (TB)',
                                                     'asthma' => 'Asthma',
                                                     'epilepsy' => 'Epilepsy',
@@ -176,18 +182,30 @@
                                             @endphp
 
                                             @foreach ($medicalHistory as $key => $label)
-                                                <div class="col-lg-2">
-                                                    <label>
-                                                        <input type="checkbox" name="medical_history[]"
-                                                            value="{{ $key }}">
-                                                        {{ $label }}
-                                                    </label>
-                                                </div>
+                                                @if ($key == 'other_disease')
+                                                    <div class="col-lg-2 d-flex align-items-start">
+                                                        <label class="mb-0">
+                                                            <input type="checkbox" name="medical_history[]"
+                                                                value="{{ $key }}">
+                                                            {{ $label }}
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="col-lg-4">
+                                                        <input type="text" class="form-control"
+                                                            name="other_disease_comments"
+                                                            placeholder="Enter Other Disease Comments">
+                                                    </div>
+                                                @else
+                                                    <div class="col-lg-2">
+                                                        <label>
+                                                            <input type="checkbox" name="medical_history[]"
+                                                                value="{{ $key }}">
+                                                            {{ $label }}
+                                                        </label>
+                                                    </div>
+                                                @endif
                                             @endforeach
-                                            <div class="col-lg-9">
-                                                <label>Other Disease Comments</label>
-                                                <textarea class="form-control" placeholder="Enter Comments" maxlength="255" name="other_disease_comments"></textarea>
-                                            </div>
                                         </div>
 
                                         <div class="row">
@@ -201,8 +219,6 @@
                                             <div class="mb-3 col-lg-4">
                                                 <label>Previous Surgery</label>
                                                 <textarea class="form-control" placeholder="Enter Previous Surgery" maxlength="255" name="previous_surgery"></textarea>
-
-
                                             </div>
 
                                             <div class="mb-3 col-lg-4">
@@ -239,33 +255,6 @@
 
                                         <hr>
                                         <h5>Referred To Us By</h5>
-                                        {{-- <div class="row mb-2 align-items-center">
-                                            <div class="col-lg-2">
-                                                <label>
-                                                    <input type="checkbox" name="referred_by[]" value="self"> Self
-                                                </label>
-                                            </div>
-
-                                            <div class="col-lg-2">
-                                                <input type="checkbox" name="referred_by[]" value="friend/relative">
-                                                Friend/Relative
-
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input type="text" class="form-control" name="relative_name"
-                                                    placeholder="Enter Friend/Relative Name">
-                                            </div>
-                                            <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
-                                                        value="google"> Google</label></div>
-                                            <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
-                                                        value="facebook"> Facebook</label></div>
-                                            <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
-                                                        value="instagram"> Instagram</label></div>
-                                            <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
-                                                        value="twitter"> Twitter</label></div>
-                                            <div class="col-lg-2"><label><input type="checkbox" name="referred_by[]"
-                                                        value="justdial"> Just Dial</label></div>
-                                        </div> --}}
                                         <div style="overflow-x:auto;">
                                             <div class="row mb-2 align-items-center flex-nowrap">
                                                 <div class="col-auto">
@@ -279,7 +268,8 @@
                                                 </div>
 
                                                 <div class="col-auto">
-                                                    <input type="text" class="form-control form-control-sm"
+                                                    <input type="text"
+                                                        class="form-control form-control-sm relative-name"
                                                         name="relative_name" placeholder="Enter Friend/Relative Name"
                                                         style="width: 190px;">
                                                 </div>
