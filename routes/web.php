@@ -249,7 +249,7 @@ Route::get('/payments/export', function (Request $request) {
     $fromDate = $request->from_date ?? date('Y-m-01');
     $toDate = $request->to_date ?? date('Y-m-d');
 
-    return Excel::download(new PaymentsExport($fromDate, $toDate), 'payment_report.xlsx');
+    return Excel::download(new PaymentsExport($fromDate, $toDate,  $request->page ?? 1), 'payment_report.xlsx');
 })->name('payments.export');
 
 
@@ -343,6 +343,10 @@ Route::prefix('employee/labworks')->name('employee.')->group(function () {
 // Patient Master Routes
 Route::prefix('admin')->name('patient.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/patient/index', [PatientController::class, 'index'])->name('index'); // Correct
+
+    Route::get('/patient/consent-form/{patient}', [PatientController::class, 'consentForm'])->name('consent.form');
+    Route::post('/patient/consent-form/{patient}', [PatientController::class, 'saveConsentForm'])->name('consent.form.save');
+
     Route::get('/patient/create/{id?}', [PatientController::class, 'create'])->name('create');
     Route::post('/patient/store', [PatientController::class, 'store'])->name('store');
     Route::get('/patient/{patient}/edit', [PatientController::class, 'edit'])->name('edit');

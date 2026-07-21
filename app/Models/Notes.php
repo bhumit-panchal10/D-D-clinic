@@ -27,7 +27,12 @@ class Notes extends Model
 
     public function treatment()
     {
-        return $this->belongsTo(Treatment::class);
+        return $this->belongsTo(Treatment::class, 'treatment_id');
+    }
+
+    public function treatment_detail()
+    {
+        return $this->belongsTo(Treatment::class, 'treatment_id', 'id');
     }
 
     public function subTreatment()

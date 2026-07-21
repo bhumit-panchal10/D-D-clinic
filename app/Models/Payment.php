@@ -20,4 +20,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Patient::class);
     }
+
+    public function notes()
+    {
+        return $this->hasMany(Notes::class, 'patient_id', 'patient_id');
+    }
 }

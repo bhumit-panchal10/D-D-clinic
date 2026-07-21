@@ -161,61 +161,61 @@
                         </a>
                     </li>
 
-                    {{-- <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('TotalPayment.index')) {{ 'active' }} @endif"
-                            href="{{ route('TotalPayment.index') }}">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span data-key="t-dashboards">Payment</span>
-                        </a>
-                    </li> --}}
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('TotalPayment.index')) {{ 'active' }} @endif"-->
+                    <!--        href="{{ route('TotalPayment.index') }}">-->
+                    <!--        <i class="fas fa-money-bill-wave"></i>-->
+                    <!--        <span data-key="t-dashboards">Payment</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
 
-                    <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('paymentsreceived.index')) {{ 'active' }} @endif"
-                            href="{{ route('paymentsreceived.index') }}">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            <span data-key="t-dashboards">Payment Recieved</span>
-                        </a>
-                    </li>
-
-                    <hr class="menu-divider">
-
-                    <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('vendor.*')) active @endif"
-                            href="{{ route('vendor.index') }}">
-                            <i class="fas fa-industry"></i> <!-- Vendor Icon -->
-                            <span data-key="t-vendor">Vendor</span>
-                        </a>
-                    </li>
-                    <hr class="menu-divider">
-
-                    <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('product.*')) active @endif"
-                            href="{{ route('product.index') }}">
-                            <i class="fas fa-box"></i> <!-- Product Icon -->
-                            <span data-key="t-product">Product</span>
-                        </a>
-                    </li>
-                    <hr class="menu-divider">
-
-                    <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('product_purchase.*')) active @endif"
-                            href="{{ route('product_purchase.index') }}">
-                            <i class="fas fa-shopping-cart"></i> <!-- Product Purchase Icon -->
-                            <span data-key="t-product-purchase">Product Purchase</span>
-                        </a>
-                    </li>
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('paymentsreceived.index')) {{ 'active' }} @endif"-->
+                    <!--        href="{{ route('paymentsreceived.index') }}">-->
+                    <!--        <i class="fas fa-hand-holding-usd"></i>-->
+                    <!--        <span data-key="t-dashboards">Payment Recieved</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
 
                     <hr class="menu-divider">
 
-                    <li class="nav-item">
-                        <a class="nav-link menu-link @if (request()->routeIs('maintenance.*')) active @endif"
-                            href="{{ route('maintenance.index') }}">
-                            <i class="fas fa-tools"></i> <!-- Maintenance Icon -->
-                            <span data-key="t-maintenance">Maintenance Register</span>
-                        </a>
-                    </li>
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('vendor.*')) active @endif"-->
+                    <!--        href="{{ route('vendor.index') }}">-->
+                    <!--        <i class="fas fa-industry"></i> -->
+                    <!--        <span data-key="t-vendor">Vendor</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
+                    <!--<hr class="menu-divider">-->
 
-                    <hr class="menu-divider">
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('product.*')) active @endif"-->
+                    <!--        href="{{ route('product.index') }}">-->
+                    <!--        <i class="fas fa-box"></i> -->
+                    <!--        <span data-key="t-product">Product</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
+                    <!--<hr class="menu-divider">-->
+
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('product_purchase.*')) active @endif"-->
+                    <!--        href="{{ route('product_purchase.index') }}">-->
+                    <!--        <i class="fas fa-shopping-cart"></i> -->
+                    <!--        <span data-key="t-product-purchase">Product Purchase</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
+
+                    <!--<hr class="menu-divider">-->
+
+                    <!--<li class="nav-item">-->
+                    <!--    <a class="nav-link menu-link @if (request()->routeIs('maintenance.*')) active @endif"-->
+                    <!--        href="{{ route('maintenance.index') }}">-->
+                    <!--        <i class="fas fa-tools"></i>-->
+                    <!--        <span data-key="t-maintenance">Maintenance Register</span>-->
+                    <!--    </a>-->
+                    <!--</li>-->
+
+                    <!--<hr class="menu-divider">-->
 
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#reports" data-bs-toggle="collapse" role="button"
