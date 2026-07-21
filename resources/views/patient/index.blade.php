@@ -35,6 +35,7 @@
                                 </div>
                             </div>
 
+
                             <div class="card-body">
                                 <table class="table table-striped">
                                     <thead>
@@ -121,6 +122,12 @@
                                                         data-bs-target="#deleteRecordModal">
                                                         Delete
                                                     </button>
+                                                    <a href="{{ route('patient.consent.form', $patient->id) }}"
+                                                        class="btn btn-sm btn-success" title="Consent Form">
+
+                                                        <i class="fas fa-file-signature"></i>
+
+                                                    </a>
                                                     <a href="{{ route('patient.overview', $patient->id) }}"
                                                         class="btn btn-sm btn-primary" title="Overview">
                                                         <i class="fas fa-eye"></i>
@@ -196,6 +203,7 @@
         </div>
     </div>
     <!-- Delete Modal End -->
+
 
 @endsection
 
@@ -298,3 +306,57 @@
         });
     </script>
 @endsection
+
+
+<!--@section('scripts')-->
+    <!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+    <!--    <script>
+        -- >
+        <
+        !--$(document).ready(function() {
+            -- >
+            <
+            !--$(".delete-patient").on("click", function() {
+                -- >
+                <
+                !--
+                let id = $(this).data("id");
+                -- >
+                <
+                !--$("#deleteid").val(id);
+                -- >
+                <
+                !--
+            });
+            -- >
+
+            // Confirm Delete Button Click
+            <
+            !--$("#confirmDelete").on("click", function() {
+                -- >
+                <
+                !--
+                let id = $("#deleteid").val();
+                -- >
+                <
+                !--
+                let actionUrl = "{{ route('patient.destroy', ':id') }}".replace(':id', id);
+                -- >
+                <
+                !--$("#deleteForm").attr("action", actionUrl);
+                -- >
+                <
+                !--$("#deleteForm").submit();
+                -- >
+                <
+                !--
+            });
+            -- >
+            <
+            !--
+        });
+        -- >
+        <
+        !--
+    </script>-->
+<!--@endsection-->

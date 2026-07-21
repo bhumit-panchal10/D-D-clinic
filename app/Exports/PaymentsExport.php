@@ -6,48 +6,88 @@ use App\Models\Payment;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithCustomQuerySize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
 class PaymentsExport implements FromCollection, WithHeadings, WithMapping, WithEvents
 {
-    protected $fromDate, $toDate;
-    protected $totalAmount = 0;
+    protected $fromDate, $toDate, $page;
+    protected $payments;
 
-    public function __construct($fromDate, $toDate)
+    protected $totalAmount = 0;
+    protected $paidAmount = 0;
+    protected $dueAmount = 0;
+
+    public function __construct($fromDate, $toDate, $page = 1)
     {
         $this->fromDate = $fromDate ?? date('Y-m-01');
-        $this->toDate = $toDate ?? date('Y-m-d');
+        $this->toDate   = $toDate ?? date('Y-m-d');
+        $this->page     = $page;
     }
 
     public function collection()
     {
-        $payments = Payment::with('patient')
+        // Same query as listing
+        $this->payments = Payment::with([
+            'patient',
+            'notes.treatment_detail'
+        ])
             ->whereBetween('payment_date', [$this->fromDate, $this->toDate])
             ->orderBy('payment_date', 'desc')
-            ->get();
+            ->paginate(config('app.per_page'), ['*'], 'page', $this->page);
 
-        // Calculate total amount
-        $this->totalAmount = $payments->sum('amount');
+        // Total Amount (same as listing)
+        $this->totalAmount = $this->payments->getCollection()
+            ->pluck('notes')
+            ->flatten()
+            ->sum('Net_amount');
 
-        return $payments;
+        // Paid Amount (same as listing)
+        $this->paidAmount = Payment::whereBetween(
+            'payment_date',
+            [$this->fromDate, $this->toDate]
+        )->sum('amount');
+
+        // Due Amount
+        $this->dueAmount = $this->totalAmount - $this->paidAmount;
+
+        return $this->payments->getCollection();
     }
 
     public function headings(): array
     {
-        return ['Sr. No', 'Patient Name', 'Payment Date', 'Mode', 'Amount'];
+        return [
+            'Sr. No',
+            'Case No',
+            'Patient Name',
+            'Treatment',
+            'Payment Date',
+            'Mode',
+            'Amount',
+        ];
     }
 
     public function map($payment): array
     {
-        static $index = 1;
+        static $sr = 1;
+
+        $latestNote = $payment->notes->sortByDesc('date')->first();
+
         return [
-            $index++,
+            $sr++,
+            optional($payment->patient)->case_no,
             optional($payment->patient)->name,
-            date('d-m-Y', strtotime($payment->payment_date)),
+
+            $payment->notes
+                ->pluck('treatment_detail.treatment_name')
+                ->filter()
+                ->implode("\n"),
+
+            $latestNote ? date('d-m-Y', strtotime($latestNote->date)) : '-',
+
             $payment->mode,
-            number_format($payment->amount, 2)
+
+            number_format($payment->notes->sum('Net_amount'), 2),
         ];
     }
 
@@ -55,10 +95,21 @@ class PaymentsExport implements FromCollection, WithHeadings, WithMapping, WithE
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $row = count($this->collection()) + 2; // Get the next row after the last record
 
-                $event->sheet->setCellValue('D' . $row, 'Total Amount:'); 
-                $event->sheet->setCellValue('E' . $row, number_format($this->totalAmount, 2));
+                $row = $this->payments->count() + 2;
+
+                $event->sheet->setCellValue('F' . $row, 'Total Amount');
+                $event->sheet->setCellValue('G' . $row, number_format($this->totalAmount, 2));
+
+                $row++;
+
+                $event->sheet->setCellValue('F' . $row, 'Paid Amount');
+                $event->sheet->setCellValue('G' . $row, number_format($this->paidAmount, 2));
+
+                $row++;
+
+                $event->sheet->setCellValue('F' . $row, 'Due Amount');
+                $event->sheet->setCellValue('G' . $row, number_format($this->dueAmount, 2));
             },
         ];
     }

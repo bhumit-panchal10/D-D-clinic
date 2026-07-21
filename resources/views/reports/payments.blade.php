@@ -12,20 +12,22 @@
                     <div class="row">
                         <div class="col-md-3">
                             <label for="from_date" class="form-label">From Date</label>
-                            <input type="date" name="from_date" id="from_date" class="form-control" value="{{ $fromDate }}">
+                            <input type="date" name="from_date" id="from_date" class="form-control"
+                                value="{{ $fromDate }}">
                         </div>
                         <div class="col-md-3">
                             <label for="to_date" class="form-label">To Date</label>
-                            <input type="date" name="to_date" id="to_date" class="form-control" value="{{ $toDate }}">
+                            <input type="date" name="to_date" id="to_date" class="form-control"
+                                value="{{ $toDate }}">
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">Search</button>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
-                           <a href="{{ route('payments.report') }}" class="btn btn-primary w-100">Clear</a>
+                            <a href="{{ route('payments.report') }}" class="btn btn-primary w-100">Clear</a>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
-                            <a href="{{ route('payments.export', ['from_date' => request('from_date', $fromDate), 'to_date' => request('to_date', $toDate)]) }}"
+                            <a href="{{ route('payments.export', ['from_date' => request('from_date', $fromDate), 'to_date' => request('to_date', $toDate), 'page' => request('page', 1)]) }}"
                                 class="btn btn-primary w-100">
                                 Export to Excel
                             </a>
@@ -39,7 +41,9 @@
                             <thead>
                                 <tr>
                                     <th>Sr. No</th>
+                                    <th>Case No</th>
                                     <th>Patient Name</th>
+                                    <th>Treatment</th>
                                     <th>Payment Date</th>
                                     <th>Mode</th>
                                     <th>Amount</th>
@@ -47,18 +51,33 @@
                             </thead>
                             <tbody>
                                 @foreach ($payments as $key => $payment)
+                                    @php
+                                        $latestNote = $payment->notes->sortByDesc('date')->first();
+                                    @endphp
                                     <tr>
                                         <td>{{ $payments->firstItem() + $key }}</td>
-                                        <td>{{ $payment->patient->name }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($payment->payment_date)) }}</td>
+                                        <td>{{ $payment->patient->case_no ?? '-' }}</td>
+                                        <td>{{ $payment->patient->name ?? '-' }}</td>
+                                        <td>
+                                            @forelse($payment->notes as $note)
+                                                {{ $note->treatment_detail->treatment_name ?? '-' }}<br>
+                                            @empty
+                                                -
+                                            @endforelse
+                                        </td>
+                                        <td>{{ date('d-m-Y', strtotime($latestNote->date)) }}</td>
                                         <td>{{ $payment->mode }}</td>
-                                        <td class="text-end">{{ number_format($payment->amount, 2) }}</td>
+                                        <td class="text-end">
+                                            {{ number_format($payment->notes->sum('Net_amount'), 2) }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
 
                         <h5 class="mt-3 text-end">Total Amount : ₹{{ number_format($totalAmount, 2) }}</h5>
+                        <h5 class="mt-3 text-end">Paid Amount : ₹{{ number_format($paid_amount, 2) }}</h5>
+                        <h5 class="mt-3 text-end">Due Amount : ₹{{ number_format($due_amount, 2) }}</h5>
 
                         <div class="d-flex justify-content-center mt-3">
                             {{ $payments->appends(request()->query())->links('pagination::bootstrap-4') }}

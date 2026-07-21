@@ -22,14 +22,19 @@ class ReportController extends Controller
         $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
 
         // Fetch Payments within the selected date range
-        $payments = Payment::whereBetween('payment_date', [$fromDate, $toDate])
+        $payments = Payment::with('notes.treatment_detail')->whereBetween('payment_date', [$fromDate, $toDate])
             ->orderBy('payment_date', 'desc')
             ->paginate(config('app.per_page'));
 
-        // Get Total Amount
-        $totalAmount = Payment::whereBetween('payment_date', [$fromDate, $toDate])->sum('amount');
+        $totalAmount = $payments->getCollection()
+            ->pluck('notes')
+            ->flatten()
+            ->sum('Net_amount');
+        $paid_amount = Payment::whereBetween('payment_date', [$fromDate, $toDate])->sum('amount');
 
-        return view('reports.payments', compact('payments', 'fromDate', 'toDate', 'totalAmount'));
+        $due_amount   = $totalAmount - $paid_amount;
+
+        return view('reports.payments', compact('payments', 'fromDate', 'toDate', 'paid_amount', 'due_amount', 'totalAmount'));
     }
 
     public function patient_report(Request $request)
@@ -87,11 +92,10 @@ class ReportController extends Controller
 
         return view('reports.due_payments', compact('orders', 'fromDate', 'toDate', 'totals'));
     }
-    
-      public function pay_to_dr_Report(Request $request)
+
+    public function pay_to_dr_Report(Request $request)
     {
-        $doctors = Doctor::
-            orderBy('doctor_name', 'asc')
+        $doctors = Doctor::orderBy('doctor_name', 'asc')
             ->get(); // Show latest first
 
         $query = PayToDr::select(
@@ -142,7 +146,7 @@ class ReportController extends Controller
         }
 
         $totalAmount = $totalAmountQuery->sum('amount');
-        
+
 
         return view('reports.pay_to_dr', compact('datas', 'fromDate', 'toDate', 'totalAmount', 'doctors', 'doctorId'));
     }

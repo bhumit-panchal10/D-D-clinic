@@ -15,9 +15,14 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use App\Models\PatientsConcernForm;
+
 class PatientController extends Controller
 {
-    // Display patients list
     public function overview(Request $request, $patient_id = null)
     {
         $patient = Patient::findOrFail($patient_id); // Fetch patient details
@@ -32,6 +37,7 @@ class PatientController extends Controller
             ->where('patient_id', $patient_id)->paginate(config('app.per_page'));
         return view('patient.overview', compact('patient', 'ReasonForVisitToday', 'examinations', 'examinationsplan', 'notes'));
     }
+    // Display patients list
     public function autocomplete(Request $request)
     {
         $search = trim($request->search);
@@ -170,6 +176,168 @@ class PatientController extends Controller
         return view('patient.index', compact('patients', 'items'));
     }
 
+    public function consentForm(Patient $patient)
+    {
+        return view('patient.consent-form', compact('patient'));
+    }
+
+    public function saveConsentForm(Request $request, Patient $patient)
+    {
+        DB::beginTransaction();
+
+        // try {
+
+        if (empty($request->patient_signature)) {
+
+            return back()->with('error', 'Please sign before saving.');
+        }
+
+        $caseNo = $patient->case_no;
+
+        $patientName = preg_replace('/[^A-Za-z0-9]/', '_', $patient->name);
+
+        /*
+            |--------------------------------------------------------------------------
+            | Save Signature
+            |--------------------------------------------------------------------------
+            */
+
+        $signatureFolder = '/home1/getdemo/public_html/dental_clinic/patient_signature';
+
+        if (!File::exists($signatureFolder)) {
+
+            File::makeDirectory($signatureFolder, 0777, true);
+        }
+
+        $image_parts = explode(";base64,", $request->patient_signature);
+
+        $image_type_aux = explode("image/", $image_parts[0]);
+
+        $image_type = $image_type_aux[1];
+
+        $image_base64 = base64_decode($image_parts[1]);
+
+        $signatureName = $caseNo . "_" . $patientName . "." . $image_type;
+
+        $signaturePath = $signatureFolder . "/" . $signatureName;
+
+        file_put_contents($signaturePath, $image_base64);
+
+        /*
+            |--------------------------------------------------------------------------
+            | Generate PDF
+            |--------------------------------------------------------------------------
+            */
+        // dd($signaturePath, file_exists($signaturePath));
+        $pdf = Pdf::loadView(
+            'patient.consent-form-pdf',
+            [
+                'patient' => $patient,
+                'signature' => $signaturePath
+            ]
+        );
+
+        /*
+            |--------------------------------------------------------------------------
+            | Save PDF
+            |--------------------------------------------------------------------------
+            */
+
+        $pdfFolder = '/home1/getdemo/public_html/dental_clinic/patinet_conser_form';
+
+        if (!File::exists($pdfFolder)) {
+
+            File::makeDirectory($pdfFolder, 0777, true);
+        }
+
+        $pdfName = $caseNo . "_" . $patientName . ".pdf";
+
+        $pdf->save($pdfFolder . "/" . $pdfName);
+
+        /*
+            |--------------------------------------------------------------------------
+            | Save Database
+            |--------------------------------------------------------------------------
+            */
+
+        PatientsConcernForm::create([
+
+            'iPatientId' => $patient->id,
+
+            'strFileName' => $pdfName,
+
+            'strIP' => $request->ip(),
+
+        ]);
+
+        DB::commit();
+
+        return redirect()
+            ->route('patient.index')
+            ->with('success', 'Consent Form saved successfully.');
+
+        // } catch (\Exception $e) {
+
+        //     DB::rollBack();
+
+        //     return back()->with('error', $e->getMessage());
+
+        // }
+    }
+
+    // public function saveConsentForm(Request $request, Patient $patient)
+    // {
+    //     DB::beginTransaction();
+
+    //     // try {
+
+    //         // Create Folder
+    //         $folder = public_path('patinet_conser_form');
+
+    //         if (!File::exists($folder)) {
+    //             File::makeDirectory($folder, 0777, true, true);
+    //         }
+
+    //         // File Name
+    //         $patientName = preg_replace('/[^A-Za-z0-9]/', '_', $patient->name);
+
+    //         $fileName = $patient->case_no . '_' . $patientName . '.pdf';
+
+    //         // Generate PDF
+    //         $pdf = Pdf::loadView(
+    //             'patient.consent-form-pdf',
+    //             compact('patient')
+    //         );
+
+    //         // Save PDF
+    //         $pdf->save($folder . '/' . $fileName);
+
+    //         // Store Record
+    //         PatientsConcernForm::create([
+
+    //             'iPatientId' => $patient->id,
+
+    //             'strFileName' => $fileName,
+
+    //             'strIP' => $request->ip(),
+
+    //         ]);
+
+    //         DB::commit();
+
+    //         return redirect()
+    //             ->route('patient.index')
+    //             ->with('success', 'Consent form generated successfully.');
+
+    //     // } catch (\Exception $e) {
+
+    //     //     DB::rollBack();
+
+    //     //     return back()->with('error', $e->getMessage());
+
+    //     // }
+    // }
+
     public function show($id)
     {
         $patient = Patient::findOrFail($id);
@@ -208,6 +376,7 @@ class PatientController extends Controller
 
         return redirect()->back()->with('success', 'Patient marked as complete.');
     }
+
     public function getPatientDetails($id)
     {
 
@@ -275,6 +444,7 @@ class PatientController extends Controller
             'other_disease_comments' => 'nullable',
             //'mobile2' => 'required',
             'dob' => 'nullable|date',
+            'weight' => 'nullable|numeric|min:0',
             'gender' => 'nullable',
             'Age' => 'nullable',
             'address' => 'nullable|string|max:255',
@@ -306,7 +476,7 @@ class PatientController extends Controller
         $caseMaster->last_number += 1;
         $caseMaster->save();
 
-        return redirect()->route('patient.index')->with('success', 'Patient added successfully.');
+        return redirect()->route('patient.consent.form', $patient->id)->with('success', 'Patient added successfully.');
     }
 
     // Show edit form
@@ -333,6 +503,7 @@ class PatientController extends Controller
             'relative_name' => 'nullable',
             'other_disease_comments' => 'nullable',
             'dob' => 'nullable|date',
+            'weight' => 'nullable|numeric|min:0',
             'gender' => 'required',
             'Age' => 'nullable',
             'address' => 'nullable|string|max:255',
