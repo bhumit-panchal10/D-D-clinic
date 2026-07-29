@@ -51,6 +51,37 @@
                                 </div>
                             </div>
 
+                            <!-- Quick Prescription Template -->
+                            <!-- Prescription Template -->
+                            <div class="row mb-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label>Prescription Template</label>
+
+                                    <select id="prescriptionTemplate" class="form-control select2"
+                                        data-items-url="{{ route('prescription-templates.items', ['template' => '__TEMPLATE_ID__']) }}">
+                                        <option value="">Select Prescription Template</option>
+
+                                        @foreach ($prescriptionTemplates as $template)
+                                            <option value="{{ $template->id }}">
+                                                {{ $template->template_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <button type="button" id="addPrescriptionTemplate" class="btn btn-primary w-100">
+                                        Add Template
+                                    </button>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <small class="text-muted">
+                                        Select a template and click Add Template to add all medicines.
+                                    </small>
+                                </div>
+                            </div>
+
                             <!-- Second Row: Medicine & Dosage -->
                             <div class="row mb-3 align-items-end">
                                 <div class="col-md-3">
@@ -120,6 +151,608 @@
     </div>
 
     <script>
+        let currentComment = '';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSelect2();
+
+            const addTemplateButton =
+                document.getElementById('addPrescriptionTemplate');
+
+            addTemplateButton.addEventListener('click', async function() {
+                const templateSelect =
+                    document.getElementById('prescriptionTemplate');
+
+                const templateId = templateSelect.value;
+
+                if (!templateId) {
+                    alert('Please select prescription template.');
+                    return;
+                }
+
+                let url = templateSelect.dataset.itemsUrl;
+
+                url = url.replace(
+                    '__TEMPLATE_ID__',
+                    templateId
+                );
+
+                try {
+                    addTemplateButton.disabled = true;
+                    addTemplateButton.innerText = 'Adding...';
+
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(
+                            data.message ||
+                            'Unable to load prescription template.'
+                        );
+                    }
+
+                    if (!Array.isArray(data.items) || data.items.length === 0) {
+                        alert('No medicines found in this template.');
+                        return;
+                    }
+
+                    let addedCount = 0;
+                    let skippedCount = 0;
+
+                    data.items.forEach(function(item) {
+                        const added = appendPrescriptionRow({
+                            medicineId: item.medicine_id,
+                            medicineName: item.medicine_name,
+                            dosageId: item.dosage_id,
+                            dosageText: item.dosage_text,
+                            days: item.days,
+                            qty: item.qty,
+                            comment: item.comment
+                        });
+
+                        if (added) {
+                            addedCount++;
+                        } else {
+                            skippedCount++;
+                        }
+                    });
+
+                    if (addedCount > 0 && skippedCount === 0) {
+                        alert(
+                            addedCount +
+                            ' medicine(s) added successfully.'
+                        );
+                    }
+
+                    if (skippedCount > 0) {
+                        alert(
+                            addedCount + ' medicine(s) added and ' +
+                            skippedCount + ' duplicate medicine(s) skipped.'
+                        );
+                    }
+
+                    $('#prescriptionTemplate')
+                        .val(null)
+                        .trigger('change');
+
+                } catch (error) {
+                    console.error('Template error:', error);
+                    alert(error.message);
+                } finally {
+                    addTemplateButton.disabled = false;
+                    addTemplateButton.innerText = 'Add Template';
+                }
+            });
+
+            const templateSelect =
+                document.getElementById('prescriptionTemplate');
+
+            const addButton =
+                document.getElementById('addToPrescription');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Add all medicines from template
+            |--------------------------------------------------------------------------
+            */
+            templateSelect.addEventListener('change', async function() {
+                const templateId = this.value;
+
+                if (!templateId) {
+                    return;
+                }
+
+                let url = this.dataset.itemsUrl;
+
+                url = url.replace(
+                    '__TEMPLATE_ID__',
+                    templateId
+                );
+
+                try {
+                    this.disabled = true;
+
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(
+                            data.message ||
+                            'Unable to load prescription template.'
+                        );
+                    }
+
+                    if (!data.items || data.items.length === 0) {
+                        alert('No medicines found in this template.');
+                        return;
+                    }
+
+                    let addedCount = 0;
+                    let skippedCount = 0;
+
+                    data.items.forEach(function(item) {
+                        const added = appendPrescriptionRow({
+                            medicineId: item.medicine_id,
+                            medicineName: item.medicine_name,
+                            dosageId: item.dosage_id,
+                            dosageText: item.dosage_text,
+                            days: item.days,
+                            qty: item.qty,
+                            comment: item.comment
+                        });
+
+                        if (added) {
+                            addedCount++;
+                        } else {
+                            skippedCount++;
+                        }
+                    });
+
+                    if (skippedCount > 0) {
+                        alert(
+                            addedCount + ' medicine(s) added. ' +
+                            skippedCount + ' duplicate medicine(s) skipped.'
+                        );
+                    }
+
+                    $('#prescriptionTemplate')
+                        .val(null)
+                        .trigger('change.select2');
+
+                } catch (error) {
+                    console.error(error);
+                    alert(error.message);
+                } finally {
+                    this.disabled = false;
+                }
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Add single medicine manually
+            |--------------------------------------------------------------------------
+            */
+            addButton.addEventListener('click', function() {
+                const medicineSelect =
+                    document.getElementById('medicines');
+
+                const dosageSelect =
+                    document.getElementById('dosages');
+
+                const daysInput =
+                    document.getElementById('Days');
+
+                const medicineId = medicineSelect.value;
+
+                const medicineName =
+                    medicineSelect.options[
+                        medicineSelect.selectedIndex
+                    ]?.textContent.trim() || '';
+
+                const dosageId = dosageSelect.value;
+
+                const dosageText =
+                    dosageSelect.options[
+                        dosageSelect.selectedIndex
+                    ]?.textContent.trim() || '';
+
+                const days = parseInt(daysInput.value, 10);
+
+                if (!medicineId) {
+                    alert('Please select medicine.');
+                    return;
+                }
+
+                if (!dosageId) {
+                    alert('Please select dosage.');
+                    return;
+                }
+
+                if (!days || days < 1) {
+                    alert('Please enter valid days.');
+                    return;
+                }
+
+                const qty = calculateMedicineQty(
+                    dosageText,
+                    days
+                );
+
+                const added = appendPrescriptionRow({
+                    medicineId: medicineId,
+                    medicineName: medicineName,
+                    dosageId: dosageId,
+                    dosageText: dosageText,
+                    days: days,
+                    qty: qty,
+                    comment: currentComment
+                });
+
+                if (!added) {
+                    alert(
+                        'This medicine, dosage and days combination is already added.'
+                    );
+
+                    return;
+                }
+
+                resetManualFields();
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Remove medicine row
+            |--------------------------------------------------------------------------
+            */
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-row')) {
+                    event.target.closest('tr').remove();
+                }
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Validate prescription before submit
+            |--------------------------------------------------------------------------
+            */
+            document
+                .querySelector('form')
+                .addEventListener('submit', function(event) {
+                    const rows = document.querySelectorAll(
+                        '#prescriptionTable tbody tr'
+                    );
+
+                    if (rows.length === 0) {
+                        event.preventDefault();
+
+                        alert(
+                            'Please add at least one medicine before saving.'
+                        );
+                    }
+                });
+        });
+
+        function initializeSelect2() {
+            if (!window.jQuery || !jQuery.fn.select2) {
+                return;
+            }
+
+            $('#prescriptionTemplate').select2({
+                placeholder: 'Select Prescription Template',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#medicines').select2({
+                placeholder: 'Select Medicine',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#dosages').select2({
+                placeholder: 'Select Dosage',
+                allowClear: true,
+                width: '100%'
+            });
+        }
+
+        function appendPrescriptionRow(item) {
+            if (
+                prescriptionItemExists(
+                    item.medicineId,
+                    item.dosageId,
+                    item.days
+                )
+            ) {
+                return false;
+            }
+
+            let qty = item.qty;
+
+            if (
+                qty === null ||
+                qty === undefined ||
+                qty === ''
+            ) {
+                qty = calculateMedicineQty(
+                    item.dosageText,
+                    item.days
+                );
+            }
+
+            const row = `
+            <tr>
+                <td>
+                    <input
+                        type="hidden"
+                        name="medicine_id[]"
+                        value="${item.medicineId}"
+                    >
+
+                    ${escapeHtml(item.medicineName)}
+                </td>
+
+                <td>
+                    <input
+                        type="hidden"
+                        name="dosage_id[]"
+                        value="${item.dosageId}"
+                    >
+
+                    ${escapeHtml(item.dosageText)}
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="form-control"
+                        value="${escapeHtml(item.days)}"
+                        disabled
+                    >
+
+                    <input
+                        type="hidden"
+                        name="days[]"
+                        value="${escapeHtml(item.days)}"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="form-control"
+                        value="${escapeHtml(qty)}"
+                        disabled
+                    >
+
+                    <input
+                        type="hidden"
+                        name="qtys[]"
+                        value="${escapeHtml(qty)}"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="text"
+                        name="comments[]"
+                        class="form-control"
+                        value="${escapeHtml(item.comment || '')}"
+                        placeholder="Enter comment"
+                    >
+                </td>
+
+                <td>
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-sm remove-row"
+                    >
+                        Cancel
+                    </button>
+                </td>
+            </tr>
+        `;
+
+            document
+                .querySelector('#prescriptionTable tbody')
+                .insertAdjacentHTML('beforeend', row);
+
+            return true;
+        }
+
+        function prescriptionItemExists(
+            medicineId,
+            dosageId,
+            days
+        ) {
+            const rows = document.querySelectorAll(
+                '#prescriptionTable tbody tr'
+            );
+
+            return Array.from(rows).some(function(row) {
+                const existingMedicineId = row.querySelector(
+                    'input[name="medicine_id[]"]'
+                )?.value;
+
+                const existingDosageId = row.querySelector(
+                    'input[name="dosage_id[]"]'
+                )?.value;
+
+                const existingDays = row.querySelector(
+                    'input[name="days[]"]'
+                )?.value;
+
+                return (
+                    String(existingMedicineId) ===
+                    String(medicineId) &&
+                    String(existingDosageId) ===
+                    String(dosageId) &&
+                    String(existingDays) ===
+                    String(days)
+                );
+            });
+        }
+
+        function calculateMedicineQty(dosageText, days) {
+            if (!dosageText || !days) {
+                return '';
+            }
+
+            const totalPerDay = String(dosageText)
+                .split('-')
+                .map(parseDosePart)
+                .reduce(function(total, value) {
+                    return total + value;
+                }, 0);
+
+            return Math.ceil(
+                totalPerDay * Number(days)
+            );
+        }
+
+        function parseDosePart(value) {
+            value = String(value).trim();
+
+            if (value.includes('/')) {
+                const parts = value.split('/');
+
+                const numerator = Number(parts[0]);
+                const denominator = Number(parts[1]);
+
+                if (denominator) {
+                    return numerator / denominator;
+                }
+            }
+
+            return Number(value) || 0;
+        }
+
+        function getDosages() {
+            const medicineId =
+                document.getElementById('medicines').value;
+
+            const dosageSelect =
+                document.getElementById('dosages');
+
+            const daysInput =
+                document.getElementById('Days');
+
+            if (!medicineId) {
+                currentComment = '';
+                daysInput.value = '';
+
+                dosageSelect.innerHTML =
+                    '<option value="">Select Dosage</option>';
+
+                $('#dosages').val(null).trigger('change');
+
+                return;
+            }
+
+            let url =
+                "{{ route('prescriptions.get_dosages', ':id') }}";
+
+            url = url.replace(':id', medicineId);
+
+            fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error(
+                            'Unable to load dosage.'
+                        );
+                    }
+
+                    return response.json();
+                })
+                .then(function(data) {
+                    currentComment = data.comment || '';
+
+                    daysInput.value = data.days || 1;
+
+                    dosageSelect.innerHTML =
+                        '<option value="">Select Dosage</option>';
+
+                    if (
+                        data.dosages &&
+                        Array.isArray(data.dosages)
+                    ) {
+                        data.dosages.forEach(function(dosage) {
+                            const option =
+                                document.createElement('option');
+
+                            option.value = dosage.id;
+                            option.textContent = dosage.dosage;
+
+                            if (
+                                String(dosage.id) ===
+                                String(data.selected_dosage_id)
+                            ) {
+                                option.selected = true;
+                            }
+
+                            dosageSelect.appendChild(option);
+                        });
+                    }
+
+                    $('#dosages').trigger('change');
+                })
+                .catch(function(error) {
+                    console.error(error);
+                    alert(error.message);
+                });
+        }
+
+        function resetManualFields() {
+            currentComment = '';
+
+            $('#medicines')
+                .val(null)
+                .trigger('change.select2');
+
+            $('#dosages')
+                .val(null)
+                .trigger('change.select2');
+
+            document.getElementById('Days').value = '';
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(
+                /[&<>"']/g,
+                function(character) {
+                    const map = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    };
+
+                    return map[character];
+                }
+            );
+        }
+    </script>
+
+    {{-- <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (window.jQuery) {
                 console.log("✅ jQuery is loaded! Version:", jQuery.fn.jquery);
@@ -241,7 +874,7 @@
                 }
             });
         });
-    </script>
+    </script> --}}
 
     <script>
         function getDosages() {

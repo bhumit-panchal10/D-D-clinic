@@ -90,6 +90,14 @@
                                         data-key="t-calendar">Medicine
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('prescription-templates.index') }}"
+                                        class="nav-link {{ request()->routeIs('prescription-templates.*') ? 'active' : '' }}"
+                                        data-key="t-prescription-template">
+
+                                        Prescription Template
+                                    </a>
+                                </li>
 
                                 <li class="nav-item">
                                     <a href="{{ route('concern_form_master.index') }}" class="nav-link"
