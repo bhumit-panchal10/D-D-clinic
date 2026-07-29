@@ -39,7 +39,9 @@ class Patient extends Model
         'company_name',
         'relative_name',
         'Age',
-        'is_completed'
+        'is_completed',
+        'preferred_time_to_contact_you',
+        'emergency_contact_name'
     ];
     public function notes()
     {

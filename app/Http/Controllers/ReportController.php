@@ -7,6 +7,8 @@ use App\Models\Lab;
 use App\Models\Labwork;
 use App\Models\Payment;
 use App\Models\Patient;
+use App\Models\Notes;
+
 use App\Models\Order;
 use App\Models\PayToDr;
 use Illuminate\Http\Request;
@@ -17,24 +19,43 @@ class ReportController extends Controller
 
     public function report(Request $request)
     {
-        // Get Date Range (Default: Current Month)
         $fromDate = $request->input('from_date', now()->startOfMonth()->toDateString());
-        $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
+        $toDate   = $request->input('to_date', now()->endOfMonth()->toDateString());
 
-        // Fetch Payments within the selected date range
-        $payments = Payment::with('notes.treatment_detail')->whereBetween('payment_date', [$fromDate, $toDate])
-            ->orderBy('payment_date', 'desc')
+        $notes = Notes::with([
+            'patient',
+            'treatment_detail',
+            'patient.payments' => function ($q) use ($fromDate, $toDate) {
+                $q->whereBetween('payment_date', [$fromDate, $toDate]);
+            }
+        ])
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->orderBy('date', 'desc')
             ->paginate(config('app.per_page'));
+        // dd($notes);
+        foreach ($notes as $note) {
 
-        $totalAmount = $payments->getCollection()
-            ->pluck('notes')
-            ->flatten()
-            ->sum('Net_amount');
+            $paid = $note->patient->payments->sum('amount');
+
+            $note->paid_amount = $paid;
+            $note->due_amount  = $note->Net_amount - $paid;
+        }
+
+        $totalAmount = $notes->sum('Net_amount');
         $paid_amount = Payment::whereBetween('payment_date', [$fromDate, $toDate])->sum('amount');
+        $due_amount  = $totalAmount - $paid_amount;
 
-        $due_amount   = $totalAmount - $paid_amount;
-
-        return view('reports.payments', compact('payments', 'fromDate', 'toDate', 'paid_amount', 'due_amount', 'totalAmount'));
+        return view(
+            'reports.payments',
+            compact(
+                'notes',
+                'fromDate',
+                'toDate',
+                'totalAmount',
+                'paid_amount',
+                'due_amount'
+            )
+        );
     }
 
     public function patient_report(Request $request)

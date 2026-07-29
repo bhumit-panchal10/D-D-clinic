@@ -47,29 +47,43 @@
                                     <th>Payment Date</th>
                                     <th>Mode</th>
                                     <th>Amount</th>
+                                    <th>Payment Received</th>
+                                    <th>Balance</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($payments as $key => $payment)
+                                @foreach ($notes as $key => $note)
                                     @php
-                                        $latestNote = $payment->notes->sortByDesc('date')->first();
+                                        $payment = $note->patient->payments->first();
                                     @endphp
+
                                     <tr>
-                                        <td>{{ $payments->firstItem() + $key }}</td>
-                                        <td>{{ $payment->patient->case_no ?? '-' }}</td>
-                                        <td>{{ $payment->patient->name ?? '-' }}</td>
-                                        <td>
-                                            @forelse($payment->notes as $note)
-                                                {{ $note->treatment_detail->treatment_name ?? '-' }}<br>
-                                            @empty
-                                                -
-                                            @endforelse
+                                        <td>{{ $notes->firstItem() + $key }}</td>
+
+                                        <td>{{ $note->patient->case_no }}</td>
+
+                                        <td><a
+                                                href="{{ route('notes.index', $note->patient->id) }}">{{ $note->patient->name }}</a>
                                         </td>
-                                        <td>{{ date('d-m-Y', strtotime($latestNote->date)) }}</td>
-                                        <td>{{ $payment->mode }}</td>
+
+                                        <td>{{ $note->treatment_detail->treatment_name ?? '-' }}</td>
+
+                                        <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
+
+                                        <td>{{ $payment->mode ?? '-' }}</td>
+
                                         <td class="text-end">
-                                            {{ number_format($payment->notes->sum('Net_amount'), 2) }}
+                                            {{ number_format($note->Net_amount, 2) }}
                                         </td>
+
+                                        <td class="text-end">
+                                            {{ number_format($note->paid_amount, 2) }}
+                                        </td>
+
+                                        <td class="text-end">
+                                            {{ number_format($note->due_amount, 2) }}
+                                        </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -80,7 +94,7 @@
                         <h5 class="mt-3 text-end">Due Amount : ₹{{ number_format($due_amount, 2) }}</h5>
 
                         <div class="d-flex justify-content-center mt-3">
-                            {{ $payments->appends(request()->query())->links('pagination::bootstrap-4') }}
+                            {{ $notes->appends(request()->query())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>

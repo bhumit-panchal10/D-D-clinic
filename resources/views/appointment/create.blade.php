@@ -17,6 +17,10 @@
             margin: 0 !important;
         }
 
+        .fc .fc-timegrid-slot {
+            height: 35px !important;
+        }
+
         /* Remove rounded box effect from background event */
         .fc .fc-timegrid-bg-harness .fc-bg-event {
             inset: 0 !important;
@@ -254,6 +258,122 @@
         </div>
     </div>
 
+    <!-- Reschedule Modal -->
+    <div class="modal fade" id="rescheduleModal">
+        <div class="modal-dialog">
+            <form method="POST" id="editAppointmentForm" action="{{ route('appointment.appointmentsUpdate') }}">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5>Reschedule Appointment</h5>
+
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <input type="hidden" name="appointment_id" id="edit_appointment_id">
+
+                        <div class="mb-3">
+                            <label>Patient</label>
+
+                            <input type="text" id="edit_patient_name" class="form-control" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Doctor</label>
+
+                            <select class="form-control" id="edit_doctor_id" name="doctor_id">
+
+                                @foreach ($doctors as $doctor)
+                                    <option value="{{ $doctor->id }}">
+                                        {{ $doctor->doctor_name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Contact No</label>
+
+                            <input class="form-control" id="edit_contact_no" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Email</label>
+
+                            <input class="form-control" id="edit_email" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Duration</label>
+
+                            <input class="form-control" id="edit_duration" name="duration">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Treatment</label>
+
+                            <select class="form-control" id="edit_treatment_id" name="treatment_id">
+
+                                @foreach ($Treatments as $Treatment)
+                                    <option value="{{ $Treatment->id }}">
+                                        {{ $Treatment->treatment_name }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Date</label>
+
+                            <input type="date" id="edit_schedule_date" name="appointment_date" class="form-control">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>Time</label>
+
+                            <input type="text" id="edit_followup_datetime" name="appointment_time"
+                                class="form-control">
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="btn btn-primary">
+                            Update Appointment
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deleteAppointmentBtn">
+                            Delete Appointment
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+            <form id="deleteAppointmentForm" method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
+
+        </div>
+    </div>
+
 @endsection
 @section('scripts')
     <!-- jQuery FIRST -->
@@ -347,6 +467,41 @@
                     $('#appointmentModal').modal('show');
                 },
 
+                // eventClick: function(info) {
+
+                //     console.log(info.event);
+
+                //     // Here you will fill the edit modal
+
+                //     $('#rescheduleModal').modal('show');
+                // },
+                eventClick: function(info) {
+                    var event = info.event;
+                    var props = event.extendedProps;
+
+                    $('#edit_appointment_id').val(event.id);
+                    $('#edit_patient_name').val(props.patient_name);
+                    $('#edit_doctor_id').val(props.doctor_id);
+                    $('#edit_contact_no').val(props.mobile_no);
+                    $('#edit_email').val(props.email);
+                    $('#edit_duration').val(props.duration);
+                    $('#edit_treatment_id').val(props.treatment_id);
+
+                    var start = event.start;
+                    var dateStr = start.getFullYear() + '-' +
+                        String(start.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(start.getDate()).padStart(2, '0');
+                    $('#edit_schedule_date').val(dateStr);
+
+                    var hours = start.getHours();
+                    var minutes = start.getMinutes().toString().padStart(2, '0');
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    $('#edit_followup_datetime').val(hours + ':' + minutes + ' ' + ampm);
+
+                    $('#rescheduleModal').modal('show');
+                },
                 eventDidMount: function(info) {
                     const titleElement = info.el.querySelector('.fc-event-title');
                     if (titleElement) {
@@ -360,9 +515,25 @@
                         info.el.setAttribute('title', info.event.title);
                     }
                 }
+
             });
 
             calendar.render();
+            $('#deleteAppointmentBtn').click(function() {
+
+                if (!confirm('Are you sure you want to delete this appointment?')) {
+                    return;
+                }
+
+                let id = $('#edit_appointment_id').val();
+
+                let url = "{{ route('appointment.appointmentsDelete', ':id') }}";
+                url = url.replace(':id', id);
+
+                $('#deleteAppointmentForm')
+                    .attr('action', url)
+                    .submit();
+            });
 
             function fetchAppointments() {
                 var doctorId = $('#doctor_id_filter').val();
@@ -383,13 +554,31 @@
                             return;
                         }
 
+                        // var events = data.map(function(appointment) {
+                        //     return {
+                        //         title: appointment
+                        //             .title,
+                        //         start: appointment.start,
+                        //         allDay: false,
+                        //         color: appointment.color
+                        //     };
+                        // });
                         var events = data.map(function(appointment) {
                             return {
-                                title: appointment
-                                    .title,
+                                id: appointment.id,
+                                title: appointment.title,
                                 start: appointment.start,
                                 allDay: false,
-                                color: appointment.color
+                                color: appointment.color,
+                                extendedProps: {
+                                    patient_id: appointment.patient_id,
+                                    patient_name: appointment.patient_name,
+                                    doctor_id: appointment.doctor_id,
+                                    treatment_id: appointment.treatment_id,
+                                    mobile_no: appointment.mobile1,
+                                    email: appointment.email,
+                                    duration: appointment.duration
+                                }
                             };
                         });
                         // events.push({

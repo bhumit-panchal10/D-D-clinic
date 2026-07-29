@@ -82,13 +82,17 @@ class AppointmentController extends Controller
             }
 
             $formattedTime = $time ? $time->format('h:i A') : $timeString;
-
+            $patientName = $appointment->patient?->name ?? 'Unknown Patient';
+            $caseNo      = $appointment->patient?->case_no ?? '';
+            $doctorName  = $appointment->doctor?->doctor_name ?? 'Unknown Doctor';
             return [
                 'id' => $appointment->id,
 
-                'title' => ($appointment->patient?->name ?? 'Unknown Patient')
+                // 👇 Patient Name + Case No
+                'title' => $patientName
+                    . ($caseNo ? " ({$caseNo})" : "")
                     . ' with Dr. '
-                    . ($appointment->doctor?->doctor_name ?? 'Unknown Doctor')
+                    . $doctorName
                     . ' at '
                     . $formattedTime,
 
@@ -98,85 +102,58 @@ class AppointmentController extends Controller
 
                 'color' => $appointment->doctor?->color ?? '#6c757d',
 
-                'patient_id' => $appointment->patient_id,
-                'patient_name' => $appointment->patient?->name,
-                'doctor_id' => $appointment->doctor_id,
+                'patient_id'   => $appointment->patient_id,
+                'patient_name' => $patientName,
+                'case_no'      => $caseNo,
+                'doctor_id'    => $appointment->doctor_id,
                 'treatment_id' => $appointment->treatment_id,
-                'mobile_no' => $appointment->mobile_no,
-                'email' => $appointment->email,
-                'duration' => $appointment->duration,
+                'mobile_no'    => $appointment->mobile_no,
+                'email'        => $appointment->email,
+                'duration'     => $appointment->duration,
             ];
         }));
     }
 
-
-    // public function getAppointments(Request $request)
-    // {
-    //     $doctorId = $request->doctor_id;
-
-    //     $query = PatientAppointment::with('patient', 'doctor');
-
-    //     if ($doctorId) {
-    //         $query->where('doctor_id', $doctorId);
-    //     }
-
-    //     // Filter: Today to +30 days
-    //     $query->whereBetween('appointment_date', [
-    //         now()->toDateString(),
-    //         now()->addDays(30)->toDateString()
-    //     ]);
-
-    //     $appointments = $query->get();
-
-
-    //     return response()->json($appointments->map(function ($appointment) {
-    //         $timeString = $appointment->appointment_time; // "9:00 AM"
-    //         try {
-    //             $time = Carbon::createFromFormat('g:i A', $timeString);
-    //         } catch (\Exception $e) {
-    //             $time = null;
-    //         }
-
-    //         $formattedTime = $time ? $time->format('h:i A') : $timeString;
-    //         //dd($doctorColors[$appointment->doctor_id]);
-
-    //         return [
-    //             // 'title' => $appointment->patient->name . ' with Dr. ' . $appointment->doctor->doctor_name . ' at ' . $formattedTime,
-    //             'title' => ($appointment->patient?->name ?? 'Unknown Patient')
-    //     . ' with Dr. '
-    //     . ($appointment->doctor?->doctor_name ?? 'Unknown Doctor')
-    //     . ' at '
-    //     . $formattedTime,
-    //             'start' => Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time)->format('Y-m-d\TH:i:s'),
-    //             'color' => $appointment->doctor->color ?? '#6c757d', // default gray
-
-    //         ];
-    //     }));
-    // }
-
-
     public function search(Request $request)
     {
-        $term = $request->input('term');
+        $term = $request->get('term');
 
-        $patients = Patient::where('name', 'like', '%' . $term . '%')
-            ->orWhere('mobile1', 'like', '%' . $term . '%')
+        $patients = Patient::where(function ($q) use ($term) {
+            $q->where('case_no', 'LIKE', "%{$term}%")
+                ->orWhere('name', 'LIKE', "%{$term}%")
+                ->orWhere('middle_name', 'LIKE', "%{$term}%")
+                ->orWhere('last_name', 'LIKE', "%{$term}%");
+        })
             ->limit(10)
             ->get();
 
-        $results = $patients->map(function ($patient) {
-            return [
-                'id' => $patient->id,
-                'label' => $patient->name . ' (Case No: ' . $patient->case_no . ')',
-                'value' => $patient->name,
-                'caseno' => $patient->case_no
+        $result = [];
+        foreach ($patients as $patient) {
+
+            $fullName = trim(
+                $patient->name . ' ' .
+                    $patient->middle_name . ' ' .
+                    $patient->last_name
+            );
+
+            $result[] = [
+                'id'    => $patient->id,
+                'label' => $patient->case_no . ' - ' . $fullName,
+                'value' => $patient->case_no . ' - ' . $fullName,
             ];
-        });
-        return response()->json($results);
+        }
+
+
+        return response()->json($result);
     }
 
+    public function appointmentsDelete($id)
+    {
+        $appointment = PatientAppointment::findOrFail($id);
+        $appointment->delete();
 
-    // Store
+        return redirect()->route('appointment.create');
+    }
     // Store
     public function appointmentsstore(Request $request)
     {

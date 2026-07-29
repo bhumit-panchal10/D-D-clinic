@@ -450,6 +450,8 @@ class PatientController extends Controller
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
+            'preferred_time_to_contact_you' => 'nullable',
+            'emergency_contact_name' => 'nullable',
         ]);
         $caseMaster = ClinicCaseCounters::first();
         if (!$caseMaster) {
@@ -509,6 +511,8 @@ class PatientController extends Controller
             'address' => 'nullable|string|max:255',
             'pincode' => 'nullable|string|size:6',
             'reference_by' => 'nullable|string|max:30',
+            'preferred_time_to_contact_you' => 'nullable',
+            'emergency_contact_name' => 'nullable',
         ]);
         $data = $request->all();
 

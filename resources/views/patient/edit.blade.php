@@ -175,7 +175,31 @@
                                             @enderror
                                         </div>
                                         <div class="mb-3 col-lg-3">
-                                            <label>Contact Number</label>
+                                            <label>Email</label>
+                                            <input type="text" class="form-control" name="email"
+                                                value="{{ $patient->email }}">
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>preferred time to contact you</label>
+                                            <input type="text" class="form-control"
+                                                name="preferred_time_to_contact_you"
+                                                placeholder="Enter preferred time to contact you"
+                                                value="{{ $patient->preferred_time_to_contact_you }}">
+                                            @error('preferred_time_to_contact_you')
+                                                <span class="text-danger text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>emergency contact name</label>
+                                            <input type="text" class="form-control" name="emergency_contact_name"
+                                                placeholder="Enter emergency Contact Number"
+                                                value="{{ $patient->emergency_contact_name }}">
+                                            @error('emergency_contact_name')
+                                                <span class="text-danger text-sm">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="mb-3 col-lg-3">
+                                            <label>emergency contact number</label>
                                             <input type="text"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
                                                 class="form-control" name="mobile2" placeholder="Enter Contact Number"
@@ -185,11 +209,7 @@
                                             @enderror
                                         </div>
 
-                                        <div class="mb-3 col-lg-3">
-                                            <label>Email</label>
-                                            <input type="text" class="form-control" name="email"
-                                                value="{{ $patient->email }}">
-                                        </div>
+
 
                                     </div>
 
@@ -398,7 +418,7 @@
 
                                     <hr>
 
-                                    <h5>Reminder</h5>
+                                    <h5>Preference to receive reminders for regular dental check up and follow up at</h5>
                                     <div class="row">
                                         @foreach (['6_months' => '6 Months', '1_year' => '1 Year', '2_years' => '2 Years', 'never' => 'Never'] as $key => $label)
                                             <div class="col-lg-2">

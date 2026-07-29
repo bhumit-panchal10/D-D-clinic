@@ -106,7 +106,7 @@ class HomeController extends Controller
 
                 $patient->total_amount = $patient->notes->sum('Net_amount');
                 $patient->paid_amount  = $patient->payments->sum('amount');
-                $patient->due_amount   = $patient->total_amount - $patient->paid_amount;
+                $patient->due_amount = max(0, $patient->total_amount - $patient->paid_amount);
 
                 return $patient;
             });

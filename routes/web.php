@@ -169,6 +169,8 @@ Route::prefix('admin/appointment')->name('appointment.')->group(function () {
     Route::get('/{appointment}/edit', [AppointmentController::class, 'edit'])->name('edit');
     Route::put('/{appointment}', [AppointmentController::class, 'update'])->name('update');
     Route::delete('/{appointment}', [AppointmentController::class, 'destroy'])->name('destroy');
+    Route::delete('/appointment/{id}', [AppointmentController::class, 'appointmentsDelete'])
+        ->name('appointmentsDelete');
 
     Route::get('/today', [AppointmentController::class, 'todayAppointments'])->name('today');
     Route::put('/{appointment}/confirm', [AppointmentController::class, 'confirm'])->name('confirm');
