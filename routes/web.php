@@ -55,6 +55,8 @@ use App\Http\Controllers\PatientConcernFormController;
 use App\Http\Controllers\ReasonForVisitTodayController;
 use App\Http\Controllers\IntraoralExaminationController;
 use App\Http\Controllers\TreatmentPlanController;
+use App\Http\Controllers\PrescriptionTemplateController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -101,6 +103,21 @@ Route::resource('roles', App\Http\Controllers\RolesController::class);
 // Permissions
 Route::resource('permissions', App\Http\Controllers\PermissionsController::class);
 
+Route::prefix('admin')->group(function () {
+    Route::get(
+        'prescription-templates/{template}/items',
+        [PrescriptionTemplateController::class, 'items']
+    )->name('prescription-templates.items');
+
+    Route::resource(
+        'prescription-templates',
+        PrescriptionTemplateController::class
+    )->parameters([
+        'prescription-templates' => 'template',
+    ])->except([
+        'show',
+    ]);
+});
 // Users
 Route::middleware('auth')->prefix('users')->name('users.')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');

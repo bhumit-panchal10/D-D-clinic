@@ -10,6 +10,7 @@ use App\Models\PrescriptionDetail;
 use App\Models\Patient;
 use App\Models\Medicine;
 use App\Models\Dosage;
+use App\Models\PrescriptionTemplate;
 
 class PrescriptionController extends Controller
 {
@@ -33,7 +34,14 @@ class PrescriptionController extends Controller
         $medicines = Medicine::all();
         $dosages = Dosage::all();
 
-        return view('prescriptions.create', compact('patient', 'medicines', 'dosages'));
+        $prescriptionTemplates = PrescriptionTemplate::where(
+            'is_active',
+            true
+        )
+            ->orderBy('template_name')
+            ->get();
+
+        return view('prescriptions.create', compact('patient', 'medicines', 'dosages', 'prescriptionTemplates'));
     }
 
     /**
@@ -119,6 +127,8 @@ class PrescriptionController extends Controller
                     'medicine_id' => $medicine_id,
                     'dosage_id' => $request->dosage_id[$index],
                     'comments' => $request->comments[$index] ?? null,
+                    'days' => $request->days[$index] ?? null,
+                    'medicine_qty' => $request->qtys[$index] ?? null,
                 ]);
                 $updatedIds[] = $detailId;
             } else {

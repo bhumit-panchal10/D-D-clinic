@@ -17,9 +17,9 @@
             margin: 0 !important;
         }
 
-        .fc .fc-timegrid-slot {
-            height: 35px !important;
-        }
+        /* .fc .fc-timegrid-slot {
+                height: 35px !important;
+            } */
 
         /* Remove rounded box effect from background event */
         .fc .fc-timegrid-bg-harness .fc-bg-event {
