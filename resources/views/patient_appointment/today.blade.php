@@ -24,40 +24,51 @@
                                     <th>Appointment Date</th>
                                     <th>Appointment Time</th>
                                     <!-- <th>Rescheduled Date</th>
-                                        <th>Rescheduled Time</th> -->
+                                                <th>Rescheduled Time</th> -->
                                     <th>Appointment Confirm?</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if($appointments->isEmpty())
+                                @if ($appointments->isEmpty())
                                     <tr>
                                         <td colspan="8" class="text-center">No Appointments for Today</td>
                                     </tr>
                                 @else
-                                    @foreach($appointments as $key => $appointment)
+                                    @foreach ($appointments as $key => $appointment)
                                         <tr>
                                             <td>{{ $appointments->firstItem() + $key }}</td>
-                                            <td>{{ $appointment->patient->name }}</td>
+                                            <td>
+                                                <a href="{{ route('notes.index', $appointment->patient->id) }}">
+                                                    {{ trim(
+                                                        ($appointment->patient->name ?? '') .
+                                                            ' ' .
+                                                            ($appointment->patient->middle_name ?? '') .
+                                                            ' ' .
+                                                            ($appointment->patient->last_name ?? ''),
+                                                    ) }}
+                                                </a>
+                                            </td>
                                             <td>{{ $appointment->doctor->doctor_name }}</td>
                                             <td>{{ $appointment->patient->mobile }}</td>
                                             <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td>
                                             <td>{{ date('g:i A', strtotime($appointment->appointment_time)) }}</td>
                                             <!-- <td>
-                                                            {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $appointment->rescheduled_time ?? '-' }}
-                                                        </td> -->
+                                                                    {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
+                                                                </td>
+                                                                <td>
+                                                                    {{ $appointment->rescheduled_time ?? '-' }}
+                                                                </td> -->
                                             <td>
                                                 {{ $appointment->status == 1 ? 'Yes' : 'No' }}
                                             </td>
 
                                             <!-- Confirm Button (Visible only if not confirmed) -->
                                             <td>
-                                                @if($appointment->status == 0)
+                                                @if ($appointment->status == 0)
                                                     <!-- Confirm Button -->
-                                                    <form action="{{ route('patient_appointment.confirm', $appointment->id) }}"
+                                                    <form
+                                                        action="{{ route('patient_appointment.confirm', $appointment->id) }}"
                                                         method="POST" style="display:inline;">
                                                         @csrf
                                                         @method('PUT')
@@ -83,7 +94,7 @@
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center mt-3">
-                        {{ $appointments->links('pagination::bootstrap-4') }}
+                            {{ $appointments->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -131,9 +142,9 @@
         }
 
         // Modal Dismiss Logic
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.custom-dismiss-btn').forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     $('#rescheduleModal').modal('hide');
                 });
             });

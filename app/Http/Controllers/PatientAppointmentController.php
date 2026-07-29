@@ -111,7 +111,7 @@ class PatientAppointmentController extends Controller
                     ->where('appointment_date', today())
                     ->orWhere('rescheduled_date', today());
             })
-            ->orderBy('created_at', 'desc')
+            ->orderBy('appointment_time', 'asc')
             ->paginate(config('app.per_page'));
 
         return view('patient_appointment.today', compact('appointments'));
