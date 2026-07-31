@@ -41,10 +41,10 @@
                             <thead>
                                 <tr>
                                     <th>Sr. No</th>
+                                    <th>Date</th>
                                     <th>Case No</th>
                                     <th>Patient Name</th>
                                     <th>Treatment</th>
-                                    <th>Payment Date</th>
                                     <th>Mode</th>
                                     <th>Amount</th>
                                     <th>Payment Received</th>
@@ -60,6 +60,7 @@
                                     <tr>
                                         <td>{{ $notes->firstItem() + $key }}</td>
 
+                                        <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
                                         <td>{{ $note->patient->case_no }}</td>
 
                                         <td><a
@@ -68,12 +69,11 @@
 
                                         <td>{{ $note->treatment_detail->treatment_name ?? '-' }}</td>
 
-                                        <td>{{ date('d-m-Y', strtotime($note->date)) }}</td>
 
                                         <td>{{ $payment->mode ?? '-' }}</td>
 
                                         <td class="text-end">
-                                            {{ number_format($note->Net_amount, 2) }}
+                                            {{ number_format($note->total_amount, 2) }}
                                         </td>
 
                                         <td class="text-end">

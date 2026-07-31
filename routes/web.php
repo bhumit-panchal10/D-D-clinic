@@ -268,7 +268,7 @@ Route::get('/payments/export', function (Request $request) {
     $fromDate = $request->from_date ?? date('Y-m-01');
     $toDate = $request->to_date ?? date('Y-m-d');
 
-    return Excel::download(new PaymentsExport($fromDate, $toDate,  $request->page ?? 1), 'payment_report.xlsx');
+    return Excel::download(new PaymentsExport($fromDate, $toDate), 'payment_report.xlsx');
 })->name('payments.export');
 
 

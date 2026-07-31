@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Payment;
+use App\Models\Notes;
+
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -18,40 +20,43 @@ class PaymentsExport implements FromCollection, WithHeadings, WithMapping, WithE
     protected $paidAmount = 0;
     protected $dueAmount = 0;
 
-    public function __construct($fromDate, $toDate, $page = 1)
+    public function __construct($fromDate, $toDate)
     {
         $this->fromDate = $fromDate ?? date('Y-m-01');
         $this->toDate   = $toDate ?? date('Y-m-d');
-        $this->page     = $page;
     }
 
     public function collection()
     {
-        // Same query as listing
-        $this->payments = Payment::with([
+        $this->payments = Notes::with([
             'patient',
-            'notes.treatment_detail'
+            'treatment_detail',
+            'patient.payments' => function ($q) {
+                $q->whereBetween('payment_date', [$this->fromDate, $this->toDate]);
+            }
         ])
-            ->whereBetween('payment_date', [$this->fromDate, $this->toDate])
-            ->orderBy('payment_date', 'desc')
-            ->paginate(config('app.per_page'), ['*'], 'page', $this->page);
+            ->whereBetween('date', [$this->fromDate, $this->toDate])
+            ->orderBy('date', 'desc')
+            ->get();
 
-        // Total Amount (same as listing)
-        $this->totalAmount = $this->payments->getCollection()
-            ->pluck('notes')
-            ->flatten()
-            ->sum('Net_amount');
+        foreach ($this->payments as $note) {
+            $paid = $note->patient->payments->sum('amount');
 
-        // Paid Amount (same as listing)
+            $note->paid_amount = $paid;
+            $note->due_amount = $note->Net_amount - $paid;
+        }
+
+        // Footer Totals
+        $this->totalAmount = $this->payments->sum('Net_amount');
+
         $this->paidAmount = Payment::whereBetween(
             'payment_date',
             [$this->fromDate, $this->toDate]
         )->sum('amount');
 
-        // Due Amount
         $this->dueAmount = $this->totalAmount - $this->paidAmount;
 
-        return $this->payments->getCollection();
+        return $this->payments;
     }
 
     public function headings(): array
@@ -67,27 +72,19 @@ class PaymentsExport implements FromCollection, WithHeadings, WithMapping, WithE
         ];
     }
 
-    public function map($payment): array
+    public function map($note): array
     {
         static $sr = 1;
 
-        $latestNote = $payment->notes->sortByDesc('date')->first();
-
         return [
             $sr++,
-            optional($payment->patient)->case_no,
-            optional($payment->patient)->name,
-
-            $payment->notes
-                ->pluck('treatment_detail.treatment_name')
-                ->filter()
-                ->implode("\n"),
-
-            $latestNote ? date('d-m-Y', strtotime($latestNote->date)) : '-',
-
-            $payment->mode,
-
-            number_format($payment->notes->sum('Net_amount'), 2),
+            optional($note->patient)->case_no,
+            optional($note->patient)->name,
+            optional($note->treatment_detail)->treatment_name,
+            date('d-m-Y', strtotime($note->date)),
+            number_format($note->Net_amount, 2),
+            number_format($note->paid_amount, 2),
+            number_format($note->due_amount, 2),
         ];
     }
 
