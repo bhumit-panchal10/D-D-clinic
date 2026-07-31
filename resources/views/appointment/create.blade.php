@@ -17,9 +17,9 @@
             margin: 0 !important;
         }
 
-        /* .fc .fc-timegrid-slot {
-                height: 35px !important;
-            } */
+        /* .fc .fc-timegrid-slot {*/
+        /*    height: 35px !important;*/
+        /*}*/
 
         /* Remove rounded box effect from background event */
         .fc .fc-timegrid-bg-harness .fc-bg-event {
@@ -365,7 +365,6 @@
                 </div>
 
             </form>
-
             <form id="deleteAppointmentForm" method="POST">
                 @csrf
                 @method('DELETE')
@@ -502,6 +501,9 @@
 
                     $('#rescheduleModal').modal('show');
                 },
+
+
+
                 eventDidMount: function(info) {
                     const titleElement = info.el.querySelector('.fc-event-title');
                     if (titleElement) {
@@ -515,10 +517,10 @@
                         info.el.setAttribute('title', info.event.title);
                     }
                 }
-
             });
 
             calendar.render();
+
             $('#deleteAppointmentBtn').click(function() {
 
                 if (!confirm('Are you sure you want to delete this appointment?')) {
@@ -575,7 +577,7 @@
                                     patient_name: appointment.patient_name,
                                     doctor_id: appointment.doctor_id,
                                     treatment_id: appointment.treatment_id,
-                                    mobile_no: appointment.mobile1,
+                                    mobile_no: appointment.mobile_no,
                                     email: appointment.email,
                                     duration: appointment.duration
                                 }
@@ -601,7 +603,6 @@
 
             // Load all appointments by default
             fetchAppointments();
-
 
             // Search Button Click Event
             $('#searchAppointments').on('click', function() {

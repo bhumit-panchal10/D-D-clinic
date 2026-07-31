@@ -82,13 +82,22 @@ class AppointmentController extends Controller
             }
 
             $formattedTime = $time ? $time->format('h:i A') : $timeString;
-            $patientName = $appointment->patient?->name ?? 'Unknown Patient';
+            $patient = $appointment->patient;
+
+            $patientName = trim(
+                ($patient?->name ?? '') . ' ' .
+                    ($patient?->middle_name ?? '') . ' ' .
+                    ($patient?->last_name ?? '')
+            );
+
+            if ($patientName === '') {
+                $patientName = 'Unknown Patient';
+            }
             $caseNo      = $appointment->patient?->case_no ?? '';
             $doctorName  = $appointment->doctor?->doctor_name ?? 'Unknown Doctor';
             return [
                 'id' => $appointment->id,
 
-                // 👇 Patient Name + Case No
                 'title' => $patientName
                     . ($caseNo ? " ({$caseNo})" : "")
                     . ' with Dr. '
@@ -107,12 +116,58 @@ class AppointmentController extends Controller
                 'case_no'      => $caseNo,
                 'doctor_id'    => $appointment->doctor_id,
                 'treatment_id' => $appointment->treatment_id,
-                'mobile_no'    => $appointment->mobile_no,
+                'mobile_no'    => $appointment->mobile1,
                 'email'        => $appointment->email,
                 'duration'     => $appointment->duration,
             ];
         }));
     }
+
+
+    // public function getAppointments(Request $request)
+    // {
+    //     $doctorId = $request->doctor_id;
+
+    //     $query = PatientAppointment::with('patient', 'doctor');
+
+    //     if ($doctorId) {
+    //         $query->where('doctor_id', $doctorId);
+    //     }
+
+    //     // Filter: Today to +30 days
+    //     $query->whereBetween('appointment_date', [
+    //         now()->toDateString(),
+    //         now()->addDays(30)->toDateString()
+    //     ]);
+
+    //     $appointments = $query->get();
+
+
+    //     return response()->json($appointments->map(function ($appointment) {
+    //         $timeString = $appointment->appointment_time; // "9:00 AM"
+    //         try {
+    //             $time = Carbon::createFromFormat('g:i A', $timeString);
+    //         } catch (\Exception $e) {
+    //             $time = null;
+    //         }
+
+    //         $formattedTime = $time ? $time->format('h:i A') : $timeString;
+    //         //dd($doctorColors[$appointment->doctor_id]);
+
+    //         return [
+    //             // 'title' => $appointment->patient->name . ' with Dr. ' . $appointment->doctor->doctor_name . ' at ' . $formattedTime,
+    //             'title' => ($appointment->patient?->name ?? 'Unknown Patient')
+    //     . ' with Dr. '
+    //     . ($appointment->doctor?->doctor_name ?? 'Unknown Doctor')
+    //     . ' at '
+    //     . $formattedTime,
+    //             'start' => Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time)->format('Y-m-d\TH:i:s'),
+    //             'color' => $appointment->doctor->color ?? '#6c757d', // default gray
+
+    //         ];
+    //     }));
+    // }
+
 
     public function search(Request $request)
     {
@@ -147,14 +202,14 @@ class AppointmentController extends Controller
         return response()->json($result);
     }
 
+
     public function appointmentsDelete($id)
     {
         $appointment = PatientAppointment::findOrFail($id);
         $appointment->delete();
 
         return redirect()->route('appointment.create');
-    }
-    // Store
+    }    // Store
     public function appointmentsstore(Request $request)
     {
         $request->validate([

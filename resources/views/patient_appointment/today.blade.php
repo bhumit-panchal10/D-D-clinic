@@ -18,14 +18,16 @@
                             <thead>
                                 <tr>
                                     <th>Sr no.</th>
+                                    <th>Case No</th>
                                     <th>Patient Name</th>
                                     <th>Doctor Name</th>
+                                    <th>Treatment</th>
                                     <th>Mobile</th>
-                                    <th>Appointment Date</th>
+                                    {{-- <th>Appointment Date</th> --}}
                                     <th>Appointment Time</th>
                                     <!-- <th>Rescheduled Date</th>
-                                                <th>Rescheduled Time</th> -->
-                                    <th>Appointment Confirm?</th>
+                                                                            <th>Rescheduled Time</th> -->
+                                    {{-- <th>Appointment Confirm?</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -38,6 +40,7 @@
                                     @foreach ($appointments as $key => $appointment)
                                         <tr>
                                             <td>{{ $appointments->firstItem() + $key }}</td>
+                                            <td>{{ $appointment->patient->case_no ?? '' }}</td>
                                             <td>
                                                 <a href="{{ route('notes.index', $appointment->patient->id) }}">
                                                     {{ trim(
@@ -49,19 +52,20 @@
                                                     ) }}
                                                 </a>
                                             </td>
-                                            <td>{{ $appointment->doctor->doctor_name }}</td>
-                                            <td>{{ $appointment->patient->mobile }}</td>
-                                            <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td>
+                                            <td>{{ $appointment->doctor->doctor_name ?? '' }}</td>
+                                            <td>{{ $appointment->treatment->treatment_name ?? '' }}</td>
+                                            <td>{{ $appointment->patient->mobile1 }}</td>
+                                            {{-- <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td> --}}
                                             <td>{{ date('g:i A', strtotime($appointment->appointment_time)) }}</td>
                                             <!-- <td>
-                                                                    {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
-                                                                </td>
-                                                                <td>
-                                                                    {{ $appointment->rescheduled_time ?? '-' }}
-                                                                </td> -->
-                                            <td>
+                                                                                                {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {{ $appointment->rescheduled_time ?? '-' }}
+                                                                                            </td> -->
+                                            {{-- <td>
                                                 {{ $appointment->status == 1 ? 'Yes' : 'No' }}
-                                            </td>
+                                            </td> --}}
 
                                             <!-- Confirm Button (Visible only if not confirmed) -->
                                             <td>

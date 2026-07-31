@@ -104,7 +104,7 @@ class PatientAppointmentController extends Controller
     // Today's Appointments
     public function todayAppointments()
     {
-        $appointments = PatientAppointment::with(['patient', 'doctor'])
+        $appointments = PatientAppointment::with(['patient', 'doctor', 'treatment'])
             ->where('is_disrupted', 0) // Ignore disrupted appointments
             ->where(function ($query) {
                 $query->whereNull('rescheduled_date')
@@ -113,6 +113,7 @@ class PatientAppointmentController extends Controller
             })
             ->orderBy('appointment_time', 'asc')
             ->paginate(config('app.per_page'));
+        //dd($appointments);
 
         return view('patient_appointment.today', compact('appointments'));
     }

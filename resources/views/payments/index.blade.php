@@ -97,14 +97,30 @@
                             <div class="card-header">
                                 <h5 class="card-title mb-0">Payments List</h5>
                                 <div class="d-flex justify-content-between align-items-center m-3">
-                                    <h5 class="mb-0">
-                                        Total Amount: {{ $Totalamount }} | Paid Amount: {{ $Paidamount }} | Discount:
-                                        {{ $discount }}
-                                        @if ($Totalamount > $Paidamount)
-                                            | Due Amount: {{ $Totalamount - $Paidamount - $discount }}
-                                        @endif
+                                    <button type="button" class="btn btn-primary btn-sm" id="toggleAmountBtn">
+                                        Show Amount Details
+                                    </button>
 
-                                    </h5>
+                                    <div id="amountSummary" class="ms-3" style="display: none;">
+                                        <h5 class="mb-0">
+                                            <span class="badge bg-info">
+                                                Total Amount: ₹{{ number_format($Totalamount, 2) }}
+                                            </span>
+
+                                            <span class="badge bg-success ms-2">
+                                                Paid Amount: ₹{{ number_format($Paidamount, 2) }}
+                                            </span>
+
+                                            <span class="badge bg-warning text-dark ms-2">
+                                                Discount: ₹{{ number_format($discount, 2) }}
+                                            </span>
+
+                                            <span class="badge bg-danger ms-2">
+                                                Due Amount:
+                                                ₹{{ number_format($Totalamount - $Paidamount - $discount, 2) }}
+                                            </span>
+                                        </h5>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -263,6 +279,19 @@
 
 @section('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#toggleAmountBtn").click(function() {
+                $("#amountSummary").slideToggle();
+
+                if ($("#amountSummary").is(":visible")) {
+                    $(this).text("Hide Amount Details");
+                } else {
+                    $(this).text("Show Amount Details");
+                }
+            });
+        });
+    </script>
     <script>
         function getEditData(id) {
 
