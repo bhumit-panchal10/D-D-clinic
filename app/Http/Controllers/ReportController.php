@@ -32,18 +32,23 @@ class ReportController extends Controller
             ->whereBetween('date', [$fromDate, $toDate])
             ->orderBy('date', 'desc')
             ->paginate(config('app.per_page'));
-        // dd($notes);
+
         foreach ($notes as $note) {
 
-            $paid = $note->patient->payments->sum('amount');
+            $note->total_amount = Notes::where('patient_id', $note->patient_id)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->sum('Net_amount');
 
-            $note->paid_amount = $paid;
-            $note->due_amount  = $note->Net_amount - $paid;
+            $note->paid_amount = Payment::where('patient_id', $note->patient_id)
+                ->whereBetween('payment_date', [$fromDate, $toDate])
+                ->sum('amount');
+
+            $note->due_amount = $note->total_amount - $note->paid_amount;
         }
 
-        $totalAmount = $notes->sum('Net_amount');
-        $paid_amount = Payment::whereBetween('payment_date', [$fromDate, $toDate])->sum('amount');
-        $due_amount  = $totalAmount - $paid_amount;
+        $totalAmount = $notes->getCollection()->sum('total_amount');
+        $paid_amount = $notes->getCollection()->sum('paid_amount');
+        $due_amount  = $notes->getCollection()->sum('due_amount');
 
         return view(
             'reports.payments',
@@ -57,6 +62,23 @@ class ReportController extends Controller
             )
         );
     }
+
+    // public function report(Request $request)
+    // {
+    //     // Get Date Range (Default: Current Month)
+    //     $fromDate = $request->input('from_date', now()->startOfMonth()->toDateString());
+    //     $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
+
+    //     // Fetch Payments within the selected date range
+    //     $payments = Payment::whereBetween('payment_date', [$fromDate, $toDate])
+    //         ->orderBy('payment_date', 'desc')
+    //         ->paginate(config('app.per_page'));
+
+    //     // Get Total Amount
+    //     $totalAmount = Payment::whereBetween('payment_date', [$fromDate, $toDate])->sum('amount');
+
+    //     return view('reports.payments', compact('payments', 'fromDate', 'toDate', 'totalAmount'));
+    // }
 
     public function patient_report(Request $request)
     {

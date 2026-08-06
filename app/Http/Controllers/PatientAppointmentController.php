@@ -102,22 +102,61 @@ class PatientAppointmentController extends Controller
     }
 
     // Today's Appointments
-    public function todayAppointments()
+    // public function todayAppointments()
+    // {
+    //     $appointments = PatientAppointment::with(['patient', 'doctor', 'treatment'])
+    //         ->where('is_disrupted', 0) // Ignore disrupted appointments
+    //         ->where(function ($query) {
+    //             $query->whereNull('rescheduled_date')
+    //                 ->where('appointment_date', today())
+    //                 ->orWhere('rescheduled_date', today());
+    //         })
+    //         ->orderBy('appointment_time', 'asc')
+    //         ->paginate(config('app.per_page'));
+    //     //dd($appointments);
+
+    //     return view('patient_appointment.today', compact('appointments'));
+    // }
+
+    public function todayAppointments(Request $request)
     {
         $appointments = PatientAppointment::with(['patient', 'doctor', 'treatment'])
-            ->where('is_disrupted', 0) // Ignore disrupted appointments
-            ->where(function ($query) {
-                $query->whereNull('rescheduled_date')
-                    ->where('appointment_date', today())
-                    ->orWhere('rescheduled_date', today());
-            })
-            ->orderBy('appointment_time', 'asc')
-            ->paginate(config('app.per_page'));
-        //dd($appointments);
+            ->where('is_disrupted', 0);
+
+        // Date Filter
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $appointments->where(function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->whereNull('rescheduled_date')
+                        ->whereBetween('appointment_date', [
+                            $request->from_date,
+                            $request->to_date
+                        ]);
+                })
+                    ->orWhereBetween('rescheduled_date', [
+                        $request->from_date,
+                        $request->to_date
+                    ]);
+            });
+        } else {
+            // Default: Today's Appointments
+            $appointments->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('rescheduled_date')
+                        ->whereDate('appointment_date', today());
+                })
+                    ->orWhereDate('rescheduled_date', today());
+            });
+        }
+
+        $appointments = $appointments
+            ->orderBy('appointment_date')
+            ->orderBy('appointment_time')
+            ->paginate(config('app.per_page'))
+            ->appends($request->all());
 
         return view('patient_appointment.today', compact('appointments'));
     }
-
 
     // Reschedule Appointment
     public function reschedule(Request $request, PatientAppointment $appointment)

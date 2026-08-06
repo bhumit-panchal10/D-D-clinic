@@ -38,9 +38,71 @@ class PatientController extends Controller
         return view('patient.overview', compact('patient', 'ReasonForVisitToday', 'examinations', 'examinationsplan', 'notes'));
     }
     // Display patients list
+    // public function autocomplete(Request $request)
+    // {
+    //     $search = trim($request->search);
+
+    //     $results = Patient::select(
+    //         'id',
+    //         'name',
+    //         'middle_name',
+    //         'last_name',
+    //         'mobile1',
+    //         'case_no'
+    //     )
+    //         ->where(function ($query) use ($search) {
+
+    //             $query->where('name', 'LIKE', "%{$search}%")
+    //                 ->orWhere('middle_name', 'LIKE', "%{$search}%")
+    //                 ->orWhere('last_name', 'LIKE', "%{$search}%")
+    //                 ->orWhere('mobile1', 'LIKE', "%{$search}%")
+    //                 ->orWhere('mobile2', 'LIKE', "%{$search}%")
+    //                 ->orWhere('case_no', 'LIKE', "%{$search}%");
+
+    //             $query->orWhereRaw("
+    //         CONCAT(
+    //             COALESCE(name, ''),
+    //             ' ',
+    //             COALESCE(middle_name, ''),
+    //             ' ',
+    //             COALESCE(last_name, '')
+    //         ) LIKE ?
+    //     ", ["%{$search}%"]);
+    //         })
+
+    //         // Exact match first
+    //         ->orderByRaw("CASE WHEN case_no = ? THEN 0 ELSE 1 END", [$search])
+
+    //         ->orderBy('case_no')
+
+    //         ->limit(10)
+    //         ->get();
+
+    //     return response()->json($results);
+    // }
+
+
     public function autocomplete(Request $request)
     {
-        $search = trim($request->search);
+        // Extra spaces remove:
+        // "  Kajal   Parmar " => "Kajal Parmar"
+        $search = preg_replace(
+            '/\s+/',
+            ' ',
+            trim((string) $request->search)
+        );
+
+        if ($search === '') {
+            return response()->json([]);
+        }
+
+        // "Kajal Parmar" => ["Kajal", "Parmar"]
+        $searchTerms = preg_split(
+            '/\s+/',
+            $search,
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
 
         $results = Patient::select(
             'id',
@@ -48,35 +110,79 @@ class PatientController extends Controller
             'middle_name',
             'last_name',
             'mobile1',
+            'mobile2',
             'case_no'
         )
-            ->where(function ($query) use ($search) {
+            ->where(function ($mainQuery) use ($searchTerms) {
 
-                $query->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
-                    ->orWhere('last_name', 'LIKE', "%{$search}%")
-                    ->orWhere('mobile1', 'LIKE', "%{$search}%")
-                    ->orWhere('mobile2', 'LIKE', "%{$search}%")
-                    ->orWhere('case_no', 'LIKE', "%{$search}%");
+                foreach ($searchTerms as $term) {
 
-                $query->orWhereRaw("
-            CONCAT(
-                COALESCE(name, ''),
-                ' ',
-                COALESCE(middle_name, ''),
-                ' ',
-                COALESCE(last_name, '')
-            ) LIKE ?
-        ", ["%{$search}%"]);
+                    /*
+                 * Every entered word must match at least one column.
+                 *
+                 * Example:
+                 * Kajal  => name
+                 * Parmar => last_name
+                 */
+                    $mainQuery->where(function ($query) use ($term) {
+                        $query->where('name', 'LIKE', "%{$term}%")
+                            ->orWhere('middle_name', 'LIKE', "%{$term}%")
+                            ->orWhere('last_name', 'LIKE', "%{$term}%")
+                            ->orWhere('mobile1', 'LIKE', "%{$term}%")
+                            ->orWhere('mobile2', 'LIKE', "%{$term}%")
+                            ->orWhere('case_no', 'LIKE', "%{$term}%");
+                    });
+                }
             })
 
-            // Exact match first
-            ->orderByRaw("CASE WHEN case_no = ? THEN 0 ELSE 1 END", [$search])
+            // Exact case number first
+            ->orderByRaw(
+                'CASE WHEN case_no = ? THEN 0 ELSE 1 END',
+                [$search]
+            )
 
             ->orderBy('case_no')
-
             ->limit(10)
-            ->get();
+            ->get()
+
+            // Full name and suggestion label prepare
+            ->map(function ($patient) {
+
+                $fullName = collect([
+                    $patient->name,
+                    $patient->middle_name,
+                    $patient->last_name,
+                ])
+                    ->filter(function ($value) {
+                        return $value !== null && trim($value) !== '';
+                    })
+                    ->map(function ($value) {
+                        return trim($value);
+                    })
+                    ->implode(' ');
+
+                return [
+                    'id'          => $patient->id,
+                    'name'        => $patient->name,
+                    'middle_name' => $patient->middle_name,
+                    'last_name'   => $patient->last_name,
+                    'full_name'   => $fullName,
+                    'mobile1'     => $patient->mobile1,
+                    'mobile2'     => $patient->mobile2,
+                    'case_no'     => $patient->case_no,
+
+                    // Useful when using jQuery autocomplete
+                    'label' => $patient->case_no
+                        . ' - '
+                        . $fullName
+                        . ($patient->mobile1
+                            ? " ({$patient->mobile1})"
+                            : ''),
+
+                    'value' => $fullName,
+                ];
+            })
+            ->values();
 
         return response()->json($results);
     }
@@ -133,33 +239,38 @@ class PatientController extends Controller
         // Search Logic
         if ($request->filled('search')) {
 
-            $search = trim($request->search);
+            $search = preg_replace(
+                '/\s+/',
+                ' ',
+                trim((string) $request->search)
+            );
 
-            $query->where(function ($q) use ($search) {
+            $searchTerms = preg_split(
+                '/\s+/',
+                $search,
+                -1,
+                PREG_SPLIT_NO_EMPTY
+            );
 
-                // Single Field Search
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('middle_name', 'LIKE', "%{$search}%")
-                    ->orWhere('last_name', 'LIKE', "%{$search}%")
-                    ->orWhere('mobile1', 'LIKE', "%{$search}%")
-                    ->orWhere('mobile2', 'LIKE', "%{$search}%")
-                    ->orWhere('case_no', 'LIKE', "%{$search}%");
+            $query->where(function ($mainQuery) use ($searchTerms) {
 
-                // Full Name Search
-                $q->orWhereRaw("
-                CONCAT(
-                    COALESCE(name, ''),
-                    ' ',
-                    COALESCE(middle_name, ''),
-                    ' ',
-                    COALESCE(last_name, '')
-                ) LIKE ?
-            ", ["%{$search}%"]);
+                foreach ($searchTerms as $term) {
+
+                    $mainQuery->where(function ($q) use ($term) {
+
+                        $q->where('name', 'LIKE', "%{$term}%")
+                            ->orWhere('middle_name', 'LIKE', "%{$term}%")
+                            ->orWhere('last_name', 'LIKE', "%{$term}%")
+                            ->orWhere('mobile1', 'LIKE', "%{$term}%")
+                            ->orWhere('mobile2', 'LIKE', "%{$term}%")
+                            ->orWhere('case_no', 'LIKE', "%{$term}%");
+                    });
+                }
             });
 
-            // Exact case_no first
+            // Exact case number first
             $query->orderByRaw(
-                "CASE WHEN case_no = ? THEN 0 ELSE 1 END",
+                'CASE WHEN case_no = ? THEN 0 ELSE 1 END',
                 [$search]
             );
         }

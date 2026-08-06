@@ -12,8 +12,31 @@
                     <div class="card-header">
                         <h5 class="card-title mb-0">Today's Appointment Details</h5>
                     </div>
-
                     <div class="card-body">
+                        <form method="GET" action="{{ route('patient_appointment.today') }}" class="row mb-3">
+
+                            <div class="col-md-3">
+                                <label>From Date</label>
+                                <input type="date" name="from_date" class="form-control"
+                                    value="{{ request('from_date') }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label>To Date</label>
+                                <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
+                            </div>
+
+                            <div class="col-md-3 mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    Search
+                                </button>
+
+                                <a href="{{ route('patient_appointment.today') }}" class="btn btn-secondary">
+                                    Reset
+                                </a>
+                            </div>
+
+                        </form>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -23,10 +46,10 @@
                                     <th>Doctor Name</th>
                                     <th>Treatment</th>
                                     <th>Mobile</th>
-                                    {{-- <th>Appointment Date</th> --}}
+                                    <th>Appointment Date</th>
                                     <th>Appointment Time</th>
                                     <!-- <th>Rescheduled Date</th>
-                                                                            <th>Rescheduled Time</th> -->
+                                                                                                    <th>Rescheduled Time</th> -->
                                     {{-- <th>Appointment Confirm?</th> --}}
                                     <th>Action</th>
                                 </tr>
@@ -55,14 +78,14 @@
                                             <td>{{ $appointment->doctor->doctor_name ?? '' }}</td>
                                             <td>{{ $appointment->treatment->treatment_name ?? '' }}</td>
                                             <td>{{ $appointment->patient->mobile1 }}</td>
-                                            {{-- <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td> --}}
+                                            <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td>
                                             <td>{{ date('g:i A', strtotime($appointment->appointment_time)) }}</td>
                                             <!-- <td>
-                                                                                                {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                {{ $appointment->rescheduled_time ?? '-' }}
-                                                                                            </td> -->
+                                                                                                                        {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
+                                                                                                                    </td>
+                                                                                                                    <td>
+                                                                                                                        {{ $appointment->rescheduled_time ?? '-' }}
+                                                                                                                    </td> -->
                                             {{-- <td>
                                                 {{ $appointment->status == 1 ? 'Yes' : 'No' }}
                                             </td> --}}
@@ -83,10 +106,12 @@
                                                     </form>
 
                                                     <!-- Reschedule Button (Visible before confirmation) -->
-                                                    <button class="btn btn-sm btn-primary"
+                                                    {{-- <button class="btn btn-sm btn-primary"
                                                         onclick="showRescheduleModal({{ $appointment->id }})">
                                                         Reschedule
-                                                    </button>
+                                                    </button> --}}
+                                                    <a href="{{ route('appointment.create') }}"
+                                                        class="btn btn-sm btn-primary">Reschedule</a>
                                                 @else
                                                     <!-- Show Confirmed Badge and Hide Reschedule -->
                                                     <span class="badge bg-primary">Confirmed</span>
