@@ -27,9 +27,42 @@
             border-radius: 0 !important;
         }
 
-        .fc-timeGridWeek-view .fc-timegrid-event {
-            min-width: 100px !important;
+        /* .fc-timeGridWeek-view .fc-timegrid-event {
+                                                                                                                                                                                                        min-width: 100px !important;
+                                                                                                                                                                                                        min-height: 20px !important;
+                                                                                                                                                                                                    } */
+
+        /* Same-time appointments overlap fix */
+        .fc-timeGridWeek-view .fc-timegrid-event,
+        .fc-timeGridDay-view .fc-timegrid-event {
+            min-width: 0 !important;
+            max-width: 100% !important;
             min-height: 20px !important;
+            overflow: hidden !important;
+        }
+
+        /* FullCalendar ko automatic width calculate karne dein */
+        .fc-timegrid-event-harness {
+            min-width: 90px !important;
+        }
+
+        .fc-timegrid-event .fc-event-main {
+            width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        /* Long appointment text control */
+        .fc-timegrid-event-title,
+        .fc-timegrid-event .fc-event-title {
+            display: block !important;
+            width: 100% !important;
+            white-space: normal !important;
+            overflow: hidden !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            line-height: 1.15 !important;
+            font-size: 10px !important;
+            text-align: center;
         }
 
         .fc .fc-event {
@@ -44,6 +77,7 @@
             font-size: 11px !important;
             line-height: 1.2 !important;
             min-height: 18px !important;
+            min-width: 90px !important;
         }
 
         .fc-non-business {
@@ -70,6 +104,32 @@
         .fc-timegrid-event-title,
         .fc-event-title {
             white-space: normal !important;
+        }
+
+        /* Same-time appointments side-by-side overlap fix */
+        .fc-timeGridWeek-view .fc-timegrid-event,
+        .fc-timeGridDay-view .fc-timegrid-event {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        .fc .fc-timegrid-event-harness {
+            min-width: 0 !important;
+        }
+
+        .fc .fc-timegrid-event .fc-event-main {
+            width: 100% !important;
+            overflow: hidden !important;
+        }
+
+        .fc .fc-timegrid-event-title {
+            width: 100% !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: hidden !important;
+            font-size: 10px !important;
+            line-height: 1.15 !important;
         }
     </style>
 
@@ -229,8 +289,13 @@
                             <input type="email" class="form-control" id="email" name="email" readonly>
                         </div>
                         <div class="form-group">
-                            <label>Duration</label>
-                            <input type="text" class="form-control" id="duration" name="duration">
+                            <label>
+                                Duration in Minutes
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="number" class="form-control" id="duration" name="duration" min="15"
+                                max="1440" step="15" value="30" required placeholder="Example: 120">
                         </div>
                         <div class="form-group">
                             <label>Treatment</label>
@@ -259,7 +324,7 @@
     </div>
 
     <!-- Reschedule Modal -->
-    <div class="modal fade" id="rescheduleModal">
+    {{-- <div class="modal fade" id="rescheduleModal">
         <div class="modal-dialog">
             <form method="POST" id="editAppointmentForm" action="{{ route('appointment.appointmentsUpdate') }}">
                 @csrf
@@ -371,6 +436,143 @@
             </form>
 
         </div>
+    </div> --}}
+
+    <!-- Reschedule Modal -->
+    <div class="modal fade" id="rescheduleModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+
+            <form method="POST" id="editAppointmentForm" action="{{ route('appointment.appointmentsUpdate') }}">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reschedule Appointment</h5>
+
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <input type="hidden" name="appointment_id" id="edit_appointment_id">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Patient :</label>
+                                    {{-- <p id="edit_patient_name"></p> --}}
+                                    <a href="#" id="edit_patient_name">View Patient</a>
+                                    {{-- <input type="text" id="edit_patient_name" class="form-control" readonly> --}}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Doctor</label>
+
+                                    <select class="form-control" id="edit_doctor_id" name="doctor_id" required>
+                                        @foreach ($doctors as $doctor)
+                                            <option value="{{ $doctor->id }}">
+                                                {{ $doctor->doctor_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Contact No</label>
+
+                                    <input type="text" class="form-control" id="edit_contact_no" name="contact_no"
+                                        readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Email</label>
+
+                                    <input type="email" class="form-control" id="edit_email" name="email" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Duration</label>
+
+                                    <input type="number" class="form-control" id="edit_duration" name="duration"
+                                        min="15" step="15" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Treatment</label>
+
+                                    <select class="form-control" id="edit_treatment_id" name="treatment_id">
+                                        @foreach ($Treatments as $Treatment)
+                                            <option value="{{ $Treatment->id }}">
+                                                {{ $Treatment->treatment_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Date</label>
+
+                                    <input type="date" id="edit_schedule_date" name="appointment_date"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label>Time</label>
+
+                                    <input type="text" id="edit_followup_datetime" name="appointment_time"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="submit" class="btn btn-primary">
+                            Update Appointment
+                        </button>
+
+                        <button type="button" class="btn btn-danger" id="deleteAppointmentBtn">
+                            Delete Appointment
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+
+                    </div>
+
+                </div>
+            </form>
+
+            <form id="deleteAppointmentForm" method="POST">
+                @csrf
+                @method('DELETE')
+            </form>
+
+        </div>
     </div>
 
 @endsection
@@ -400,7 +602,7 @@
                     $('#patient_id').val(ui.item.id);
 
                     $.ajax({
-                        url: '/dental_clinic/admin/get-patient-details/' + ui.item.id,
+                        url: '/admin/get-patient-details/' + ui.item.id,
                         method: 'GET',
                         success: function(data) {
                             console.log(data);
@@ -416,11 +618,24 @@
                 initialView: 'timeGridWeek',
                 selectable: true,
                 eventDisplay: 'block',
+
                 slotEventOverlap: false,
+                //eventMaxStack: 3,
+
+                eventOrderStrict: true,
+                eventOrder: 'start,-duration,title',
                 selectMirror: false,
 
                 slotMinTime: "09:00:00",
                 slotMaxTime: "22:00:00",
+                // Every row will represent 30 minutes
+                slotDuration: "00:30:00",
+                slotLabelInterval: "01:00:00",
+
+                // Event ko supplied end time use karne dega
+                forceEventDuration: true,
+                defaultTimedEventDuration: "00:30:00",
+
                 height: 'auto',
                 contentHeight: 'auto',
                 expandRows: false,
@@ -479,7 +694,15 @@
                     var props = event.extendedProps;
 
                     $('#edit_appointment_id').val(event.id);
-                    $('#edit_patient_name').val(props.patient_name);
+                    $('#edit_appointment_id').val(event.id);
+
+                    var url = "{{ url('/admin/notes') }}/" + props.patient_id;
+
+                    $('#edit_patient_name')
+                        .text(props.patient_name) // Display patient name
+                        .attr('href', url); // Set link
+
+
                     $('#edit_doctor_id').val(props.doctor_id);
                     $('#edit_contact_no').val(props.mobile_no);
                     $('#edit_email').val(props.email);
@@ -501,8 +724,6 @@
 
                     $('#rescheduleModal').modal('show');
                 },
-
-
 
                 eventDidMount: function(info) {
                     const titleElement = info.el.querySelector('.fc-event-title');
@@ -569,12 +790,20 @@
                             return {
                                 id: appointment.id,
                                 title: appointment.title,
+
                                 start: appointment.start,
+                                end: appointment.end, // Important for event height
+
                                 allDay: false,
-                                color: appointment.color,
+                                display: 'block',
+
+                                backgroundColor: appointment.color,
+                                borderColor: appointment.color,
+
                                 extendedProps: {
                                     patient_id: appointment.patient_id,
                                     patient_name: appointment.patient_name,
+                                    case_no: appointment.case_no,
                                     doctor_id: appointment.doctor_id,
                                     treatment_id: appointment.treatment_id,
                                     mobile_no: appointment.mobile_no,

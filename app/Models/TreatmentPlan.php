@@ -40,7 +40,18 @@ class TreatmentPlan extends Model
         'created_at',
         'updated_at',
         'date',
-        'patient_id'
+        'patient_id',
+        'scaling_completed',
+        'polishing_completed',
+        'grinding_completed',
+        'bleaching_completed',
+        'smile_design_completed',
+        'orthodontics_completed',
+        'surgery_completed',
+        'biopsy_completed',
+        'dentures_completed',
+        'implants_completed',
+        'other_treatment_completed',
     ];
 
     public function details()

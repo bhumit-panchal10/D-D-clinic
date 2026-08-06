@@ -385,18 +385,26 @@
                                 @foreach ($treatmentPlans as $plan)
                                     @php
                                         // Get tooth-wise comments for each treatment type
-                                        $rctDetails = $plan->details
-                                            ->where('type_id', 1)
-                                            ->filter(fn($d) => !empty($d->comment));
-                                        $extractionDetails = $plan->details
-                                            ->where('type_id', 2)
-                                            ->filter(fn($d) => !empty($d->comment));
-                                        $restorationDetails = $plan->details
-                                            ->where('type_id', 3)
-                                            ->filter(fn($d) => !empty($d->comment));
-                                        $prosthesisDetails = $plan->details
-                                            ->where('type_id', 4)
-                                            ->filter(fn($d) => !empty($d->comment));
+                                        // $rctDetails = $plan->details
+                                        //     ->where('type_id', 1)
+                                        //     ->filter(fn($d) => !empty($d->comment));
+                                        // $extractionDetails = $plan->details
+                                        //     ->where('type_id', 2)
+                                        //     ->filter(fn($d) => !empty($d->comment));
+                                        // $restorationDetails = $plan->details
+                                        //     ->where('type_id', 3)
+                                        //     ->filter(fn($d) => !empty($d->comment));
+                                        // $prosthesisDetails = $plan->details
+                                        //     ->where('type_id', 4)
+                                        //     ->filter(fn($d) => !empty($d->comment));
+
+                                        $rctDetails = $plan->details->where('type_id', 1);
+
+                                        $extractionDetails = $plan->details->where('type_id', 2);
+
+                                        $restorationDetails = $plan->details->where('type_id', 3);
+
+                                        $prosthesisDetails = $plan->details->where('type_id', 4);
 
                                         // Format tooth-wise comments
                                         $formatToothComments = fn($details) => $details
@@ -410,82 +418,289 @@
                                         <td>
                                             {{ $plan->RCT_IPC ?? '-' }}
                                             @if ($rctDetails->isNotEmpty())
-                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
-                                                    {!! $formatToothComments($rctDetails) !!}
+                                                <div class="mt-1" style="font-size:14px">
+                                                    @foreach ($rctDetails as $detail)
+                                                        <div class="mb-2">
+                                                            Tooth {{ $detail->tooth_no }} :
+                                                            {{ $detail->comment }}
+
+                                                            @if ($detail->is_completed)
+                                                                <i class="fas fa-check-circle text-success fs-5"
+                                                                    title="Completed"></i>
+                                                            @else
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-success completeTreatment"
+                                                                    data-id="{{ $detail->id }}">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             @endif
                                         </td>
 
                                         <td>
                                             {{ $plan->Extraction ?? '-' }}
+
                                             @if ($extractionDetails->isNotEmpty())
-                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
-                                                    {!! $formatToothComments($extractionDetails) !!}
+                                                <div class="mt-1" style="font-size:14px">
+                                                    @foreach ($extractionDetails as $detail)
+                                                        <div class="mb-2">
+                                                            Tooth {{ $detail->tooth_no }}
+                                                            @if ($detail->comment)
+                                                                : {{ $detail->comment }}
+                                                            @endif
+
+                                                            @if ($detail->is_completed)
+                                                                <i class="fas fa-check-circle text-success fs-5"
+                                                                    title="Completed"></i>
+                                                            @else
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-success completeTreatment"
+                                                                    data-id="{{ $detail->id }}">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             @endif
                                         </td>
 
                                         <td>
                                             {{ $plan->Restoration ?? '-' }}
+
                                             @if ($restorationDetails->isNotEmpty())
-                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
-                                                    {!! $formatToothComments($restorationDetails) !!}
+                                                <div class="mt-1" style="font-size:14px">
+                                                    @foreach ($restorationDetails as $detail)
+                                                        <div class="mb-2">
+                                                            Tooth {{ $detail->tooth_no }}
+                                                            @if ($detail->comment)
+                                                                : {{ $detail->comment }}
+                                                            @endif
+
+                                                            @if ($detail->is_completed)
+                                                                <i class="fas fa-check-circle text-success fs-5"
+                                                                    title="Completed"></i>
+                                                            @else
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-success completeTreatment"
+                                                                    data-id="{{ $detail->id }}">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             @endif
                                         </td>
 
                                         <td>
                                             {{ $plan->Prosthesis ?? '-' }}
+
                                             @if ($prosthesisDetails->isNotEmpty())
-                                                <div style="font-size: 0.85rem; margin-top: 4px; color: #555;">
-                                                    {!! $formatToothComments($prosthesisDetails) !!}
+                                                <div class="mt-1" style="font-size:14px">
+                                                    @foreach ($prosthesisDetails as $detail)
+                                                        <div class="mb-2">
+                                                            Tooth {{ $detail->tooth_no }}
+                                                            @if ($detail->comment)
+                                                                : {{ $detail->comment }}
+                                                            @endif
+
+                                                            @if ($detail->is_completed)
+                                                                <i class="fas fa-check-circle text-success fs-5"
+                                                                    title="Completed"></i>
+                                                            @else
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-success completeTreatment"
+                                                                    data-id="{{ $detail->id }}">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             @endif
                                         </td>
                                         <td>
+
                                             @if ($plan->Scaling)
-                                                <div><strong>Scaling:</strong> {{ $plan->Scaling_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Scaling:</strong> {{ $plan->Scaling_desc }}
+
+                                                    @if ($plan->scaling_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="scaling">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->polishing)
-                                                <div><strong>Polishing:</strong> {{ $plan->polishing_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Polishing:</strong> {{ $plan->polishing_desc }}
+
+                                                    @if ($plan->polishing_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="polishing">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->Grinding)
-                                                <div><strong>Grinding:</strong> {{ $plan->Grinding_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Grinding:</strong> {{ $plan->Grinding_desc }}
+
+                                                    @if ($plan->grinding_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="grinding">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->Bleaching)
-                                                <div><strong>Bleaching:</strong> {{ $plan->Bleaching_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Bleaching:</strong> {{ $plan->Bleaching_desc }}
+
+                                                    @if ($plan->bleaching_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="bleaching">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->smile_design)
-                                                <div><strong>Smile Design:</strong> {{ $plan->smile_design_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Smile Design:</strong> {{ $plan->smile_design_desc }}
+
+                                                    @if ($plan->smile_design_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="smile_design">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->orthodontics)
-                                                <div><strong>Orthodontics:</strong> {{ $plan->orthodontics_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Orthodontics:</strong> {{ $plan->orthodontics_desc }}
+
+                                                    @if ($plan->orthodontics_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="orthodontics">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->surgery)
-                                                <div><strong>Surgery:</strong> {{ $plan->surgery_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Surgery:</strong> {{ $plan->surgery_desc }}
+
+                                                    @if ($plan->surgery_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="surgery">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if ($plan->biopsy)
-                                                <div><strong>Biopsy:</strong> {{ $plan->biopsy_desc }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Biopsy:</strong> {{ $plan->biopsy_desc }}
+
+                                                    @if ($plan->biopsy_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="biopsy">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if (!empty($plan->Dentures))
-                                                <div><strong>Dentures:</strong> {{ $plan->Dentures }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Dentures:</strong> {{ $plan->Dentures }}
+
+                                                    @if ($plan->dentures_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="dentures">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if (!empty($plan->implants))
-                                                <div><strong>Implants:</strong> {{ $plan->implants }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Implants:</strong> {{ $plan->implants }}
+
+                                                    @if ($plan->implants_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="implants">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
 
                                             @if (!empty($plan->other_treatment))
-                                                <div><strong>Other Treatment:</strong> {{ $plan->other_treatment }}</div>
+                                                <div class="mb-2">
+                                                    <strong>Other Treatment:</strong> {{ $plan->other_treatment }}
+
+                                                    @if ($plan->other_treatment_completed)
+                                                        <i class="fas fa-check-circle text-success fs-5"></i>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-success completeOtherTreatment"
+                                                            data-id="{{ $plan->id }}" data-type="other_treatment">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
                                             @endif
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -512,6 +727,69 @@
         });
     </script>
     <script>
+        $(document).on('click', '.completeOtherTreatment', function() {
+
+            let btn = $(this);
+
+            $.post("{{ route('treatment.other.complete') }}", {
+                _token: "{{ csrf_token() }}",
+                id: btn.data('id'),
+                type: btn.data('type')
+            }, function(response) {
+
+                if (response.status) {
+                    btn.replaceWith('<i class="fas fa-check-circle text-success ms-2"></i>');
+                }
+
+            });
+
+        });
+        $(document).on('click', '.completeTreatment', function() {
+
+            var btn = $(this); // Current clicked button
+            var id = btn.data('id');
+
+            $.ajax({
+                url: "{{ route('treatment.complete') }}",
+                type: "POST",
+                data: {
+                    id: id,
+                    _token: "{{ csrf_token() }}"
+                },
+                beforeSend: function() {
+                    btn.prop('disabled', true)
+                        .html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+                },
+                success: function(response) {
+
+                    if (response.status) {
+
+                        btn.replaceWith(
+                            '<span class="text-success fs-5">' +
+                            '<i class="fa fa-check-circle"></i>' +
+                            '</span>'
+                        );
+
+                    } else {
+
+                        btn.prop('disabled', false)
+                            .html('<i class="fa fa-check"></i> Complete');
+
+                        alert(response.message);
+                    }
+
+                },
+                error: function() {
+
+                    btn.prop('disabled', false)
+                        .html('<i class="fa fa-check"></i> Complete');
+
+                    alert('Something went wrong.');
+                }
+            });
+
+        });
+
         function getEditData(id) {
 
             var url = "{{ route('notes.edit', ':id') }}";

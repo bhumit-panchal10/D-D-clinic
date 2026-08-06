@@ -17,6 +17,8 @@ class TreatmentPlanDetail extends Model
         'tooth_no',
         'type_id',
         'comment',
+        'is_completed',
+        'completed_at',
         'created_at',
         'updated_at'
     ];

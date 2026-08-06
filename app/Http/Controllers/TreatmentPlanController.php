@@ -43,6 +43,34 @@ class TreatmentPlanController extends Controller
     //     ));
     // }
 
+    public function completeOtherTreatment(Request $request)
+    {
+        $plan = TreatmentPlan::findOrFail($request->id);
+
+        $column = $request->type . '_completed';
+
+        $plan->$column = 1;
+        $plan->save();
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
+
+    public function complete(Request $request)
+    {
+        $detail = TreatmentPlanDetail::findOrFail($request->id);
+
+        $detail->update([
+            'is_completed' => 1
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Treatment completed successfully.'
+        ]);
+    }
+
     public function index(Request $request, $patientId)
     {
         $patient = Patient::findOrFail($patientId);

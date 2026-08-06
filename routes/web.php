@@ -600,7 +600,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     // Intraoral Examination Routes
-
+    Route::post('/treatment-plan/complete', [TreatmentPlanController::class, 'complete'])
+        ->name('treatment.complete');
+    Route::post('/treatment-plan/complete-other', [TreatmentPlanController::class, 'completeOtherTreatment'])
+        ->name('treatment.other.complete');
     Route::prefix('TreatmentPlan')->group(function () {
         Route::get('/{patient}', [TreatmentPlanController::class, 'index'])
             ->name('TreatmentPlan.index');

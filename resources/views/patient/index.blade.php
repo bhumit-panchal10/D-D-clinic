@@ -122,12 +122,18 @@
                                                         data-bs-target="#deleteRecordModal">
                                                         Delete
                                                     </button>
-                                                    <a href="{{ route('patient.consent.form', $patient->id) }}"
-                                                        class="btn btn-sm btn-success" title="Consent Form">
-
-                                                        <i class="fas fa-file-signature"></i>
-
-                                                    </a>
+                                                    @if (isset($patient->strFileName) && $patient->strFileName != '')
+                                                        <a href="{{ asset('patinet_conser_form/' . $patient->strFileName) }}"
+                                                            target="_blank" class="btn btn-sm btn-danger"
+                                                            title="View Consent PDF">
+                                                            <i class="fas fa-file-pdf"></i>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('patient.consent.form', $patient->id) }}"
+                                                            class="btn btn-sm btn-success" title="Fill Consent Form">
+                                                            <i class="fas fa-file-signature"></i>
+                                                        </a>
+                                                    @endif
                                                     <a href="{{ route('patient.overview', $patient->id) }}"
                                                         class="btn btn-sm btn-primary" title="Overview">
                                                         <i class="fas fa-eye"></i>
