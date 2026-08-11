@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Role;
 // use App\Models\VideoGallery;
 // use App\Models\ProductInquiry;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomeController extends Controller
 {
@@ -29,7 +31,7 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $todayAppointmentsCount = PatientAppointment::where('is_disrupted', 0) // Ignore disrupted entries
             ->where(function ($query) {
@@ -73,44 +75,182 @@ class HomeController extends Controller
             ->get()
             ->map(function ($patient) {
 
-                $patient->total_amount = $patient->notes->sum('Net_amount');
-                $patient->paid_amount  = $patient->payments->sum('amount');
-                $patient->due_amount   = $patient->total_amount - $patient->paid_amount;
+                // Total amount of all notes
+                $patient->total_amount = $patient->notes()->sum('Net_amount');
+
+                // Today's payment only
+                $patient->paid_amount = $patient->payments->sum('amount');
+
+                // Total paid till date
+                $totalPaid = $patient->payments()->sum('amount');
+
+                // Overall due
+                $patient->due_amount = $patient->total_amount - $totalPaid;
+
                 return $patient;
             });
-        //dd($todayPatients);
+
+
+        //     $completedPatients = Patient::with([
+        //     'notes' => function ($query) {
+        //         $query->whereDate('date', today())
+        //             ->where('is_completed', 1)
+        //             ->with('treatment');
+        //     },
+
+        //     'payments' => function ($query) {
+        //         $query->whereDate('payment_date', today())
+        //             ->where('is_completed', 1);
+        //     },
+
+        //     'appointments' => function ($query) {
+        //         $query->whereDate('created_at', today());
+        //     },
+        // ])
+        // ->where('is_completed', 1)
+
+        // ->where(function ($query) {
+        //     $query->whereHas('notes', function ($noteQuery) {
+        //         $noteQuery->whereDate('date', today())
+        //             ->where('is_completed', 1);
+        //     })
+        //     ->orWhereHas('payments', function ($paymentQuery) {
+        //         $paymentQuery->whereDate('payment_date', today())
+        //             ->where('is_completed', 1);
+        //     });
+
+        // })
+
+        // ->get()
+        // ->map(function ($patient) {
+        //     $patient->total_amount = $patient->notes->sum('Net_amount');
+        //     $patient->paid_amount = $patient->payments->sum('amount');
+
+        //     $patient->due_amount = max(
+        //         0,
+        //         $patient->total_amount - $patient->paid_amount
+        //     );
+
+        //     return $patient;
+        // });
+
+        $searchDate = $request->date;
+        $perPage = 5;
+        if ($searchDate) {
+
+            // Search ki hui koi bhi date
+            $fromDate = Carbon::parse($searchDate)->startOfDay();
+            $toDate   = Carbon::parse($searchDate)->endOfDay();
+
+            $isSearch = true;
+        } else {
+
+            // Default: only today
+            $fromDate = Carbon::today()->startOfDay();
+            $toDate   = Carbon::today()->endOfDay();
+
+            $isSearch = false;
+        }
 
         $completedPatients = Patient::with([
-            'notes' => function ($q) {
-                $q->whereDate('date', today())
-                    ->where('is_completed', 1)
-                    ->with('treatment');
+
+            'notes' => function ($q) use ($fromDate, $toDate, $isSearch) {
+
+                $q->whereBetween('date', [$fromDate, $toDate]);
+
+                // Default page par hi completed check karna
+                if (!$isSearch) {
+                    $q->where('is_completed', 1);
+                }
+
+                $q->with('treatment');
             },
-            'payments' => function ($q) {
-                $q->whereDate('payment_date', today())
-                    ->where('is_completed', 1);
+
+            'payments' => function ($q) use ($fromDate, $toDate, $isSearch) {
+
+                $q->whereBetween('payment_date', [$fromDate, $toDate]);
+
+                if (!$isSearch) {
+                    $q->where('is_completed', 1);
+                }
             },
+
             'appointments'
         ])
-            ->where('is_completed', 1)
-            ->whereHas('notes', function ($q) {
-                $q->whereDate('date', today())
-                    ->where('is_completed', 1);
+
+            // ->where('is_completed', 1)
+
+            ->where(function ($query) use ($fromDate, $toDate, $isSearch) {
+
+                $query->whereHas('notes', function ($q) use (
+                    $fromDate,
+                    $toDate,
+                    $isSearch
+                ) {
+
+                    $q->whereBetween('date', [$fromDate, $toDate]);
+
+                    if (!$isSearch) {
+                        $q->where('is_completed', 1);
+                    }
+                })
+
+                    ->orWhereHas('payments', function ($q) use (
+                        $fromDate,
+                        $toDate,
+                        $isSearch
+                    ) {
+
+                        $q->whereBetween('payment_date', [$fromDate, $toDate]);
+
+                        if (!$isSearch) {
+                            $q->where('is_completed', 1);
+                        }
+                    });
             })
-            ->whereHas('payments', function ($q) {
-                $q->whereDate('payment_date', today())
-                    ->where('is_completed', 1);
-            })
+
             ->get()
+
             ->map(function ($patient) {
 
                 $patient->total_amount = $patient->notes->sum('Net_amount');
-                $patient->paid_amount  = $patient->payments->sum('amount');
-                $patient->due_amount = max(0, $patient->total_amount - $patient->paid_amount);
+
+                $patient->paid_amount = $patient->payments->sum('amount');
+
+                $patient->due_amount = max(
+                    0,
+                    $patient->total_amount - $patient->paid_amount
+                );
+
+                // Latest activity
+                $noteDate = $patient->notes->max('date');
+
+                $paymentDate = $patient->payments->max('payment_date');
+
+                $patient->latest_activity_date = collect([
+                    $noteDate,
+                    $paymentDate
+                ])->filter()->max();
 
                 return $patient;
-            });
-        //dd($completedPatients);
+            })
+
+            ->sortByDesc('latest_activity_date')
+            ->values();
+        // Pagination
+        $currentPage = request()->get('page', 1);
+
+        $completedPatients = new LengthAwarePaginator(
+            $completedPatients->forPage($currentPage, $perPage),
+            $completedPatients->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
+
 
         $todayAppointments = PatientAppointment::with(['patient', 'doctor'])
             ->where('is_disrupted', 0)
@@ -128,7 +268,7 @@ class HomeController extends Controller
             ->whereDate('date', today())
             ->groupBy('patient_id')
             ->get();
-        return view('home', compact('todayPatients', 'todayAppointments', 'todayDuePatients', 'todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending', 'completedPatients'));
+        return view('home', compact('todayPatients', 'todayAppointments', 'todayDuePatients', 'todayAppointmentsCount', 'pendingCollectedCount', 'pendingReceivedCount', 'MarkAsReceivedPending', 'completedPatients', 'searchDate'));
     }
 
 

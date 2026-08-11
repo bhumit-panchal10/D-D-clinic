@@ -296,11 +296,36 @@
                                     <div class="row mt-2">
                                         <div class="col-md-12">
                                             <div class="card">
-                                                <div class="card-header">
-                                                    <h5>Completed Patients List</h5>
+                                                <div class="card-header" style="padding-bottom:0px !important">
+                                                    <form method="GET" action="{{ url()->current() }}" class="mb-3">
+                                                        <div class="row align-items-end">
+                                                            <div class="col-md-3">
+                                                                <h5>Completed Patients List</h5>
+                                                            </div>
+                                                            <div class="col-md-4 gap-2 d-flex align-items-center">
+                                                                <label for="date">Search Date:</label>
+
+                                                                <input type="date" name="date" id="date"
+                                                                    class="form-control" value="{{ $searchDate }}"
+                                                                    style="width:60% !important">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    Search
+                                                                </button>
+
+                                                                <a href="{{ url()->current() }}" class="btn btn-secondary">
+                                                                    Reset
+                                                                </a>
+                                                            </div>
+
+                                                        </div>
+                                                    </form>
                                                 </div>
 
                                                 <div class="card-body table-responsive">
+
                                                     <table class="table table-bordered table-striped">
                                                         <thead>
                                                             <tr>
@@ -363,88 +388,91 @@
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center">
+                                                                    <td colspan="8" class="text-center">
                                                                         No Record Found
                                                                     </td>
                                                                 </tr>
                                                             @endforelse
                                                         </tbody>
                                                     </table>
+                                                    <div class="mt-3">
+                                                        {{ $completedPatients->links() }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            @else
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="card text-white wrapper">
-                                            <div class="card-body">
-                                                <h5 class="card-title text-white">Today's Appointments</h5>
-                                                <p class="card-text">
-                                                    <strong>{{ $todayAppointmentsCount }}</strong>
-                                                </p>
-                                                <a href="{{ route('patient_appointment.today') }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    View Details
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Pending Collection Box -->
-                                    <div class="col-md-4">
-                                        <div class="card text-white wrapper">
-                                            <div class="card-body">
-                                                <h5 class="card-title text-white">Pending Collection Labwork</h5>
-                                                <p class="card-text">
-                                                    <strong>{{ $pendingCollectedCount }}</strong>
-                                                </p>
-                                                <a href="{{ route('labworks.full_list', ['filter' => 'pending_collection']) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    View Details
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Pending Received Box -->
-                                    <div class="col-md-4">
-                                        <div class="card text-white wrapper">
-                                            <div class="card-body">
-                                                <h5 class="card-title text-white">Pending Received Labwork</h5>
-                                                <p class="card-text">
-                                                    <strong>{{ $pendingReceivedCount }}</strong>
-                                                </p>
-                                                <a href="{{ route('labworks.full_list', ['filter' => 'pending_received']) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    View Details
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Mark As Received Pending -->
-                                    <div class="col-md-4">
-                                        <div class="card text-white wrapper">
-                                            <div class="card-body">
-                                                <h5 class="card-title text-white">Mark As Received Pending</h5>
-                                                <p class="card-text">
-                                                    <strong>{{ $MarkAsReceivedPending }}</strong>
-                                                </p>
-                                                <a href="{{ route('employee.maintenance.index') }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    View Details
-                                                </a>
-                                            </div>
-                                        </div>
+                        </div>
+                    @else
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card text-white wrapper">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-white">Today's Appointments</h5>
+                                        <p class="card-text">
+                                            <strong>{{ $todayAppointmentsCount }}</strong>
+                                        </p>
+                                        <a href="{{ route('patient_appointment.today') }}" class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>
                                     </div>
                                 </div>
-                            @endif
+                            </div>
+                            <!-- Pending Collection Box -->
+                            <div class="col-md-4">
+                                <div class="card text-white wrapper">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-white">Pending Collection Labwork</h5>
+                                        <p class="card-text">
+                                            <strong>{{ $pendingCollectedCount }}</strong>
+                                        </p>
+                                        <a href="{{ route('labworks.full_list', ['filter' => 'pending_collection']) }}"
+                                            class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pending Received Box -->
+                            <div class="col-md-4">
+                                <div class="card text-white wrapper">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-white">Pending Received Labwork</h5>
+                                        <p class="card-text">
+                                            <strong>{{ $pendingReceivedCount }}</strong>
+                                        </p>
+                                        <a href="{{ route('labworks.full_list', ['filter' => 'pending_received']) }}"
+                                            class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mark As Received Pending -->
+                            <div class="col-md-4">
+                                <div class="card text-white wrapper">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-white">Mark As Received Pending</h5>
+                                        <p class="card-text">
+                                            <strong>{{ $MarkAsReceivedPending }}</strong>
+                                        </p>
+                                        <a href="{{ route('employee.maintenance.index') }}"
+                                            class="btn btn-primary btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        <!-- container-fluid -->
+    </div>
+    <!-- container-fluid -->
     </div>
     <!-- End Page-content -->
 

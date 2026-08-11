@@ -28,9 +28,9 @@
         }
 
         /* .fc-timeGridWeek-view .fc-timegrid-event {
-                                                                                                                                                                                                        min-width: 100px !important;
-                                                                                                                                                                                                        min-height: 20px !important;
-                                                                                                                                                                                                    } */
+                                                                                                                                                                                                            min-width: 100px !important;
+                                                                                                                                                                                                            min-height: 20px !important;
+                                                                                                                                                                                                        } */
 
         /* Same-time appointments overlap fix */
         .fc-timeGridWeek-view .fc-timegrid-event,
@@ -295,7 +295,7 @@
                             </label>
 
                             <input type="number" class="form-control" id="duration" name="duration" min="15"
-                                max="1440" step="15" value="30" required placeholder="Example: 120">
+                                max="1440" step="15" value="60" required placeholder="Example: 120">
                         </div>
                         <div class="form-group">
                             <label>Treatment</label>
