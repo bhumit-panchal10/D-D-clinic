@@ -55,6 +55,11 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label>Content <span class="text-danger"></span></label>
+                                        <textarea class="form-control" placeholder="Enter Content" name="content" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label>Days<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" name="days" maxlength="10"
                                             placeholder="Enter Days" required>
@@ -101,7 +106,8 @@
                                                         data-name="{{ $medicine->medicine_name }}"
                                                         data-dosage="{{ $medicine->dosage_id }}"
                                                         data-days="{{ $medicine->days }}"
-                                                        data-comment="{{ $medicine->comment }}" data-bs-toggle="modal"
+                                                        data-comment="{{ $medicine->comment }}"
+                                                        data-content="{{ $medicine->content }}" data-bs-toggle="modal"
                                                         data-bs-target="#editMedicineModal">
                                                         Edit
                                                     </button>
@@ -166,6 +172,11 @@
                         </div>
 
                         <div class="mb-3">
+                            <label>Content <span class="text-danger"></span></label>
+                            <textarea class="form-control" placeholder="Enter Content" name="content" id="Editcontent" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label>Days <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="days" id="editdays" maxlength="10"
                                 required>
@@ -226,6 +237,7 @@
                 let name = $(this).data("name");
                 let dosage = $(this).data("dosage");
                 let comment = $(this).data("comment");
+                let content = $(this).data("content");
                 let days = $(this).data("days");
                 let currentPage = "{{ request('page', 1) }}";
 
@@ -233,6 +245,7 @@
                 $("#editMedicineName").val(name);
                 $("#Editdosage_id").val(dosage);
                 $("#Editcomment").val(comment);
+                $("#Editcontent").val(content);
                 $("#editdays").val(days);
 
 

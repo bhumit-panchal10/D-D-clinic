@@ -17,25 +17,26 @@ class MedicineController extends Controller
         )
             ->join('dosages', 'dosages.id', '=', 'medicines.dosage_id')
             ->paginate(config('app.per_page'));
-
         return view('medicines.index', compact('medicines', 'dosages'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'medicine_name' => 'required|string|max:255|unique:medicines,medicine_name',
-            'dosage_id' => 'required|exists:dosages,id',
-            'comment' => 'nullable',
-        ], [
-            'medicine_name.unique' => 'This medicine already exists.',
-            'medicine_name.required' => 'The medicine name is required.',
-            'dosage_id.exists' => 'The selected dosage is invalid.',
-            'dosage_id.required' => 'The dosage is required.',
-        ]);
-
+        $request->validate(
+            [
+                'medicine_name' => 'required|string|max:255|unique:medicines,medicine_name',
+                'dosage_id' => 'required|exists:dosages,id',
+                'comment' => 'nullable',
+                'content' => 'nullable',
+            ],
+            [
+                'medicine_name.unique' => 'This medicine already exists.',
+                'medicine_name.required' => 'The medicine name is required.',
+                'dosage_id.exists' => 'The selected dosage is invalid.',
+                'dosage_id.required' => 'The dosage is required.',
+            ]
+        );
         Medicine::create($request->all());
-
         return redirect()->back()->with('success', 'Medicine added successfully!');
     }
 
@@ -45,6 +46,7 @@ class MedicineController extends Controller
             'medicine_name' => 'required|string|max:255|unique:medicines,medicine_name,' . $id,
             'dosage_id' => 'required|exists:dosages,id',
             'comment' => 'nullable',
+            'content' => 'nullable',
         ], [
             'medicine_name.unique' => 'This medicine already exists.',
             'medicine_name.required' => 'The medicine name is required.',

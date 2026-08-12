@@ -124,6 +124,7 @@
                                             <th>Days</th>
                                             <th>Medicine Qty</th>
                                             <th>Comments</th> <!-- Comment field only in listing -->
+                                            <th>Content</th> <!-- Content field only in listing -->
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -152,6 +153,7 @@
 
     <script>
         let currentComment = '';
+        let currentContent = '';
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeSelect2();
@@ -207,6 +209,12 @@
                     let skippedCount = 0;
 
                     data.items.forEach(function(item) {
+                        console.log('========== TEMPLATE ITEM ==========');
+                        console.log('FULL ITEM:', item);
+                        console.log('Medicine:', item.medicine_name);
+                        console.log('Comment:', item.comment);
+                        console.log('Content:', item.content);
+                        console.log('===================================');
                         const added = appendPrescriptionRow({
                             medicineId: item.medicine_id,
                             medicineName: item.medicine_name,
@@ -214,7 +222,8 @@
                             dosageText: item.dosage_text,
                             days: item.days,
                             qty: item.qty,
-                            comment: item.comment
+                            comment: item.comment,
+                            content: item.content
                         });
 
                         if (added) {
@@ -311,7 +320,8 @@
                             dosageText: item.dosage_text,
                             days: item.days,
                             qty: item.qty,
-                            comment: item.comment
+                            comment: item.comment,
+                            content: item.content
                         });
 
                         if (added) {
@@ -398,7 +408,8 @@
                     dosageText: dosageText,
                     days: days,
                     qty: qty,
-                    comment: currentComment
+                    comment: currentComment,
+                    content: currentContent
                 });
 
                 if (!added) {
@@ -556,6 +567,16 @@
                 </td>
 
                 <td>
+                    <input
+                        type="text"
+                        name="content[]"
+                        class="form-control"
+                        value="${escapeHtml(item.content || '')}"
+                        placeholder="Enter content"
+                    >
+                </td>
+
+                <td>
                     <button
                         type="button"
                         class="btn btn-primary btn-sm remove-row"
@@ -652,6 +673,7 @@
 
             if (!medicineId) {
                 currentComment = '';
+                currentContent = '';
                 daysInput.value = '';
 
                 dosageSelect.innerHTML =
@@ -684,6 +706,7 @@
                 })
                 .then(function(data) {
                     currentComment = data.comment || '';
+                    currentContent = data.content || '';
 
                     daysInput.value = data.days || 1;
 
@@ -722,6 +745,7 @@
 
         function resetManualFields() {
             currentComment = '';
+            currentContent = '';
 
             $('#medicines')
                 .val(null)
@@ -876,7 +900,7 @@
         });
     </script> --}}
 
-    <script>
+    {{-- <script>
         function getDosages() {
             var medicineId = document.getElementById("medicines").value;
             var url = "{{ route('prescriptions.get_dosages', ':id') }}";
@@ -916,6 +940,6 @@
                 })
                 .catch(error => console.error('Error fetching dosages:', error));
         }
-    </script>
+    </script> --}}
 
 @endsection
