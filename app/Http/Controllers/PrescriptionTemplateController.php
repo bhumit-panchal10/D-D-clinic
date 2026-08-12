@@ -123,6 +123,8 @@ class PrescriptionTemplateController extends Controller
                     'days' => $item->days,
                     'qty' => $item->medicine_qty,
                     'comment' => $item->comments ?? '',
+                    'content' =>
+                    optional($item->medicine)->content ?? '',
                 ];
             })->values(),
         ]);

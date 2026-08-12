@@ -5,66 +5,69 @@
     <meta charset="UTF-8">
     <title>Prescription</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            font-size: 14px;
-        }
-
-        table {
+        .prescription-table {
             width: 100%;
-        }
-
-        .header-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #0c3b6a;
-        }
-
-        .textcolor {
-            color: #0c3b6a;
-        }
-
-        .medicine-table {
-            margin-left: auto;
-            margin-right: auto;
-            width: 60%;
-            /* Optional: you can adjust this */
-        }
-
-        .clinic-subtitle {
-            font-style: italic;
-            color: #007a7c;
-        }
-
-        .doctor-info {
+            border-collapse: collapse;
+            margin-top: 8px;
             font-size: 12px;
         }
 
-        .rx {
-            font-weight: bold;
-            font-size: 18px;
-            padding-top: 10px;
-        }
-
-        .patient-info {
-            padding-top: 20px;
-        }
-
-        .medicine-table td {
-            padding: 5px 0;
+        .prescription-table th,
+        .prescription-table td {
+            border: 1px solid #777;
+            padding: 6px 7px;
             vertical-align: top;
         }
 
-        .footer {
-            font-size: 12px;
+        .prescription-table th {
+            background: #f2f2f2;
+            font-weight: bold;
             text-align: center;
-            padding-top: 40px;
         }
 
-        .signature {
-            text-align: right;
-            padding-top: 50px;
+        .prescription-table .medicine-col {
+            width: 55%;
+        }
+
+        .prescription-table .frequency-col {
+            width: 18%;
+            text-align: center;
+        }
+
+        .prescription-table .duration-col {
+            width: 14%;
+            text-align: center;
+        }
+
+        .prescription-table .qty-col {
+            width: 13%;
+            text-align: center;
+        }
+
+        .medicine-name {
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .medicine-comment {
+            font-size: 10px;
+            color: #444;
+            margin-top: 2px;
+        }
+
+        .medicine-content {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .rx-title {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 20px;
+            margin-top: 10px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -145,7 +148,94 @@
     </table>
 
     <!-- Rx and Medicines -->
-    <table>
+    <div class="rx-title">Rx</div>
+
+    <table class="prescription-table">
+        <thead>
+            <tr>
+                <th class="medicine-col" style="text-align:left;">
+                    Medicine
+                </th>
+
+                <th class="frequency-col">
+                    Frequency
+                </th>
+
+                <th class="duration-col">
+                    Duration
+                </th>
+
+                <th class="qty-col">
+                    Qty
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach ($prescription->prescriptionDetails as $index => $detail)
+                <tr>
+
+                    {{-- Medicine --}}
+                    <td class="medicine-col">
+
+                        <div class="medicine-name">
+                            {{ $index + 1 }}.
+                            {{ $detail->medicine->medicine_name ?? '' }}
+                        </div>
+
+                        {{-- Medicine Master Comment --}}
+                        @if (!empty($detail->medicine->comment))
+                            <div class="medicine-comment">
+                                {{ $detail->medicine->comment }}
+                            </div>
+                        @endif
+
+                        {{-- Medicine Master Content --}}
+                        @if (!empty($detail->medicine->content))
+                            <div class="medicine-content">
+                                {{ $detail->medicine->content }}
+                            </div>
+                        @endif
+
+                    </td>
+
+
+                    {{-- Frequency / Dosage --}}
+                    <td class="frequency-col">
+
+                        {{ $detail->dosage->dosage ?? '' }}
+
+                    </td>
+
+
+                    {{-- Duration --}}
+                    <td class="duration-col">
+
+                        @if ($detail->days)
+                            {{ $detail->days }} days
+                        @endif
+
+                    </td>
+
+
+                    {{-- Quantity --}}
+                    <td class="qty-col">
+
+                        {{ $detail->medicine_qty ?? '' }}
+
+                    </td>
+
+                </tr>
+            @endforeach
+
+        </tbody>
+    </table>
+
+
+
+
+    {{-- <table>
         <tr>
             <td colspan="2" class="rx">Rx</td>
         </tr>
@@ -184,7 +274,7 @@
                 </td>
             </tr>
         @endforeach
-    </table>
+    </table> --}}
 
 
     <!-- Signature -->
