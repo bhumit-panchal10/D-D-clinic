@@ -303,13 +303,13 @@
                                             @php
                                                 $treatments = [
                                                     'scaling' => 'Scaling',
-                                                    'polishing' => 'Polishing',
+                                                    // 'polishing' => 'Polishing',
                                                     'grinding' => 'Grinding',
-                                                    'bleaching' => 'Bleaching',
-                                                    'smile_design' => 'Smile Design',
+                                                    // 'bleaching' => 'Bleaching',
+                                                    // 'smile_design' => 'Smile Design',
                                                     'orthodontics' => 'Orthodontics',
-                                                    'surgery' => 'Surgery',
-                                                    'biopsy' => 'Biopsy',
+                                                    // 'surgery' => 'Surgery',
+                                                    // 'biopsy' => 'Biopsy',
                                                 ];
                                             @endphp
 
@@ -381,68 +381,125 @@
                                 <div class="card-body p-3">
                                     <div class="selected-teeth-summary">
                                         <!-- RCT_IPC -->
-                                        <div class="condition-summary mb-3">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-danger" style="min-width: 90px;">RCT/IPC:</strong>
-                                                <div class="teeth-list-container flex-grow-1">
-                                                    <div id="RCT_IPC-teeth-list" class="teeth-list">
-                                                        <span class="text-muted small">No teeth selected</span>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <strong class="text-danger"
+                                                            style="min-width: 90px;">RCT/IPC:</strong>
+                                                        <div class="teeth-list-container flex-grow-1">
+                                                            <div id="RCT_IPC-teeth-list" class="teeth-list">
+                                                                <span class="text-muted small">No teeth selected</span>
+                                                            </div>
+                                                            <div class="count-badge">
+                                                                <span id="RCT_IPC-count"
+                                                                    class="badge bg-danger rounded-pill">0</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="count-badge">
-                                                        <span id="RCT_IPC-count"
-                                                            class="badge bg-danger rounded-pill">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <textarea name="rct_ipc_comment" class="form-control">
+                                                            </textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!-- Extraction -->
-                                        <div class="condition-summary mb-3">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-warning" style="min-width: 90px;">Extraction:</strong>
-                                                <div class="teeth-list-container flex-grow-1">
-                                                    <div id="Extraction-teeth-list" class="teeth-list">
-                                                        <span class="text-muted small">No teeth selected</span>
-                                                    </div>
-                                                    <div class="count-badge">
-                                                        <span id="Extraction-count"
-                                                            class="badge bg-warning rounded-pill">0</span>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <strong class="text-warning"
+                                                            style="min-width: 90px;">Extraction:</strong>
+                                                        <div class="teeth-list-container flex-grow-1">
+                                                            <div id="Extraction-teeth-list" class="teeth-list">
+                                                                <span class="text-muted small">No teeth selected</span>
+                                                            </div>
+                                                            <div class="count-badge">
+                                                                <span id="Extraction-count"
+                                                                    class="badge bg-warning rounded-pill">0</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <textarea name="extraction_comment" class="form-control">
+                                                            </textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
+
 
                                         <!-- Restoration -->
-                                        <div class="condition-summary mb-3">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-dark" style="min-width: 90px;">Restoration:</strong>
-                                                <div class="teeth-list-container flex-grow-1">
-                                                    <div id="Restoration-teeth-list" class="teeth-list">
-                                                        <span class="text-muted small">No teeth selected</span>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <strong class="text-dark"
+                                                            style="min-width: 90px;">Restoration:</strong>
+                                                        <div class="teeth-list-container flex-grow-1">
+                                                            <div id="Restoration-teeth-list" class="teeth-list">
+                                                                <span class="text-muted small">No teeth selected</span>
+                                                            </div>
+                                                            <div class="count-badge">
+                                                                <span id="Restoration-count"
+                                                                    class="badge bg-dark rounded-pill">0</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="count-badge">
-                                                        <span id="Restoration-count"
-                                                            class="badge bg-dark rounded-pill">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <textarea name="restoration_comment" class="form-control">
+                                                            </textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
+
                                         <!-- Prosthesis -->
-                                        <div class="condition-summary mb-3">
-                                            <div class="d-flex align-items-start mb-2">
-                                                <strong class="text-primary" style="min-width: 90px;">Prosthesis:</strong>
-                                                <div class="teeth-list-container flex-grow-1">
-                                                    <div id="Prosthesis-teeth-list" class="teeth-list">
-                                                        <span class="text-muted small">No teeth selected</span>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <strong class="text-primary"
+                                                            style="min-width: 90px;">Prosthesis:</strong>
+                                                        <div class="teeth-list-container flex-grow-1">
+                                                            <div id="Prosthesis-teeth-list" class="teeth-list">
+                                                                <span class="text-muted small">No teeth selected</span>
+                                                            </div>
+                                                            <div class="count-badge">
+                                                                <span id="Prosthesis-count"
+                                                                    class="badge bg-primary rounded-pill">0</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="count-badge">
-                                                        <span id="Prosthesis-count"
-                                                            class="badge bg-primary rounded-pill">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="condition-summary mb-3">
+                                                    <div class="d-flex align-items-start mb-2">
+                                                        <textarea name="prosthesis_comment" class="form-control">
+                                                            </textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>

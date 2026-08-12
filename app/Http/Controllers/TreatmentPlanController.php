@@ -120,6 +120,18 @@ class TreatmentPlanController extends Controller
         ));
     }
 
+    public function update(Request $request, $examinationid)
+    {
+        TreatmentPlan::where('id', $examinationid)
+            ->update([
+                'other_treatment' => $request->other_treatment,
+            ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Other treatment updated successfully!');
+    }
+
     public function add(Request $request, $patientId)
     {
         $examination = '';
@@ -152,7 +164,6 @@ class TreatmentPlanController extends Controller
 
     public function store(Request $request, $patientId)
     {
-
         $request->validate([
             'exam_date' => 'required|date',
             'impacted'  => 'nullable|string|max:500',
@@ -175,6 +186,10 @@ class TreatmentPlanController extends Controller
             'Dentures'        => $request->impacted,
             'implants'        => $request->pocket,
             'other_treatment' => $request->vitality,
+            'rct_ipc_comment' => $request->rct_ipc_comment,
+            'extraction_comment' => $request->extraction_comment,
+            'restoration_comment' => $request->restoration_comment,
+            'prosthesis_comment' => $request->prosthesis_comment,
         ];
 
 
@@ -245,8 +260,6 @@ class TreatmentPlanController extends Controller
                 }
             }
         }
-
-
         return redirect()
             ->route('TreatmentPlan.index', ['patient' => $patientId])
             ->with('success', 'Treatment Plan saved successfully!');

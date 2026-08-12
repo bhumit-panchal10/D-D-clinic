@@ -612,6 +612,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('TreatmentPlan/add/{patient}', [TreatmentPlanController::class, 'add'])
         ->name('TreatmentPlan.add');
 
+    Route::post('TreatmentPlan/add-other/{examinationid}', [TreatmentPlanController::class, 'update'])
+        ->name('TreatmentPlan.update');
+
     Route::post('/save-condition', [TreatmentPlanController::class, 'saveCondition'])
         ->name('save.comments');
 

@@ -170,7 +170,8 @@
                 <!-- Patient Header -->
                 <div class="d-flex justify-content-between align-items-center m-3">
                     <h5 class="mb-0">
-                        Name: {{ $patient->name }} | Mobile: {{ $patient->mobile1 }} |
+                        Name: {{ $patient->name }} {{ $patient->middle_name }} {{ $patient->last_name }} | Mobile No 1:
+                        {{ $patient->mobile1 }} |
                         Age: @php
                             $age = $patient->Age ?? null;
                             $dob = $patient->dob ?? null;
@@ -372,13 +373,13 @@
                                             @php
                                                 $treatments = [
                                                     'Scaling',
-                                                    'polishing',
+                                                    // 'polishing',
                                                     'Grinding',
-                                                    'Bleaching',
-                                                    'smile_design',
+                                                    // 'Bleaching',
+                                                    // 'smile_design',
                                                     'orthodontics',
-                                                    'surgery',
-                                                    'biopsy',
+                                                    // 'surgery',
+                                                    // 'biopsy',
                                                 ];
                                             @endphp
 
@@ -396,6 +397,38 @@
                                                     @endif
                                                 </div>
                                             @endforeach
+                                            <div class="row">
+                                                <div class="col-md-6">
+
+                                                    <label for="pocket" class="form-label">RCT/IPC Comments</label>
+                                                    <textarea name="pocket" id="pocket" class="form-control" rows="2"
+                                                        placeholder="Describe pocket conditions...">{{ $examination->rct_ipc_comment ?? '' }}</textarea>
+
+                                                </div>
+                                                <div class="col-md-6">
+
+                                                    <label for="pocket" class="form-label">Extraction Comments</label>
+                                                    <textarea name="pocket" id="pocket" class="form-control" rows="2"
+                                                        placeholder="Describe pocket conditions...">{{ $examination->extraction_comment ?? '' }}</textarea>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="pocket" class="form-label">Restoration Comments</label>
+                                                    <textarea name="pocket" id="pocket" class="form-control" rows="2"
+                                                        placeholder="Describe pocket conditions...">{{ $examination->rct_ipc_comment ?? '' }}</textarea>
+                                                </div>
+                                                <div class="col-md-6">
+
+                                                    <label for="pocket" class="form-label">Extraction Comments</label>
+                                                    <textarea name="pocket" id="pocket" class="form-control" rows="2"
+                                                        placeholder="Describe pocket conditions...">{{ $examination->extraction_comment ?? '' }}</textarea>
+
+                                                </div>
+                                            </div>
+
 
                                             <div class="mb-3 col-lg-6">
                                                 <label for="impacted" class="form-label">Dentures:CD / RPD / CPD /
@@ -409,12 +442,19 @@
                                                 <textarea name="pocket" id="pocket" class="form-control" rows="2"
                                                     placeholder="Describe pocket conditions...">{{ $examination->implants ?? '' }}</textarea>
                                             </div>
-
-                                            <div class="mb-3 col-lg-12">
-                                                <label for="vitality" class="form-label">Other treatment</label>
-                                                <textarea name="vitality" id="vitality" class="form-control" rows="2" placeholder="Describe vitality...">{{ $examination->other_treatment ?? '' }}</textarea>
-                                            </div>
-
+                                            <form method="POST"
+                                                action="{{ route('TreatmentPlan.update', $examination->id) }}">
+                                                <div class="mb-3 col-lg-12">
+                                                    <label for="other_treatment" class="form-label">Other
+                                                        treatment</label>
+                                                    <textarea name="other_treatment" id="other_treatment" class="form-control" rows="2"
+                                                        placeholder="Describe Other treatment...">{{ $examination->other_treatment ?? '' }}</textarea>
+                                                </div>
+                                                @csrf
+                                                <div class="text-start">
+                                                    <button type="submit" class="btn btn-primary">Update</button>
+                                                </div>
+                                            </form>
                                         </div>
 
                                     </div>
