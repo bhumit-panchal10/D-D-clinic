@@ -52,6 +52,10 @@ class TreatmentPlan extends Model
         'dentures_completed',
         'implants_completed',
         'other_treatment_completed',
+        'rct_ipc_comment',
+        'extraction_comment',
+        'restoration_comment',
+        'prosthesis_comment',
     ];
 
     public function details()

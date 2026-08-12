@@ -170,7 +170,8 @@
                 <!-- Patient Header -->
                 <div class="d-flex justify-content-between align-items-center m-3">
                     <h5 class="mb-0">
-                        Name: {{ $patient->name }} | Mobile: {{ $patient->mobile1 }} |
+                        Name: {{ $patient->name }} {{ $patient->middle_name }} {{ $patient->last_name }} | Mobile No 1:
+                        {{ $patient->mobile1 }} |
                         Age: @php
                             $age = $patient->Age ?? null;
                             $dob = $patient->dob ?? null;

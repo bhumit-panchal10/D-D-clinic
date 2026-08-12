@@ -18,7 +18,7 @@ class PaymentsController extends Controller
         $Paidamount = Payment::where('patient_id', $patient_id)->sum('amount');
         $discount = Payment::where('patient_id', $patient_id)->sum('discount');
         $patient = Patient::findOrFail($patient_id);
-        $payments = Payment::where('patient_id', $patient_id)->paginate(config('app.per_page'));
+        $payments = Payment::where('patient_id', $patient_id)->orderBy('payment_date', 'desc')->paginate(config('app.per_page'));
         return view('payments.index', compact('discount', 'patient', 'payments', 'Totalamount', 'Paidamount', 'patient_id'));
     }
 
