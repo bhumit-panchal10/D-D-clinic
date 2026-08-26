@@ -361,7 +361,7 @@
     <!-- Delete Modal End -->
 
     <!-- Treatment Plan Modal -->
-    <div class="modal fade" id="treatmentPlanModal" tabindex="-1" aria-hidden="true">
+     <div class="modal fade" id="treatmentPlanModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -436,7 +436,11 @@
                                                             @endif
                                                         </div>
                                                     @endforeach
+                                                    
                                                 </div>
+                                            @endif
+                                            @if(isset($plan->rct_ipc_comment) && $plan->rct_ipc_comment != "")
+                                                <strong>Comments :</strong> {{ $plan->rct_ipc_comment ?? '-' }}
                                             @endif
                                         </td>
 
@@ -466,6 +470,9 @@
                                                     @endforeach
                                                 </div>
                                             @endif
+                                            @if(isset($plan->extraction_comment) && $plan->extraction_comment != "")
+                                                <strong>Comments :</strong> {{ $plan->extraction_comment ?? '-' }}
+                                            @endif
                                         </td>
 
                                         <td>
@@ -494,6 +501,9 @@
                                                     @endforeach
                                                 </div>
                                             @endif
+                                            @if(isset($plan->restoration_comment) && $plan->restoration_comment != "")
+                                                <strong>Comments : </strong> {{ $plan->restoration_comment ?? '-' }}
+                                            @endif
                                         </td>
 
                                         <td>
@@ -521,6 +531,9 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
+                                            @endif
+                                            @if(isset($plan->prosthesis_comment) && $plan->prosthesis_comment != "")
+                                                <strong>Comments : </strong> {{ $plan->prosthesis_comment ?? '-' }}
                                             @endif
                                         </td>
                                         <td>
@@ -727,7 +740,7 @@
         });
     </script>
     <script>
-        $(document).on('click', '.completeOtherTreatment', function() {
+     $(document).on('click', '.completeOtherTreatment', function() {
 
             let btn = $(this);
 
@@ -789,7 +802,6 @@
             });
 
         });
-
         function getEditData(id) {
 
             var url = "{{ route('notes.edit', ':id') }}";
