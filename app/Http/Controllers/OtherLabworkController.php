@@ -38,7 +38,6 @@ class OtherLabworkController extends Controller
             'given_by' => 'nullable|string',
             'work_code' => 'nullable|string',
         ]);
-
         Labwork::create([
             'consult_name' => $request->consult_name,
             'patient_id' => 0,
@@ -96,7 +95,8 @@ class OtherLabworkController extends Controller
         ];
         Labwork::where("id", $request->id)->update($data);
 
-        return redirect()->route('Otherlabworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        // return redirect()->route('Otherlabworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        return redirect()->back()->with('success', 'Received Date updated successfully.');
     }
 
 
@@ -140,7 +140,7 @@ class OtherLabworkController extends Controller
         $patient_id = $labwork->patient_id;
         $labwork->delete();
 
-        return redirect()->route('Otherlabworks.index', ['patient_id' => $patient_id])
-            ->with('success', 'Labwork deleted successfully.');
+        //return redirect()->route('Otherlabworks.index', ['patient_id' => $patient_id])->with('success', 'Labwork deleted successfully.');
+        return redirect()->back()->with('success', 'Labwork deleted successfully.');
     }
 }

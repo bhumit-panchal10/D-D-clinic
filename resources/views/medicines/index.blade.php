@@ -60,6 +60,11 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label>Dosage Comment<span class="text-danger"></span></label>
+                                        <textarea class="form-control" placeholder="Enter Dosage Comment" name="dosage_comment" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
                                         <label>Days<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" name="days" maxlength="10"
                                             placeholder="Enter Days" required>
@@ -107,8 +112,9 @@
                                                         data-dosage="{{ $medicine->dosage_id }}"
                                                         data-days="{{ $medicine->days }}"
                                                         data-comment="{{ $medicine->comment }}"
-                                                        data-content="{{ $medicine->content }}" data-bs-toggle="modal"
-                                                        data-bs-target="#editMedicineModal">
+                                                        data-content="{{ $medicine->content }}"
+                                                        data-dosage_comment="{{ $medicine->dosage_comment }}"
+                                                        data-bs-toggle="modal" data-bs-target="#editMedicineModal">
                                                         Edit
                                                     </button>
 
@@ -177,13 +183,16 @@
                         </div>
 
                         <div class="mb-3">
+                            <label>Dosage Comment<span class="text-danger"></span></label>
+                            <textarea class="form-control" placeholder="Enter Dosage Comment" name="dosage_comment" id="Editdosage_comment"
+                                rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label>Days <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="days" id="editdays" maxlength="10"
                                 required>
                         </div>
-
-
-
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Update</button>
@@ -238,6 +247,7 @@
                 let dosage = $(this).data("dosage");
                 let comment = $(this).data("comment");
                 let content = $(this).data("content");
+                let dosage_comment = $(this).data("dosage_comment");
                 let days = $(this).data("days");
                 let currentPage = "{{ request('page', 1) }}";
 
@@ -246,8 +256,8 @@
                 $("#Editdosage_id").val(dosage);
                 $("#Editcomment").val(comment);
                 $("#Editcontent").val(content);
+                $("#Editdosage_comment").val(dosage_comment);
                 $("#editdays").val(days);
-
 
                 let actionUrl = "{{ route('medicine.update', ':id') }}".replace(':id', id) + "?page=" +
                     currentPage;

@@ -30,7 +30,17 @@
                         <form action="{{ route('prescriptions.update', $prescription->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>Date</label>
+                                    <input type="date" name="date" class="form-control" value="{{ $prescription->date ?? date('Y-m-d') }}"
+                                        readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Special Instruction</label>
+                                    <textarea type="text" name="strSpecialInstruction" placeholder="Enter Special Instruction" class="form-control">{{ $prescription->strSpecialInstruction ?? '' }}</textarea>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="prescriptionTable">
                                     <thead>

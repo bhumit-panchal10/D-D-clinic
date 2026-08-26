@@ -98,7 +98,8 @@ class LabworkController extends Controller
         ];
         Labwork::where("id", $request->id)->update($data);
 
-        return redirect()->route('labworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        // return redirect()->route('labworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        return redirect()->back()->with('success', 'Received Date updated successfully.');
     }
 
 
@@ -132,7 +133,7 @@ class LabworkController extends Controller
         }
 
         $labworks = $labworks->paginate(10);
-
+       // dd($labworks);
         return view('labworks.full_list', compact('labworks'));
     }
 
@@ -142,7 +143,7 @@ class LabworkController extends Controller
         $patient_id = $labwork->patient_id;
         $labwork->delete();
 
-        return redirect()->route('labworks.index', ['patient_id' => $patient_id])
-            ->with('success', 'Labwork deleted successfully.');
+        // return redirect()->route('labworks.index', ['patient_id' => $patient_id])->with('success', 'Labwork deleted successfully.');
+        return redirect()->back()->with('success', 'Labwork deleted successfully.');
     }
 }
