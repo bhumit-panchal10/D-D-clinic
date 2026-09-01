@@ -21,7 +21,6 @@
                     </div>
                 @endif
 
-
                 <div class="row">
                     <!-- Medicine Create Form -->
                     <div class="col-lg-5">
