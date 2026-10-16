@@ -62,9 +62,9 @@
                                     <div class="mb-3">
                                         <label for="amount" class="form-label">Special discount<span
                                                 class="text-danger">*</span></label>
-                                        <input type="text" name="discount" id="discount" class="form-control"
-                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')" maxlength="10"
-                                            value="" required>
+                                        <input type="text" name="discount" id="discount" value="0"
+                                            class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                                            maxlength="10" value="" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="mode" class="form-label">Payment Mode<span
@@ -74,6 +74,15 @@
                                             <option value="UPI">UPI</option>
                                             <option value="Card swipe">Card swipe</option>
                                             <option value="Cheque">Cheque</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="received_by" class="form-label">Received By<span
+                                                class="text-danger">*</span></label>
+                                        <select name="received_by" id="received_by" class="form-select" required>
+                                            @foreach ($Users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="row mt-3">
@@ -96,6 +105,18 @@
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title mb-0">Payments List</h5>
+                                <!--<div class="d-flex justify-content-between align-items-center m-3">-->
+                                <!--    <h5 class="mb-0">-->
+                                <!--        Total Amount: {{ $Totalamount }} | Paid Amount: {{ $Paidamount }} | Discount:-->
+                                <!--        {{ $discount }}-->
+                                <!--        @if ($Totalamount > $Paidamount)
+    -->
+                                <!--            | Due Amount: {{ $Totalamount - $Paidamount - $discount }}-->
+                                <!--
+    @endif-->
+
+                                <!--    </h5>-->
+                                <!--</div>-->
                                 <div class="d-flex justify-content-between align-items-center m-3">
                                     <button type="button" class="btn btn-primary btn-sm" id="toggleAmountBtn">
                                         Show Amount Details
@@ -105,6 +126,10 @@
                                         <h5 class="mb-0">
                                             <span class="badge bg-info">
                                                 Total Amount: ₹{{ number_format($Totalamount, 2) }}
+                                            </span>
+
+                                            <span class="badge bg-primary">
+                                                Discount: ₹{{ number_format($notes->discount ?? 0, 2) }}
                                             </span>
 
                                             <span class="badge bg-success ms-2">
@@ -132,6 +157,7 @@
                                             <th>Amount</th>
                                             <th>Discount</th>
                                             <th>Payment Mode</th>
+                                            <th>Received By</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -143,6 +169,7 @@
                                                 <td>{{ $payment->amount }}</td>
                                                 <td>{{ $payment->discount }}</td>
                                                 <td>{{ $payment->mode }}</td>
+                                                <td>{{ $payment->received_by ?? '' }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-sm btn-primary edit-btn"
                                                         onclick="getEditData(<?= $payment->id ?>)" data-bs-toggle="modal"
@@ -220,6 +247,15 @@
                                 <option value="UPI">UPI</option>
                                 <option value="Card swipe">Card swipe</option>
                                 <option value="Cheque">Cheque</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="received_by" class="form-label">Received By</label>
+                            <select name="received_by" id="edit_received_by" class="form-select" required>
+                                @foreach ($Users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -312,6 +348,7 @@
                         $("#edit_discount").val(obj.discount);
                         $("#edit_mode").val(obj.mode);
                         $("#edit_comments").val(obj.comments);
+                        $("#edit_received_by").val(obj.received_by);
                         $('#payment_id').val(id);
                     },
                     error: function(xhr) {

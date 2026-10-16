@@ -95,45 +95,118 @@ class ReportController extends Controller
     }
 
 
+    // public function duePaymentsReport(Request $request)
+    // {
+    //     // Get Date Range (Default: Current Month)
+    //     $fromDate = $request->input('from_date', now()->startOfMonth()->toDateString());
+    //     $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
+
+    //     // Fetch orders with payment details
+    //     $orders = Order::with('patient')
+    //         // ->where('due_amount', '>', '0')
+    //         ->whereBetween('created_at', [$fromDate, $toDate])
+    //         ->get()
+    //         ->map(function ($order) {
+    //             return [
+    //                 'patient_name' => $order->patient->name,
+    //                 'invoice_no' => $order->invoice_no,
+    //                 'amount' => $order->amount,
+    //                 'discount' => $order->discount,
+    //                 'net_amount' => $order->net_amount,
+    //                 'paid_amount' => $order->payments->sum('amount'), // Sum of all payments
+    //                 'due_amount' => max($order->net_amount - $order->payments->sum('amount'), 0) // Calculate due amount
+    //             ];
+    //         })
+    //         ->filter(function ($order) {
+    //             return $order['due_amount'] > 0;
+    //         })
+    //         ->values();
+    //     // dd($orders);
+
+    //     // Calculate total amounts
+    //     $totals = [
+    //         'total_amount' => $orders->sum('amount'),
+    //         'total_discount' => $orders->sum('discount'),
+    //         'total_net' => $orders->sum('net_amount'),
+    //         'total_paid' => $orders->sum('paid_amount'),
+    //         'total_due' => $orders->sum('due_amount'),
+    //     ];
+
+    //     return view('reports.due_payments', compact('orders', 'fromDate', 'toDate', 'totals'));
+    // }
+
     public function duePaymentsReport(Request $request)
     {
+        $fromDate = $request->input(
+            'from_date',
+            now()->startOfMonth()->toDateString()
+        );
 
-        // Get Date Range (Default: Current Month)
-        $fromDate = $request->input('from_date', now()->startOfMonth()->toDateString());
-        $toDate = $request->input('to_date', now()->endOfMonth()->toDateString());
+        $toDate = $request->input(
+            'to_date',
+            now()->endOfMonth()->toDateString()
+        );
 
-        // Fetch orders with payment details
-        $orders = Order::with('patient')
-            // ->where('due_amount', '>', '0')
-            ->whereBetween('created_at', [$fromDate, $toDate])
-            ->get()
-            ->map(function ($order) {
-                return [
-                    'patient_name' => $order->patient->name,
-                    'invoice_no' => $order->invoice_no,
-                    'amount' => $order->amount,
-                    'discount' => $order->discount,
-                    'net_amount' => $order->net_amount,
-                    'paid_amount' => $order->payments->sum('amount'), // Sum of all payments
-                    'due_amount' => max($order->net_amount - $order->payments->sum('amount'), 0) // Calculate due amount
-                ];
-            })
-            ->filter(function ($order) {
-                return $order['due_amount'] > 0;
-            })
-            ->values();
-        // dd($orders);
+        $notes = Notes::with([
+            'patient',
+            'treatment_detail',
+        ])
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->orderBy('date', 'desc')
+            ->paginate(config('app.per_page'));
 
-        // Calculate total amounts
-        $totals = [
-            'total_amount' => $orders->sum('amount'),
-            'total_discount' => $orders->sum('discount'),
-            'total_net' => $orders->sum('net_amount'),
-            'total_paid' => $orders->sum('paid_amount'),
-            'total_due' => $orders->sum('due_amount'),
-        ];
+        foreach ($notes as $note) {
 
-        return view('reports.due_payments', compact('orders', 'fromDate', 'toDate', 'totals'));
+            // Patient ka selected date range ka total amount
+            $note->total_amount = Notes::where('patient_id', $note->patient_id)
+                ->whereBetween('date', [$fromDate, $toDate])
+                ->sum('Net_amount');
+
+            // Selected date range me received payment
+            $note->paid_amount = Payment::where('patient_id', $note->patient_id)
+                ->whereBetween('payment_date', [$fromDate, $toDate])
+                ->sum('amount');
+
+            // Due
+            $note->due_amount = max(
+                $note->total_amount - $note->paid_amount,
+                0
+            );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Only Due Payments
+    |--------------------------------------------------------------------------
+    */
+        $notes->setCollection(
+            $notes->getCollection()
+                ->filter(function ($note) {
+                    return $note->due_amount > 0;
+                })
+                ->values()
+        );
+
+        /*
+    |--------------------------------------------------------------------------
+    | Totals
+    |--------------------------------------------------------------------------
+    */
+        $totalAmount = $notes->getCollection()->sum('total_amount');
+        $paidAmount  = $notes->getCollection()->sum('paid_amount');
+        $dueAmount   = $notes->getCollection()->sum('due_amount');
+
+        return view(
+            'reports.due_payments',
+            compact(
+                'notes',
+                'fromDate',
+                'toDate',
+                'totalAmount',
+                'paidAmount',
+                'dueAmount'
+            )
+        );
     }
 
     public function pay_to_dr_Report(Request $request)

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'User List')
+@section('title', 'Staff List')
 
 @section('content')
 
@@ -18,7 +18,7 @@
                             <div class="card-header"
                                 style="display: flex;
                             justify-content: space-between;">
-                                <h5 class="card-title mb-0">User List</h5>
+                                <h5 class="card-title mb-0">Staff List</h5>
                                 <a href="{{ route('users.create') }}" class="btn btn-sm btn-primary">
                                     <i data-feather="plus"></i> Add New
                                 </a>
@@ -31,7 +31,7 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Phone no.</th>
                                             <th scope="col">Email</th>
-                                            <th scope="col">Role</th>
+                                            {{-- <th scope="col">Role</th> --}}
                                             <th scope="col">Status</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -44,7 +44,7 @@
                                                 <td>{{ $user->username }}</td>
                                                 <td>{{ $user->mobile_number }}</td>
                                                 <td>{{ $user->email }}</td>
-                                                <td>{{ $user->name }}</td>
+                                                {{-- <td>{{ $user->name }}</td> --}}
 
                                                 <td>
                                                     @if ($user->status == 0)
@@ -76,11 +76,11 @@
                                                         onclick="deleteData(<?= $user->id ?>);">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </a>
-                                                    <a class="mx-1" href="#" data-bs-toggle="modal"
+                                                    {{-- <a class="mx-1" href="#" data-bs-toggle="modal"
                                                         title="Change Password" data-bs-target="#changepassword"
                                                         onclick="editpassword(<?= $user->id ?>);">
                                                         <i class="fa fa-key" aria-hidden="true"></i>
-                                                    </a>
+                                                    </a> --}}
                                                 </td>
                                             </tr>
                                             <?php $i++; ?>

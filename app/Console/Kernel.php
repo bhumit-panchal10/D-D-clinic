@@ -13,11 +13,13 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
-    {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('auto:birthdaywith')->now();
-        // $schedule->command('auto:birthdaywith')->everyMinute();
+    protected function schedule(
+        \Illuminate\Console\Scheduling\Schedule $schedule
+    ) {
+        $schedule->command('appointments:send-confirmation-sms')
+            ->dailyAt('21:00')
+            ->timezone('Asia/Kolkata')
+            ->withoutOverlapping();
     }
 
     /**

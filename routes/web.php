@@ -376,6 +376,10 @@ Route::prefix('admin')->name('patient.')->middleware(['auth', 'admin'])->group(f
     Route::get('/patient/autocomplete', [PatientController::class, 'autocomplete'])->name('autocomplete');
     Route::get('/get-patient-details/{id}', [PatientController::class, 'getPatientDetails'])->name('get.patient.details');
     Route::get('/patient/overview/{id?}', [PatientController::class, 'overview'])->name('overview');
+    Route::get('/patient-backup', [PatientController::class, 'patientBackup'])
+        ->name('backup');
+    Route::get('/patient-backup/{id}/pdf', [PatientController::class, 'patientBackupSinglePdf'])
+        ->name('backup.single.pdf');
 });
 
 // Maintenance Register Routes
