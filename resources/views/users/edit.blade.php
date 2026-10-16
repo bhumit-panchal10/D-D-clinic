@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit User')
+@section('title', 'Edit Staff')
 
 @section('content')
 
@@ -15,7 +15,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0">Edit User</h4>
+                            <h4 class="mb-sm-0">Edit Staff</h4>
                             <div class="page-title-right">
                                 <a href="{{ route('users.index') }}"
                                     class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
@@ -70,16 +70,16 @@
                                                 </div>
                                             </div>
                                             <!--end col-->
-                                            <div class="col-lg-4 col-md-6">
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     Address
                                                     <input type="text" maxlength="255" class="form-control"
                                                         name="address"
                                                         value="{{ old('address') ? old('address') : $user->address }}">
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!--end col-->
-                                            <div class="col-lg-4 col-md-6">
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     User Type
                                                     <select class="form-control" name="role_id" onchange="managerbind();"
@@ -93,8 +93,8 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6">
+                                            </div> --}}
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     Status
                                                     <select class="form-control" name="status">
@@ -107,7 +107,7 @@
                                                             Inactive</option>
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!--end col-->
                                         </div>
                                         <div class="card-footer mt-5" style="float : right;">

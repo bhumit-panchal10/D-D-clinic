@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add User')
+@section('title', 'Add Staff')
 
 @section('content')
 
@@ -14,7 +14,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0">Add User</h4>
+                            <h4 class="mb-sm-0">Add Staff</h4>
                             <div class="page-title-right">
                                 <a href="{{ route('users.index') }}"
                                     class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
@@ -68,16 +68,16 @@
                                                 </div>
                                             </div>
                                             <!--end col-->
-                                            <div class="col-lg-4 col-md-6">
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     Address
                                                     <input type="text" class="form-control" id=""
                                                         placeholder="Enter Address" name="address" maxlength="255"
                                                         autocomplete="off" value="{{ old('address') }}">
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!--end col-->
-                                            <div class="col-lg-4 col-md-6">
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     User Type
                                                     <select class="form-control" name="role_id" onchange="managerbind();"
@@ -91,16 +91,16 @@
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!--end col-->
-                                            <div class="col-lg-4 col-md-6">
+                                            {{-- <div class="col-lg-4 col-md-6">
                                                 <div>
                                                     Password<span style="color:red;">*</span>
                                                     <input type="password" class="form-control" maxlength="20"
                                                         name="password" autocomplete="off" value="{{ old('password') }}"
                                                         id="" placeholder="Enter Password" required>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                             <!--end col-->
                                             <div class="col-lg-4 col-md-6">
                                                 <div>

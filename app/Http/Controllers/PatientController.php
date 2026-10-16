@@ -23,6 +23,185 @@ use App\Models\PatientsConcernForm;
 
 class PatientController extends Controller
 {
+
+    public function patientBackup(Request $request)
+    {
+        $search = trim($request->get('search', ''));
+        $status = $request->get('status', '');
+
+        $patients = Patient::query()
+
+            ->with([
+                'notes' => function ($query) {
+                    $query->with([
+                        'treatment_detail',
+                        'subTreatment'
+                    ])
+                        ->orderBy('date', 'asc')
+                        ->orderBy('id', 'asc');
+                },
+
+                'payments' => function ($query) {
+                    $query->orderBy('payment_date', 'asc')
+                        ->orderBy('id', 'asc');
+                }
+            ])
+
+            ->when($search != '', function ($query) use ($search) {
+
+                $query->where(function ($q) use ($search) {
+
+                    $q->where('name', 'LIKE', '%' . $search . '%')
+                        ->orWhere('middle_name', 'LIKE', '%' . $search . '%')
+                        ->orWhere('last_name', 'LIKE', '%' . $search . '%')
+                        ->orWhere('case_no', 'LIKE', '%' . $search . '%')
+                        ->orWhere('mobile1', 'LIKE', '%' . $search . '%')
+                        ->orWhere('mobile2', 'LIKE', '%' . $search . '%')
+                        ->orWhere('email', 'LIKE', '%' . $search . '%');
+                });
+            })
+
+            ->when($status != '', function ($query) use ($status) {
+
+                if ($status == 'completed') {
+
+                    $query->where('is_completed', 1);
+                } elseif ($status == 'active') {
+
+                    $query->where(function ($q) {
+
+                        $q->where('is_completed', 0)
+                            ->orWhereNull('is_completed');
+                    });
+                }
+            })
+
+            ->orderBy('id', 'desc')
+
+            // 4000-5000 patients ke liye get() use mat karo
+            ->paginate(25)
+
+            ->withQueryString();
+
+        $patients->getCollection()->transform(function ($patient) {
+
+            $patient->total_treatment_amount =
+                $patient->notes->sum(function ($note) {
+
+                    return (float) ($note->Net_amount ?? 0);
+                });
+
+
+            $patient->total_paid_amount =
+                $patient->payments->sum(function ($payment) {
+
+                    return (float) ($payment->amount ?? 0);
+                });
+
+
+            $patient->total_due_amount =
+                $patient->total_treatment_amount -
+                $patient->total_paid_amount;
+
+
+            $patient->treatment_count =
+                $patient->notes->count();
+
+
+            $patient->payment_count =
+                $patient->payments->count();
+
+
+            return $patient;
+        });
+        return view(
+            'reports.patient-backup',
+            compact(
+                'patients',
+                'search',
+                'status'
+            )
+        );
+    }
+
+    public function patientBackupSinglePdf($id)
+    {
+        $patient = Patient::with([
+
+            'notes' => function ($query) {
+
+                $query->with([
+                    'treatment_detail',
+                    'subTreatment'
+                ])
+                    ->orderBy('date', 'asc')
+                    ->orderBy('id', 'asc');
+            },
+
+            'payments' => function ($query) {
+
+                $query->orderBy('payment_date', 'asc')
+                    ->orderBy('id', 'asc');
+            }
+
+        ])
+            ->findOrFail($id);
+
+        $patient->total_treatment_amount =
+            $patient->notes->sum(function ($note) {
+
+                return (float) ($note->Net_amount ?? 0);
+            });
+
+        $patient->total_paid_amount =
+            $patient->payments->sum(function ($payment) {
+
+                return (float) ($payment->amount ?? 0);
+            });
+
+        $patient->total_due_amount =
+            $patient->total_treatment_amount -
+            $patient->total_paid_amount;
+
+
+        $pdf = Pdf::loadView(
+            'reports.patient-single-backup-pdf',
+            compact('patient')
+        );
+
+
+        $pdf->setPaper(
+            'a4',
+            'portrait'
+        );
+
+        $patientName = trim(
+            ($patient->name ?? '') . '-' .
+                ($patient->middle_name ?? '') . '-' .
+                ($patient->last_name ?? '')
+        );
+
+
+        $patientName = preg_replace(
+            '/[^A-Za-z0-9\-]/',
+            '-',
+            $patientName
+        );
+
+
+        $fileName =
+            'Patient-' .
+            ($patient->case_no ?? $patient->id) .
+            '-' .
+            $patientName .
+            '.pdf';
+
+
+
+        return $pdf->stream($fileName);
+        // return $pdf->download($fileName);
+    }
+
     public function overview(Request $request, $patient_id = null)
     {
         $patient = Patient::findOrFail($patient_id); // Fetch patient details

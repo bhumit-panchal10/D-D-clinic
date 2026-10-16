@@ -121,7 +121,7 @@
                         <a class="nav-link menu-link @if (request()->routeIs('user.*')) active @endif"
                             href="{{ route('users.index') }}">
                             <i class="fas fa-user"></i> <!-- User Icon -->
-                            <span data-key="t-user">Manage User</span>
+                            <span data-key="t-user">Staff</span>
                         </a>
                     </li>
 
@@ -233,6 +233,10 @@
                         </a>
                         <div class="collapse menu-dropdown" id="reports">
                             <ul class="nav nav-sm flex-column">
+                                <li class="nav-item">
+                                    <a href="{{ route('patient.backup') }}" class="nav-link">Patient Backup
+                                        Reports</a>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('payments.report') }}" class="nav-link">Payment Reports</a>
                                 </li>

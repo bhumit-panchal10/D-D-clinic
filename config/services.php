@@ -30,4 +30,15 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'onlysms' => [
+        'url' => 'https://onlysms.co.in/api/sms.aspx',
+        'user_id' => env('ONLYSMS_USER_ID'),
+        'password' => env('ONLYSMS_PASSWORD'),
+        'sender_id' => env('ONLYSMS_SENDER_ID', 'DNDDEN'),
+        'peid' => env('ONLYSMS_PEID'),
+        'template_id' => env('ONLYSMS_TEMPLATE_ID', '1707172786516875968'),
+        'clinic_phone' => env('ONLYSMS_CLINIC_PHONE', '9724667455'),
+        'send_immediately' => env('ONLYSMS_SEND_IMMEDIATELY', false),
+    ],
+
 ];

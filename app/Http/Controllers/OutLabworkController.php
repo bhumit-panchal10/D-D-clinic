@@ -19,6 +19,7 @@ class OutLabworkController extends Controller
         $treatments = Treatment::all();
         $patientTreatments = PatientTreatment::all();
         $labworks = Labwork::with('lab', 'patient')->where('type', 'out')->orderByDesc('id')->paginate(10);
+
         return view('labworks.OutLabworklist', compact('patient', 'labs', 'treatments', 'patientTreatments', 'labworks'));
     }
 
@@ -97,7 +98,8 @@ class OutLabworkController extends Controller
         ];
         Labwork::where("id", $request->id)->update($data);
 
-        return redirect()->route('Outlabworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        // return redirect()->route('Outlabworks.index', $request->patient_id)->with('success', 'Received Date updated successfully.');
+        return redirect()->back()->with('success', 'Received Date updated successfully.');
     }
 
 
@@ -141,7 +143,7 @@ class OutLabworkController extends Controller
         $patient_id = $labwork->patient_id;
         $labwork->delete();
 
-        return redirect()->route('labworks.index', ['patient_id' => $patient_id])
-            ->with('success', 'Labwork deleted successfully.');
+        // return redirect()->route('labworks.index', ['patient_id' => $patient_id])->with('success', 'Labwork deleted successfully.');
+        return redirect()->back()->with('success', 'Labwork deleted successfully.');
     }
 }

@@ -73,15 +73,15 @@ class UserController extends Controller
                 'address' => $request->address,
                 'password' => Hash::make($request->password),
                 'mobile_number' => $request->mobile_number,
-                'role_id' => $request->role_id ?? 3,
+                'role_id' =>  3,
                 'status'  => $request->status,
             ]);
             // dd($user);
             // Delete Any Existing Role
-            DB::table('model_has_roles')->where('model_id', $user->id)->delete();
+            // DB::table('model_has_roles')->where('model_id', $user->id)->delete();
 
             // Assign Role To User
-            $user->assignRole($user->role_id);
+            // $user->assignRole($user->role_id);
 
             // Commit And Redirected To Listing
             DB::commit();
@@ -156,28 +156,28 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
 
-            $ireportTo = 0;
-            if ($request->role_id == 2) {
-                $ireportTo  =  0;
-            } else {
-                $ireportTo = $request->ireportTo;
-            }
+            // $ireportTo = 0;
+            // if ($request->role_id == 2) {
+            //     $ireportTo  =  0;
+            // } else {
+            //     $ireportTo = $request->ireportTo;
+            // }
             $user_updated = User::whereId($user->id)->update([
                 'name'    => $request->name,
                 'email'         => $request->email,
                 'address'     => $request->address,
                 'mobile_number' => $request->mobile_number,
-                'role_id'       => $request->role_id,
-                'status'        => $request->status,
+                // 'role_id'       => $request->role_id ?? 0,
+                // 'status'        => $request->status ?? '',
 
             ]);
             //dd($user_updated);
 
             // Delete Any Existing Role
-            DB::table('model_has_roles')->where('model_id', $user->id)->delete();
+            // DB::table('model_has_roles')->where('model_id', $user->id)->delete();
 
             // Assign Role To User
-            $user->assignRole($user->role_id);
+            // $user->assignRole($user->role_id);
 
             // Commit And Redirected To Listing
             DB::commit();

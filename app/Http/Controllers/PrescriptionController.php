@@ -61,6 +61,7 @@ class PrescriptionController extends Controller
             'patient_id' => $request->patient_id,
             'date' => now(),
             'gu_id' => Str::uuid(), // Generate a unique UUID
+            'strSpecialInstruction' => $request->strSpecialInstruction ?? ''
         ]);
 
         // Store Prescription Details
@@ -71,7 +72,6 @@ class PrescriptionController extends Controller
                 'medicine_id' => $medicine_id,
                 'dosage_id' => $request->dosage_id[$index],
                 'comments' => $request->comments[$index] ?? null,
-                'content' => $request->content[$index] ?? null,
                 'days' => $request->days[$index] ?? null,
                 'medicine_qty' => $request->qtys[$index] ?? null,
 
@@ -108,7 +108,8 @@ class PrescriptionController extends Controller
 
         // Update Prescription Date
         $prescription->update([
-            'date' => now(),
+            //'date' => now(),
+            'strSpecialInstruction' => $request->strSpecialInstruction ?? ''
         ]);
 
         // Delete removed items
@@ -199,7 +200,6 @@ class PrescriptionController extends Controller
         return response()->json([
             'selected_dosage_id' => $selectedDosage->id ?? null,
             'comment' => $medicine->comment ?? '',
-            'content' => $medicine->content ?? '',
             'days' => $medicine->days ?? 1,
             'dosages' => $allDosages,
         ]);

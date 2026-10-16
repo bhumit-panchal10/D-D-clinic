@@ -8,7 +8,8 @@ use App\Models\Doctor;
 use App\Models\Treatment;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class AppointmentController extends Controller
 {
@@ -321,18 +322,38 @@ class AppointmentController extends Controller
             'appointment_time' => 'required',
         ]);
 
-        $data = array(
-            'patient_id' => $request->patient_id,
-            'doctor_id' => $request->doctor_id,
-            'treatment_id' => $request->treatment_id,
-            'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-            'mobile_no' => $request->contact_no ?? 0,
-            'email' => $request->email,
-            'duration' => $request->duration,
-        );
+        $now = \Carbon\Carbon::now('Asia/Kolkata');
 
-        PatientAppointment::create($data);
+        if (config('services.onlysms.send_immediately')) {
+            // TEST MODE: due right now
+            $smsDueAt = $now->copy();
+        } else {
+            // NORMAL: 9 PM today, or tomorrow if already past 9 PM
+            $smsDueAt = $now->copy()->setTime(21, 0, 0);
+            if ($now->greaterThanOrEqualTo($smsDueAt)) {
+                $smsDueAt->addDay();
+            }
+        }
+        $appointment = new PatientAppointment();
+        $appointment->patient_id = $request->patient_id;
+        $appointment->doctor_id = $request->doctor_id;
+        $appointment->treatment_id = $request->treatment_id;
+        $appointment->appointment_date = $request->appointment_date;
+        $appointment->appointment_time = $request->appointment_time;
+        $appointment->mobile_no = $request->contact_no ?? 0;
+        $appointment->email = $request->email;
+        $appointment->duration = $request->duration;
+        $appointment->confirmation_sms_due_at = $smsDueAt->setTimezone(config('app.timezone')); // ← this was missing
+        $appointment->save();
+
+        if (config('services.onlysms.send_immediately')) {
+            try {
+                Artisan::call('appointments:send-confirmation-sms');
+                Log::info('SMS test run', ['output' => Artisan::output()]);
+            } catch (\Throwable $e) {
+                Log::error('SMS test run failed', ['error' => $e->getMessage()]);
+            }
+        }
 
         return redirect()->back();
     }

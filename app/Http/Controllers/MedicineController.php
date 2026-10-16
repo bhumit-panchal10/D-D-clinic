@@ -28,6 +28,7 @@ class MedicineController extends Controller
                 'dosage_id' => 'required|exists:dosages,id',
                 'comment' => 'nullable',
                 'content' => 'nullable',
+                'dosage_comment' => 'nullable',
             ],
             [
                 'medicine_name.unique' => 'This medicine already exists.',
@@ -47,6 +48,7 @@ class MedicineController extends Controller
             'dosage_id' => 'required|exists:dosages,id',
             'comment' => 'nullable',
             'content' => 'nullable',
+            'dosage_comment' => 'nullable',
         ], [
             'medicine_name.unique' => 'This medicine already exists.',
             'medicine_name.required' => 'The medicine name is required.',

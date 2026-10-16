@@ -122,21 +122,13 @@ class PatientAppointmentController extends Controller
     {
         $appointments = PatientAppointment::with(['patient', 'doctor', 'treatment'])
             ->where('is_disrupted', 0);
-
-        // Date Filter
-        if ($request->filled('from_date') && $request->filled('to_date')) {
+        if ($request->filled('from_date')) {
             $appointments->where(function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->whereNull('rescheduled_date')
-                        ->whereBetween('appointment_date', [
-                            $request->from_date,
-                            $request->to_date
-                        ]);
+                        ->whereDate('appointment_date', '=', $request->from_date);
                 })
-                    ->orWhereBetween('rescheduled_date', [
-                        $request->from_date,
-                        $request->to_date
-                    ]);
+                    ->orWhereDate('rescheduled_date', '=', $request->from_date);
             });
         } else {
             // Default: Today's Appointments

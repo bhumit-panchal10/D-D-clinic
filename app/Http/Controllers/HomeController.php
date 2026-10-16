@@ -135,7 +135,7 @@ class HomeController extends Controller
         // });
 
         $searchDate = $request->date;
-        $perPage = 5;
+        $perPage = 15;
         if ($searchDate) {
 
             // Search ki hui koi bhi date

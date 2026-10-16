@@ -421,10 +421,9 @@
                                                         placeholder="Describe pocket conditions...">{{ $examination->rct_ipc_comment ?? '' }}</textarea>
                                                 </div>
                                                 <div class="col-md-6">
-
-                                                    <label for="pocket" class="form-label">Extraction Comments</label>
+                                                    <label for="pocket" class="form-label">Prosthesis Comments</label>
                                                     <textarea name="pocket" id="pocket" class="form-control" rows="2"
-                                                        placeholder="Describe pocket conditions...">{{ $examination->extraction_comment ?? '' }}</textarea>
+                                                        placeholder="Describe pocket conditions...">{{ $examination->prosthesis_comment ?? '' }}</textarea>
 
                                                 </div>
                                             </div>

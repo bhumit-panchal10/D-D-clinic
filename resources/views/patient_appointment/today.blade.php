@@ -16,15 +16,15 @@
                         <form method="GET" action="{{ route('patient_appointment.today') }}" class="row mb-3">
 
                             <div class="col-md-3">
-                                <label>From Date</label>
+                                <label>Date</label>
                                 <input type="date" name="from_date" class="form-control"
                                     value="{{ request('from_date') }}">
                             </div>
 
-                            <div class="col-md-3">
+                            {{-- <div class="col-md-3">
                                 <label>To Date</label>
                                 <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
-                            </div>
+                            </div> --}}
 
                             <div class="col-md-3 mt-4">
                                 <button type="submit" class="btn btn-primary">
@@ -49,7 +49,7 @@
                                     <th>Appointment Date</th>
                                     <th>Appointment Time</th>
                                     <!-- <th>Rescheduled Date</th>
-                                                                                                    <th>Rescheduled Time</th> -->
+                                                                                                                <th>Rescheduled Time</th> -->
                                     {{-- <th>Appointment Confirm?</th> --}}
                                     <th>Action</th>
                                 </tr>
@@ -81,11 +81,11 @@
                                             <td>{{ date('d-m-Y', strtoTime($appointment->appointment_date)) }}</td>
                                             <td>{{ date('g:i A', strtotime($appointment->appointment_time)) }}</td>
                                             <!-- <td>
-                                                                                                                        {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
-                                                                                                                    </td>
-                                                                                                                    <td>
-                                                                                                                        {{ $appointment->rescheduled_time ?? '-' }}
-                                                                                                                    </td> -->
+                                                                                                                                    {{ $appointment->rescheduled_date ? date('d-m-Y', strtotime($appointment->rescheduled_date)) : '-' }}
+                                                                                                                                </td>
+                                                                                                                                <td>
+                                                                                                                                    {{ $appointment->rescheduled_time ?? '-' }}
+                                                                                                                                </td> -->
                                             {{-- <td>
                                                 {{ $appointment->status == 1 ? 'Yes' : 'No' }}
                                             </td> --}}

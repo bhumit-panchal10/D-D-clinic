@@ -47,7 +47,7 @@
                                 <form action="{{ route('Otherlabworks.store') }}" method="POST">
                                     @csrf
                                     <div class="mb-3">
-                                        <label for="consult_name" class="form-label">Consult Name</label>
+                                        <label for="consult_name" class="form-label">Consultant/ Patient name</label>
                                         <input type="text" name="consult_name" id="consult_name" class="form-control"
                                             value="">
                                     </div>
@@ -222,7 +222,7 @@
                         <input type="hidden" name="id" id="edit_labwork_id" value="">
 
                         <div class="mb-3">
-                            <label for="given_by" class="form-label">Consult Name<span
+                            <label for="given_by" class="form-label">Consultant/ Patient name<span
                                     class="text-danger">*</span></label>
                             <input type="text" name="consult_name" id="edit_consult_name" class="form-control"
                                 value="{{ old('consult_name') }}">
@@ -259,7 +259,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="work_code" class="form-label">Work Code</label>
+                            <label for="work_code" class="form-label">Work Type</label>
                             <textarea name="work_code" id="edit_work_code" class="form-control">{{ old('work_code') }}</textarea>
                         </div>
 

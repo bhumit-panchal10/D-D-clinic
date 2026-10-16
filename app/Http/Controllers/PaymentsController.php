@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Patient;
 use App\Models\Notes;
 use App\Models\PatientTreatmentItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use PDF;
 
@@ -18,8 +19,12 @@ class PaymentsController extends Controller
         $Paidamount = Payment::where('patient_id', $patient_id)->sum('amount');
         $discount = Payment::where('patient_id', $patient_id)->sum('discount');
         $patient = Patient::findOrFail($patient_id);
+        $Users = User::where(['status' => 1, 'role_id' => 3])->get();
+        $notes = Notes::where(['patient_id' => $patient_id])->first();
+        //$payments = Payment::where('patient_id', $patient_id)->paginate(config('app.per_page'));
         $payments = Payment::where('patient_id', $patient_id)->orderBy('payment_date', 'desc')->paginate(config('app.per_page'));
-        return view('payments.index', compact('discount', 'patient', 'payments', 'Totalamount', 'Paidamount', 'patient_id'));
+
+        return view('payments.index', compact('discount', 'patient', 'payments', 'Totalamount', 'Paidamount', 'patient_id', 'Users', 'notes'));
     }
 
     public function store(Request $request)
@@ -36,12 +41,15 @@ class PaymentsController extends Controller
             'patient_id' => $request->patient_id,
             'payment_date' => $request->payment_date,
             'amount' => $request->amount,
-            'discount' => $request->discount,
+            'discount' => $request->discount ?? 0,
             'mode' => $request->mode,
             'comments' => $request->comments,
+            'received_by' => $request->received_by,
         ]);
 
-        return redirect()->back()->with('success', 'Payment added successfully.');
+        return redirect()->route('home')->with('success', 'Payment added successfully.');
+
+        // return redirect()->back()->with('success', 'Payment added successfully.');
     }
 
     public function edit(Payment $payment, $patient_id = null)
@@ -67,12 +75,14 @@ class PaymentsController extends Controller
             'mode' => 'required|in:Cash,UPI,Card swipe,Cheque',
             'comments' => 'nullable|string'
         ]);
+
         $data = [
             'payment_date' => $request->payment_date,
             'amount' => $request->amount,
             'mode' => $request->mode,
             'discount' => $request->discount,
             'comments' => $request->comments,
+            'received_by' => $request->received_by,
             'updated_at' => now(),
 
         ];
